@@ -2,9 +2,10 @@
 
 ## 1. Introduction & Overview
 This guide will walk you through building a state-of-the-art Retrieval-Augmented Generation (RAG) chatbot using Jac Cloud, Jac-Streamlit, LangChain, ChromaDB, and modern LLMs. You’ll learn to:
-- Upload and index your own documents (PDFs)
-- Chat with an AI assistant that uses both your documents and LLMs
-- Add advanced dialogue routing for smarter conversations
+
+   - Upload and index your own documents (PDFs)
+   - Chat with an AI assistant that uses both your documents and LLMs
+   - Add advanced dialogue routing for smarter conversations
 
 ## 2. Features & Architecture
 - **Document Upload & Ingestion**: Upload PDFs, which are processed and indexed for semantic search.
