@@ -1,0 +1,6218 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://jac-lang.org/0.1.0/internals/uniir_node/">
+      
+      
+        <link rel="prev" href="../symbol_tables/resolution/">
+      
+      
+        <link rel="next" href="../jac_plugins/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>UniIR Nodes - The Jac Programming Language and Jaseci Stack</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#enum" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+      <div data-md-color-scheme="default" data-md-component="outdated" hidden>
+        
+      </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow md-header--lifted" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="The Jac Programming Language and Jaseci Stack" class="md-header__button md-logo" aria-label="The Jac Programming Language and Jaseci Stack" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            The Jac Programming Language and Jaseci Stack
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              UniIR Nodes
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Jaseci-Labs/jaseci" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+    
+      
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../learn/getting_started/" class="md-tabs__link">
+          
+  
+  
+  Learn
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../contrib/" class="md-tabs__link">
+          
+  
+  
+  Internals
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../communityhub/roadmap/" class="md-tabs__link">
+          
+  
+  
+  Community Hub
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="/playground/" class="md-tabs__link">
+          
+  
+  
+  Jac Playground
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+    
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="The Jac Programming Language and Jaseci Stack" class="md-nav__button md-logo" aria-label="The Jac Programming Language and Jaseci Stack" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    The Jac Programming Language and Jaseci Stack
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Jaseci-Labs/jaseci" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Learn
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Learn
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tour of Jac/Jaseci
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac_in_a_flash/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Learn Jac in 5 Minutes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac_playground/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jac Playground
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Learn By Example
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            Learn By Example
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5_1" id="__nav_1_5_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    LittleX (your own twitter)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            LittleX (your own twitter)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/examples/littleX/tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LittleX Tutorial for Beginners
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/examples/littleX/full_guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LittleX Full Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5_2" id="__nav_1_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    RAG-based Conversational Chatbot
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            RAG-based Conversational Chatbot
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/examples/rag_chatbot/Overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RAG Chatbot Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/examples/rag_chatbot/Tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RAG Chatbot Full Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/examples/mtp_examples/rpg_game/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RPG game with AI Genarated Maps
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/examples/mtp_examples/fantasy_trading_game/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agentic Fantasy Trading Game
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_6" id="__nav_1_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Learn Jac Language
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            Learn Jac Language
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    1. Welcome to Jac
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2. Starting Jac, Variables and Types
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    3. Functions, Control Flow, and Collections in Jac
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    4. AI functions and Decorators
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    5. Advanced AI Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    6. Imports System and File Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    7. Enhanced OOP - Objects and Classes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_8/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    8. OSP Introduction and Paradigm Shift
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_9/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    9. Nodes and Edges
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    10. Walkers and Abilities
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_11/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    11. Advanced Object Spatial Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_12/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    12. Walkers as API Endpoints
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_13/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    13. Persistence and the Root Node
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_14/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    14. Multi-User Architecture and Permissions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_15/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    15. Advanced Jac Cloud Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    16. Type System Deep Dive
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_17/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    17. Testing and Debugging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_18/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    18. Deployment Strategies
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_19/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    19. Performance Optimization
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_20/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    20. Python to Jac Migration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_7" id="__nav_1_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Programming 'by' AI
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_7">
+            <span class="md-nav__icon md-icon"></span>
+            Programming 'by' AI
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-mtllm/with_llm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    GenAI in Jaclang - MTP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-mtllm/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quick-start
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-mtllm/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    How to use MTP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-mtllm/model_declaration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Available Models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-mtllm/multimodality/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Using Multimodal models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-mtllm/creating_mtllm_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Build your own MTLLM plugin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-mtllm/python_integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Python MTLLM Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8" id="__nav_1_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Scale-Native Programming
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8">
+            <span class="md-nav__icon md-icon"></span>
+            Scale-Native Programming
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction to Jac Cloud
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quick Start Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8_3" id="__nav_1_8_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Core Features
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_8_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8_3">
+            <span class="md-nav__icon md-icon"></span>
+            Core Features
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/permission/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Permission Management: Secure Multi-User Access
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Logging and Monitoring Your Application
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/env_vars/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Environment Variables: Configuration Made Easy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8_4" id="__nav_1_8_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Real-time & Async
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_8_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8_4">
+            <span class="md-nav__icon md-icon"></span>
+            Real-time & Async
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/websocket/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    WebSocket: Real-Time Communication
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Task Scheduling: Automate Your Jac Applications
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/async_walker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Async Walker
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/webhook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Webhooks: External API Integration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8_5" id="__nav_1_8_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Operations
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_8_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8_5">
+            <span class="md-nav__icon md-icon"></span>
+            Operations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Cloud Deployment Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_9" id="__nav_1_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Tooling
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_9">
+            <span class="md-nav__icon md-icon"></span>
+            Tooling
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/tools/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jac Language Command Line Interface (CLI)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_10" id="__nav_1_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Specifications
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_10">
+            <span class="md-nav__icon md-icon"></span>
+            Specifications
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/dspfoundation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Object-Spatial Programming Specification
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac_ref/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Full Language Specification
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_11" id="__nav_1_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Misc Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_11">
+            <span class="md-nav__icon md-icon"></span>
+            Misc Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_11_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_11_1" id="__nav_1_11_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Understanding Object-Spatial
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_11_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_11_1">
+            <span class="md-nav__icon md-icon"></span>
+            Understanding Object-Spatial
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/data_spatial/nodes_and_edges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Nodes and Edges
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/data_spatial/walkers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Walkers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/data_spatial/filtering/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Node and Edge Filtering
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/data_spatial/sequence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Walker and Node ability trigger sequence
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/data_spatial/FAQ/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FAQ
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Internals
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Internals
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../contrib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Design Docs and Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Design Docs and Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../internals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Compiler/Runtime Design
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_2_2" id="__nav_2_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Static Compilation
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Static Compilation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2_2_1" id="__nav_2_2_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Sym Table Design Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_2_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            Sym Table Design Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../symbol_tables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Tables in Jaclang
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../symbol_tables/structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Table Structure
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../symbol_tables/building/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Table Building
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../symbol_tables/def_use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Definition and Use
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../symbol_tables/linking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Table Linking
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../symbol_tables/resolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Resolution in Practice
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    UniIR Nodes
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    UniIR Nodes
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#enum" class="md-nav__link">
+    <span class="md-ellipsis">
+      Enum
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#name" class="md-nav__link">
+    <span class="md-ellipsis">
+      Name
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#subtag" class="md-nav__link">
+    <span class="md-ellipsis">
+      SubTag
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#module" class="md-nav__link">
+    <span class="md-ellipsis">
+      Module
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#globalvars" class="md-nav__link">
+    <span class="md-ellipsis">
+      GlobalVars
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modulecode" class="md-nav__link">
+    <span class="md-ellipsis">
+      ModuleCode
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pyinlinecode" class="md-nav__link">
+    <span class="md-ellipsis">
+      PyInlineCode
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#import" class="md-nav__link">
+    <span class="md-ellipsis">
+      Import
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modulepath" class="md-nav__link">
+    <span class="md-ellipsis">
+      ModulePath
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#moduleitem" class="md-nav__link">
+    <span class="md-ellipsis">
+      ModuleItem
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#archetype" class="md-nav__link">
+    <span class="md-ellipsis">
+      Archetype
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#impldef" class="md-nav__link">
+    <span class="md-ellipsis">
+      ImplDef
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#semdef" class="md-nav__link">
+    <span class="md-ellipsis">
+      SemDef
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ability" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ability
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#funcsignature" class="md-nav__link">
+    <span class="md-ellipsis">
+      FuncSignature
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#eventsignature" class="md-nav__link">
+    <span class="md-ellipsis">
+      EventSignature
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paramvar" class="md-nav__link">
+    <span class="md-ellipsis">
+      ParamVar
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#archhas" class="md-nav__link">
+    <span class="md-ellipsis">
+      ArchHas
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hasvar" class="md-nav__link">
+    <span class="md-ellipsis">
+      HasVar
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#typedctxblock" class="md-nav__link">
+    <span class="md-ellipsis">
+      TypedCtxBlock
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ifstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      IfStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#elseif" class="md-nav__link">
+    <span class="md-ellipsis">
+      ElseIf
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#elsestmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      ElseStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exprstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      ExprStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trystmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      TryStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#except" class="md-nav__link">
+    <span class="md-ellipsis">
+      Except
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#finallystmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      FinallyStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#iterforstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      IterForStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inforstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      InForStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whilestmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      WhileStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#withstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      WithStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exprasitem" class="md-nav__link">
+    <span class="md-ellipsis">
+      ExprAsItem
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raisestmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      RaiseStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#assertstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      AssertStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checkstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      CheckStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ctrlstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      CtrlStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deletestmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      DeleteStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reportstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      ReportStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#returnstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      ReturnStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visitstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      VisitStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#awaitexpr" class="md-nav__link">
+    <span class="md-ellipsis">
+      AwaitExpr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#globalstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      GlobalStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nonlocalstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      NonLocalStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#assignment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Assignment
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#concurrentexpr" class="md-nav__link">
+    <span class="md-ellipsis">
+      ConcurrentExpr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#binaryexpr" class="md-nav__link">
+    <span class="md-ellipsis">
+      BinaryExpr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compareexpr" class="md-nav__link">
+    <span class="md-ellipsis">
+      CompareExpr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      Bool
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#boolexpr" class="md-nav__link">
+    <span class="md-ellipsis">
+      BoolExpr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lambdaexpr" class="md-nav__link">
+    <span class="md-ellipsis">
+      LambdaExpr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unaryexpr" class="md-nav__link">
+    <span class="md-ellipsis">
+      UnaryExpr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ifelseexpr" class="md-nav__link">
+    <span class="md-ellipsis">
+      IfElseExpr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multistring" class="md-nav__link">
+    <span class="md-ellipsis">
+      MultiString
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fstring" class="md-nav__link">
+    <span class="md-ellipsis">
+      FString
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#listval" class="md-nav__link">
+    <span class="md-ellipsis">
+      ListVal
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setval" class="md-nav__link">
+    <span class="md-ellipsis">
+      SetVal
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tupleval" class="md-nav__link">
+    <span class="md-ellipsis">
+      TupleVal
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dictval" class="md-nav__link">
+    <span class="md-ellipsis">
+      DictVal
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kvpair" class="md-nav__link">
+    <span class="md-ellipsis">
+      KVPair
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kwpair" class="md-nav__link">
+    <span class="md-ellipsis">
+      KWPair
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#innercompr" class="md-nav__link">
+    <span class="md-ellipsis">
+      InnerCompr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#listcompr" class="md-nav__link">
+    <span class="md-ellipsis">
+      ListCompr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gencompr" class="md-nav__link">
+    <span class="md-ellipsis">
+      GenCompr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setcompr" class="md-nav__link">
+    <span class="md-ellipsis">
+      SetCompr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dictcompr" class="md-nav__link">
+    <span class="md-ellipsis">
+      DictCompr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#atomtrailer" class="md-nav__link">
+    <span class="md-ellipsis">
+      AtomTrailer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#atomunit" class="md-nav__link">
+    <span class="md-ellipsis">
+      AtomUnit
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#yieldexpr" class="md-nav__link">
+    <span class="md-ellipsis">
+      YieldExpr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#funccall" class="md-nav__link">
+    <span class="md-ellipsis">
+      FuncCall
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#indexslice" class="md-nav__link">
+    <span class="md-ellipsis">
+      IndexSlice
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#typeref" class="md-nav__link">
+    <span class="md-ellipsis">
+      TypeRef
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#edgereftrailer" class="md-nav__link">
+    <span class="md-ellipsis">
+      EdgeRefTrailer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#edgeopref" class="md-nav__link">
+    <span class="md-ellipsis">
+      EdgeOpRef
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#disconnectop" class="md-nav__link">
+    <span class="md-ellipsis">
+      DisconnectOp
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connectop" class="md-nav__link">
+    <span class="md-ellipsis">
+      ConnectOp
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filtercompr" class="md-nav__link">
+    <span class="md-ellipsis">
+      FilterCompr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#assigncompr" class="md-nav__link">
+    <span class="md-ellipsis">
+      AssignCompr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchcase" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchCase
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchor" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchOr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchas" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchAs
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchvalue" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchValue
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchsingleton" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchSingleton
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchsequence" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchSequence
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchmapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchMapping
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchkvpair" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchKVPair
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchstar" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchStar
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matcharch" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchArch
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#token" class="md-nav__link">
+    <span class="md-ellipsis">
+      Token
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#specialvarref" class="md-nav__link">
+    <span class="md-ellipsis">
+      SpecialVarRef
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#builtintype" class="md-nav__link">
+    <span class="md-ellipsis">
+      BuiltinType
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#float" class="md-nav__link">
+    <span class="md-ellipsis">
+      Float
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#int" class="md-nav__link">
+    <span class="md-ellipsis">
+      Int
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#string" class="md-nav__link">
+    <span class="md-ellipsis">
+      String
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#null" class="md-nav__link">
+    <span class="md-ellipsis">
+      Null
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ellipsis" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ellipsis
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#semi" class="md-nav__link">
+    <span class="md-ellipsis">
+      Semi
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commenttoken" class="md-nav__link">
+    <span class="md-ellipsis">
+      CommentToken
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Runtime Plugin Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Planning Specs and Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Planning Specs and Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../planning_specs/ref_roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Language Ref Roadmap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../planning_specs/error_system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Error System
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../planning_specs/formatter_system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Formatter System
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3_4" id="__nav_2_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Native Type System
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Native Type System
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../planning_specs/native_type_system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../planning_specs/native_type_system/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../planning_specs/native_type_system/type_representation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Representation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../planning_specs/native_type_system/type_resolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Resolution
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../planning_specs/native_type_system/type_rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Rules
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../planning_specs/native_type_system/type_inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Inference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../planning_specs/native_type_system/compiler_integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Compiler Integration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../planning_specs/native_type_system/lets_build/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Let's Build
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Community Hub
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Community Hub
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Roadmap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/release_notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Release Notes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/breaking_changes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Breaking Changes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/top_contributors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Leaderboard
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Fun Stuff
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            Fun Stuff
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5_1" id="__nav_3_5_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Project Ideas
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            Project Ideas
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/fun/projects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Project Ideas for the Jac Community
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/fun/p1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    P1
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/fun/p2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    P2
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/fun/p3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    P3
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/content_pieces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Content Pieces
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Jac Playground
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Jac Playground
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="/playground/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Playground
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#enum" class="md-nav__link">
+    <span class="md-ellipsis">
+      Enum
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#name" class="md-nav__link">
+    <span class="md-ellipsis">
+      Name
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#subtag" class="md-nav__link">
+    <span class="md-ellipsis">
+      SubTag
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#module" class="md-nav__link">
+    <span class="md-ellipsis">
+      Module
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#globalvars" class="md-nav__link">
+    <span class="md-ellipsis">
+      GlobalVars
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#test" class="md-nav__link">
+    <span class="md-ellipsis">
+      Test
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modulecode" class="md-nav__link">
+    <span class="md-ellipsis">
+      ModuleCode
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pyinlinecode" class="md-nav__link">
+    <span class="md-ellipsis">
+      PyInlineCode
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#import" class="md-nav__link">
+    <span class="md-ellipsis">
+      Import
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#modulepath" class="md-nav__link">
+    <span class="md-ellipsis">
+      ModulePath
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#moduleitem" class="md-nav__link">
+    <span class="md-ellipsis">
+      ModuleItem
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#archetype" class="md-nav__link">
+    <span class="md-ellipsis">
+      Archetype
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#impldef" class="md-nav__link">
+    <span class="md-ellipsis">
+      ImplDef
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#semdef" class="md-nav__link">
+    <span class="md-ellipsis">
+      SemDef
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ability" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ability
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#funcsignature" class="md-nav__link">
+    <span class="md-ellipsis">
+      FuncSignature
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#eventsignature" class="md-nav__link">
+    <span class="md-ellipsis">
+      EventSignature
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#paramvar" class="md-nav__link">
+    <span class="md-ellipsis">
+      ParamVar
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#archhas" class="md-nav__link">
+    <span class="md-ellipsis">
+      ArchHas
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#hasvar" class="md-nav__link">
+    <span class="md-ellipsis">
+      HasVar
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#typedctxblock" class="md-nav__link">
+    <span class="md-ellipsis">
+      TypedCtxBlock
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ifstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      IfStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#elseif" class="md-nav__link">
+    <span class="md-ellipsis">
+      ElseIf
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#elsestmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      ElseStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exprstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      ExprStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#trystmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      TryStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#except" class="md-nav__link">
+    <span class="md-ellipsis">
+      Except
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#finallystmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      FinallyStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#iterforstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      IterForStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#inforstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      InForStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whilestmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      WhileStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#withstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      WithStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exprasitem" class="md-nav__link">
+    <span class="md-ellipsis">
+      ExprAsItem
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#raisestmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      RaiseStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#assertstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      AssertStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checkstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      CheckStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ctrlstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      CtrlStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#deletestmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      DeleteStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#reportstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      ReportStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#returnstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      ReturnStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#visitstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      VisitStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#awaitexpr" class="md-nav__link">
+    <span class="md-ellipsis">
+      AwaitExpr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#globalstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      GlobalStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#nonlocalstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      NonLocalStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#assignment" class="md-nav__link">
+    <span class="md-ellipsis">
+      Assignment
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#concurrentexpr" class="md-nav__link">
+    <span class="md-ellipsis">
+      ConcurrentExpr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#binaryexpr" class="md-nav__link">
+    <span class="md-ellipsis">
+      BinaryExpr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#compareexpr" class="md-nav__link">
+    <span class="md-ellipsis">
+      CompareExpr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#bool" class="md-nav__link">
+    <span class="md-ellipsis">
+      Bool
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#boolexpr" class="md-nav__link">
+    <span class="md-ellipsis">
+      BoolExpr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#lambdaexpr" class="md-nav__link">
+    <span class="md-ellipsis">
+      LambdaExpr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#unaryexpr" class="md-nav__link">
+    <span class="md-ellipsis">
+      UnaryExpr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ifelseexpr" class="md-nav__link">
+    <span class="md-ellipsis">
+      IfElseExpr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#multistring" class="md-nav__link">
+    <span class="md-ellipsis">
+      MultiString
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#fstring" class="md-nav__link">
+    <span class="md-ellipsis">
+      FString
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#listval" class="md-nav__link">
+    <span class="md-ellipsis">
+      ListVal
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setval" class="md-nav__link">
+    <span class="md-ellipsis">
+      SetVal
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#tupleval" class="md-nav__link">
+    <span class="md-ellipsis">
+      TupleVal
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dictval" class="md-nav__link">
+    <span class="md-ellipsis">
+      DictVal
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kvpair" class="md-nav__link">
+    <span class="md-ellipsis">
+      KVPair
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#kwpair" class="md-nav__link">
+    <span class="md-ellipsis">
+      KWPair
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#innercompr" class="md-nav__link">
+    <span class="md-ellipsis">
+      InnerCompr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#listcompr" class="md-nav__link">
+    <span class="md-ellipsis">
+      ListCompr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#gencompr" class="md-nav__link">
+    <span class="md-ellipsis">
+      GenCompr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#setcompr" class="md-nav__link">
+    <span class="md-ellipsis">
+      SetCompr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#dictcompr" class="md-nav__link">
+    <span class="md-ellipsis">
+      DictCompr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#atomtrailer" class="md-nav__link">
+    <span class="md-ellipsis">
+      AtomTrailer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#atomunit" class="md-nav__link">
+    <span class="md-ellipsis">
+      AtomUnit
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#yieldexpr" class="md-nav__link">
+    <span class="md-ellipsis">
+      YieldExpr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#funccall" class="md-nav__link">
+    <span class="md-ellipsis">
+      FuncCall
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#indexslice" class="md-nav__link">
+    <span class="md-ellipsis">
+      IndexSlice
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#typeref" class="md-nav__link">
+    <span class="md-ellipsis">
+      TypeRef
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#edgereftrailer" class="md-nav__link">
+    <span class="md-ellipsis">
+      EdgeRefTrailer
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#edgeopref" class="md-nav__link">
+    <span class="md-ellipsis">
+      EdgeOpRef
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#disconnectop" class="md-nav__link">
+    <span class="md-ellipsis">
+      DisconnectOp
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#connectop" class="md-nav__link">
+    <span class="md-ellipsis">
+      ConnectOp
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#filtercompr" class="md-nav__link">
+    <span class="md-ellipsis">
+      FilterCompr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#assigncompr" class="md-nav__link">
+    <span class="md-ellipsis">
+      AssignCompr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchstmt" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchStmt
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchcase" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchCase
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchor" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchOr
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchas" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchAs
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchvalue" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchValue
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchsingleton" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchSingleton
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchsequence" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchSequence
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchmapping" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchMapping
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchkvpair" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchKVPair
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matchstar" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchStar
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#matcharch" class="md-nav__link">
+    <span class="md-ellipsis">
+      MatchArch
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#token" class="md-nav__link">
+    <span class="md-ellipsis">
+      Token
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#specialvarref" class="md-nav__link">
+    <span class="md-ellipsis">
+      SpecialVarRef
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#builtintype" class="md-nav__link">
+    <span class="md-ellipsis">
+      BuiltinType
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#float" class="md-nav__link">
+    <span class="md-ellipsis">
+      Float
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#int" class="md-nav__link">
+    <span class="md-ellipsis">
+      Int
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#string" class="md-nav__link">
+    <span class="md-ellipsis">
+      String
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#null" class="md-nav__link">
+    <span class="md-ellipsis">
+      Null
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#ellipsis" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ellipsis
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#semi" class="md-nav__link">
+    <span class="md-ellipsis">
+      Semi
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#commenttoken" class="md-nav__link">
+    <span class="md-ellipsis">
+      CommentToken
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>UniIR Nodes</h1>
+
+<h2 id="enum">Enum</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>flowchart LR
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Enum --&gt;|Name| name
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Enum -.-&gt;|Token| access
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>Enum --&gt;|Expr , None| base_classes
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>Enum --&gt;|EnumBlockStmt , ImplDef , None| body
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>Enum -.-&gt;|String| doc
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>Enum --&gt;|Expr , None| decorators
+</code></pre></div>
+<p>Enum node type for Jac Ast. </p>
+<h2 id="name">Name</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>flowchart LR
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>Name --&gt;|Source| orig_src
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>Name --&gt;|str| name
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>Name --&gt;|str| value
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>Name --&gt;|int| end_line
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>Name --&gt;|int| col_start
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>Name --&gt;|int| col_end_
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>Name --&gt;|int| pos_start
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>Name --&gt;|int| pos_end_
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>Name --&gt;|bool| is_enum_stmt
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>Name --&gt;|bool| is_kwesc
+</code></pre></div>
+<p>Name node type for Jac Ast. </p>
+<h2 id="subtag">SubTag</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>flowchart LR
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>SubTag --&gt;|T| tag
+</code></pre></div>
+<p>SubTag node type for Jac Ast. </p>
+<h2 id="module">Module</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>flowchart LR
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>Module --&gt;|str| name
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>Module --&gt;|Source| source
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>Module -.-&gt;|String| doc
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>Module --&gt;|ElementStmt , String , EmptyToken| body
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>Module --&gt;|list - Token| terminals
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>Module --&gt;|bool| stub_only
+</code></pre></div>
+<p>Whole Program node type for Jac Ast. </p>
+<h2 id="globalvars">GlobalVars</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>flowchart LR
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>GlobalVars -.-&gt;|Token| access
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>GlobalVars --&gt;|Assignment| assignments
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>GlobalVars --&gt;|bool| is_frozen
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>GlobalVars -.-&gt;|String| doc
+</code></pre></div>
+<p>GlobalVars node type for Jac Ast. </p>
+<h2 id="test">Test</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>flowchart LR
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>Test --&gt;|Name , Token| name
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>Test --&gt;|CodeBlockStmt| body
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>Test -.-&gt;|String| doc
+</code></pre></div>
+<p>Test node type for Jac Ast. </p>
+<h2 id="modulecode">ModuleCode</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>flowchart LR
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>ModuleCode -.-&gt;|Name| name
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>ModuleCode --&gt;|CodeBlockStmt| body
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>ModuleCode --&gt;|bool| is_enum_stmt
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>ModuleCode -.-&gt;|String| doc
+</code></pre></div>
+<p>ModuleCode node type for Jac Ast. </p>
+<h2 id="pyinlinecode">PyInlineCode</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>flowchart LR
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>PyInlineCode --&gt;|Token| code
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>PyInlineCode --&gt;|bool| is_enum_stmt
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>PyInlineCode -.-&gt;|String| doc
+</code></pre></div>
+<p>PyInlineCode node type for Jac Ast. </p>
+<h2 id="import">Import</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>flowchart LR
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>Import -.-&gt;|ModulePath| from_loc
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>Import --&gt;|ModuleItem , ModulePath| items
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>Import --&gt;|bool| is_absorb
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>Import -.-&gt;|String| doc
+</code></pre></div>
+<p>Import node type for Jac Ast. </p>
+<h2 id="modulepath">ModulePath</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>flowchart LR
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>ModulePath -.-&gt;|Name| path
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>ModulePath --&gt;|int| level
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>ModulePath -.-&gt;|Name| alias
+</code></pre></div>
+<p>ModulePath node type for Jac Ast. </p>
+<h2 id="moduleitem">ModuleItem</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>flowchart LR
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>ModuleItem --&gt;|Name| name
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>ModuleItem -.-&gt;|Name| alias
+</code></pre></div>
+<p>ModuleItem node type for Jac Ast. </p>
+<h2 id="archetype">Archetype</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>flowchart LR
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>Archetype --&gt;|Name| name
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>Archetype --&gt;|Token| arch_type
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>Archetype -.-&gt;|Token| access
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>Archetype --&gt;|Expr , None| base_classes
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>Archetype --&gt;|ArchBlockStmt , ImplDef , None| body
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>Archetype -.-&gt;|String| doc
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>Archetype --&gt;|Expr , None| decorators
+</code></pre></div>
+<p>ObjectArch node type for Jac Ast. </p>
+<h2 id="impldef">ImplDef</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>flowchart LR
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>ImplDef -.-&gt;|Expr| decorators
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>ImplDef --&gt;|NameAtom| target
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>ImplDef --&gt;|Expr , FuncSignature , EventSignature , None| spec
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>ImplDef --&gt;|CodeBlockStmt , EnumBlockStmt , FuncCall| body
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>ImplDef -.-&gt;|String| doc
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>ImplDef -.-&gt;|UniNode| decl_link
+</code></pre></div>
+<p>AstImplOnlyNode node type for Jac Ast. </p>
+<h2 id="semdef">SemDef</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>flowchart LR
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>SemDef --&gt;|NameAtom| target
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>SemDef --&gt;|String| value
+</code></pre></div>
+<p>SemDef node type for Jac Ast. </p>
+<h2 id="ability">Ability</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>flowchart LR
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>Ability --&gt;|NameAtom| name_ref
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>Ability --&gt;|bool| is_async
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>Ability --&gt;|bool| is_override
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>Ability --&gt;|bool| is_static
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>Ability --&gt;|bool| is_abstract
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>Ability -.-&gt;|Token| access
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>Ability --&gt;|FuncSignature , EventSignature , None| signature
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>Ability --&gt;|CodeBlockStmt , ImplDef , FuncCall , None| body
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>Ability -.-&gt;|String| doc
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>Ability --&gt;|Expr , None| decorators
+</code></pre></div>
+<p>Ability node type for Jac Ast. </p>
+<h2 id="funcsignature">FuncSignature</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>flowchart LR
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>FuncSignature --&gt;|ParamVar , None| params
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>FuncSignature -.-&gt;|Expr| return_type
+</code></pre></div>
+<p>FuncSignature node type for Jac Ast. </p>
+<h2 id="eventsignature">EventSignature</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>flowchart LR
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>EventSignature --&gt;|Token| event
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>EventSignature -.-&gt;|Expr| arch_tag_info
+</code></pre></div>
+<p>EventSignature node type for Jac Ast. </p>
+<h2 id="paramvar">ParamVar</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>flowchart LR
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>ParamVar --&gt;|Name| name
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>ParamVar -.-&gt;|Token| unpack
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>ParamVar --&gt;|Expr| type_tag
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>ParamVar -.-&gt;|Expr| value
+</code></pre></div>
+<p>ParamVar node type for Jac Ast. </p>
+<h2 id="archhas">ArchHas</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>flowchart LR
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>ArchHas --&gt;|bool| is_static
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>ArchHas -.-&gt;|Token| access
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>ArchHas --&gt;|HasVar| vars
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>ArchHas --&gt;|bool| is_frozen
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>ArchHas -.-&gt;|String| doc
+</code></pre></div>
+<p>ArchHas node type for Jac Ast. </p>
+<h2 id="hasvar">HasVar</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>flowchart LR
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>HasVar --&gt;|Name| name
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>HasVar --&gt;|Expr| type_tag
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>HasVar -.-&gt;|Expr| value
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>HasVar --&gt;|bool| defer
+</code></pre></div>
+<p>HasVar node type for Jac Ast. </p>
+<h2 id="typedctxblock">TypedCtxBlock</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>flowchart LR
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>TypedCtxBlock --&gt;|Expr| type_ctx
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>TypedCtxBlock --&gt;|CodeBlockStmt| body
+</code></pre></div>
+<p>TypedCtxBlock node type for Jac Ast. </p>
+<h2 id="ifstmt">IfStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>flowchart LR
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>IfStmt --&gt;|Expr| condition
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>IfStmt --&gt;|CodeBlockStmt| body
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>IfStmt -.-&gt;|ElseStmt , ElseIf| else_body
+</code></pre></div>
+<p>IfStmt node type for Jac Ast. </p>
+<h2 id="elseif">ElseIf</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>flowchart LR
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>ElseIf --&gt;|Expr| condition
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>ElseIf --&gt;|CodeBlockStmt| body
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>ElseIf -.-&gt;|ElseStmt , ElseIf| else_body
+</code></pre></div>
+<p>ElseIf node type for Jac Ast. </p>
+<h2 id="elsestmt">ElseStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a>flowchart LR
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>ElseStmt --&gt;|CodeBlockStmt| body
+</code></pre></div>
+<p>ElseStmt node type for Jac Ast. </p>
+<h2 id="exprstmt">ExprStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a>flowchart LR
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>ExprStmt --&gt;|Expr| expr
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>ExprStmt --&gt;|bool| in_fstring
+</code></pre></div>
+<p>ExprStmt node type for Jac Ast. </p>
+<h2 id="trystmt">TryStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a>flowchart LR
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>TryStmt --&gt;|CodeBlockStmt| body
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>TryStmt --&gt;|Except| excepts
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>TryStmt -.-&gt;|ElseStmt| else_body
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>TryStmt -.-&gt;|FinallyStmt| finally_body
+</code></pre></div>
+<p>TryStmt node type for Jac Ast. </p>
+<h2 id="except">Except</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a>flowchart LR
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>Except --&gt;|Expr| ex_type
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>Except -.-&gt;|Name| name
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>Except --&gt;|CodeBlockStmt| body
+</code></pre></div>
+<p>Except node type for Jac Ast. </p>
+<h2 id="finallystmt">FinallyStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>flowchart LR
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>FinallyStmt --&gt;|CodeBlockStmt| body
+</code></pre></div>
+<p>FinallyStmt node type for Jac Ast. </p>
+<h2 id="iterforstmt">IterForStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a>flowchart LR
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a>IterForStmt --&gt;|Assignment| iter
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a>IterForStmt --&gt;|bool| is_async
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a>IterForStmt --&gt;|Expr| condition
+<a id="__codelineno-28-5" name="__codelineno-28-5" href="#__codelineno-28-5"></a>IterForStmt --&gt;|Assignment| count_by
+<a id="__codelineno-28-6" name="__codelineno-28-6" href="#__codelineno-28-6"></a>IterForStmt --&gt;|CodeBlockStmt| body
+<a id="__codelineno-28-7" name="__codelineno-28-7" href="#__codelineno-28-7"></a>IterForStmt -.-&gt;|ElseStmt| else_body
+</code></pre></div>
+<p>IterForStmt node type for Jac Ast. </p>
+<h2 id="inforstmt">InForStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a>flowchart LR
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a>InForStmt --&gt;|Expr| target
+<a id="__codelineno-29-3" name="__codelineno-29-3" href="#__codelineno-29-3"></a>InForStmt --&gt;|bool| is_async
+<a id="__codelineno-29-4" name="__codelineno-29-4" href="#__codelineno-29-4"></a>InForStmt --&gt;|Expr| collection
+<a id="__codelineno-29-5" name="__codelineno-29-5" href="#__codelineno-29-5"></a>InForStmt --&gt;|CodeBlockStmt| body
+<a id="__codelineno-29-6" name="__codelineno-29-6" href="#__codelineno-29-6"></a>InForStmt -.-&gt;|ElseStmt| else_body
+</code></pre></div>
+<p>InForStmt node type for Jac Ast. </p>
+<h2 id="whilestmt">WhileStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a>flowchart LR
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a>WhileStmt --&gt;|Expr| condition
+<a id="__codelineno-30-3" name="__codelineno-30-3" href="#__codelineno-30-3"></a>WhileStmt --&gt;|CodeBlockStmt| body
+<a id="__codelineno-30-4" name="__codelineno-30-4" href="#__codelineno-30-4"></a>WhileStmt -.-&gt;|ElseStmt| else_body
+</code></pre></div>
+<p>WhileStmt node type for Jac Ast. </p>
+<h2 id="withstmt">WithStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a>flowchart LR
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a>WithStmt --&gt;|bool| is_async
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a>WithStmt --&gt;|ExprAsItem| exprs
+<a id="__codelineno-31-4" name="__codelineno-31-4" href="#__codelineno-31-4"></a>WithStmt --&gt;|CodeBlockStmt| body
+</code></pre></div>
+<p>WithStmt node type for Jac Ast. </p>
+<h2 id="exprasitem">ExprAsItem</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a>flowchart LR
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a>ExprAsItem --&gt;|Expr| expr
+<a id="__codelineno-32-3" name="__codelineno-32-3" href="#__codelineno-32-3"></a>ExprAsItem -.-&gt;|Expr| alias
+</code></pre></div>
+<p>ExprAsItem node type for Jac Ast. </p>
+<h2 id="raisestmt">RaiseStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a>flowchart LR
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a>RaiseStmt -.-&gt;|Expr| cause
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a>RaiseStmt -.-&gt;|Expr| from_target
+</code></pre></div>
+<p>RaiseStmt node type for Jac Ast. </p>
+<h2 id="assertstmt">AssertStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a>flowchart LR
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a>AssertStmt --&gt;|Expr| condition
+<a id="__codelineno-34-3" name="__codelineno-34-3" href="#__codelineno-34-3"></a>AssertStmt -.-&gt;|Expr| error_msg
+</code></pre></div>
+<p>AssertStmt node type for Jac Ast. </p>
+<h2 id="checkstmt">CheckStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a>flowchart LR
+<a id="__codelineno-35-2" name="__codelineno-35-2" href="#__codelineno-35-2"></a>CheckStmt --&gt;|Expr| target
+</code></pre></div>
+<p>CheckStmt node type for Jac Ast. </p>
+<h2 id="ctrlstmt">CtrlStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-36-1" name="__codelineno-36-1" href="#__codelineno-36-1"></a>flowchart LR
+<a id="__codelineno-36-2" name="__codelineno-36-2" href="#__codelineno-36-2"></a>CtrlStmt --&gt;|Token| ctrl
+</code></pre></div>
+<p>CtrlStmt node type for Jac Ast. </p>
+<h2 id="deletestmt">DeleteStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-37-1" name="__codelineno-37-1" href="#__codelineno-37-1"></a>flowchart LR
+<a id="__codelineno-37-2" name="__codelineno-37-2" href="#__codelineno-37-2"></a>DeleteStmt --&gt;|Expr| target
+</code></pre></div>
+<p>DeleteStmt node type for Jac Ast. </p>
+<h2 id="reportstmt">ReportStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-38-1" name="__codelineno-38-1" href="#__codelineno-38-1"></a>flowchart LR
+<a id="__codelineno-38-2" name="__codelineno-38-2" href="#__codelineno-38-2"></a>ReportStmt --&gt;|Expr| expr
+</code></pre></div>
+<p>ReportStmt node type for Jac Ast. </p>
+<h2 id="returnstmt">ReturnStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-39-1" name="__codelineno-39-1" href="#__codelineno-39-1"></a>flowchart LR
+<a id="__codelineno-39-2" name="__codelineno-39-2" href="#__codelineno-39-2"></a>ReturnStmt -.-&gt;|Expr| expr
+</code></pre></div>
+<p>ReturnStmt node type for Jac Ast. </p>
+<h2 id="visitstmt">VisitStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-40-1" name="__codelineno-40-1" href="#__codelineno-40-1"></a>flowchart LR
+<a id="__codelineno-40-2" name="__codelineno-40-2" href="#__codelineno-40-2"></a>VisitStmt -.-&gt;|Expr| insert_loc
+<a id="__codelineno-40-3" name="__codelineno-40-3" href="#__codelineno-40-3"></a>VisitStmt --&gt;|Expr| target
+<a id="__codelineno-40-4" name="__codelineno-40-4" href="#__codelineno-40-4"></a>VisitStmt -.-&gt;|ElseStmt| else_body
+</code></pre></div>
+<p>VisitStmt node type for Jac Ast. </p>
+<h2 id="awaitexpr">AwaitExpr</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-41-1" name="__codelineno-41-1" href="#__codelineno-41-1"></a>flowchart LR
+<a id="__codelineno-41-2" name="__codelineno-41-2" href="#__codelineno-41-2"></a>AwaitExpr --&gt;|Expr| target
+</code></pre></div>
+<p>AwaitExpr node type for Jac Ast. </p>
+<h2 id="globalstmt">GlobalStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-42-1" name="__codelineno-42-1" href="#__codelineno-42-1"></a>flowchart LR
+<a id="__codelineno-42-2" name="__codelineno-42-2" href="#__codelineno-42-2"></a>GlobalStmt --&gt;|NameAtom| target
+</code></pre></div>
+<p>GlobalStmt node type for Jac Ast. </p>
+<h2 id="nonlocalstmt">NonLocalStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-43-1" name="__codelineno-43-1" href="#__codelineno-43-1"></a>flowchart LR
+<a id="__codelineno-43-2" name="__codelineno-43-2" href="#__codelineno-43-2"></a>NonLocalStmt --&gt;|NameAtom| target
+</code></pre></div>
+<p>NonLocalStmt node type for Jac Ast. </p>
+<h2 id="assignment">Assignment</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-44-1" name="__codelineno-44-1" href="#__codelineno-44-1"></a>flowchart LR
+<a id="__codelineno-44-2" name="__codelineno-44-2" href="#__codelineno-44-2"></a>Assignment --&gt;|Expr| target
+<a id="__codelineno-44-3" name="__codelineno-44-3" href="#__codelineno-44-3"></a>Assignment -.-&gt;|Expr , YieldExpr| value
+<a id="__codelineno-44-4" name="__codelineno-44-4" href="#__codelineno-44-4"></a>Assignment -.-&gt;|Expr| type_tag
+<a id="__codelineno-44-5" name="__codelineno-44-5" href="#__codelineno-44-5"></a>Assignment --&gt;|bool| mutable
+<a id="__codelineno-44-6" name="__codelineno-44-6" href="#__codelineno-44-6"></a>Assignment -.-&gt;|Token| aug_op
+<a id="__codelineno-44-7" name="__codelineno-44-7" href="#__codelineno-44-7"></a>Assignment --&gt;|bool| is_enum_stmt
+</code></pre></div>
+<p>Assignment node type for Jac Ast. </p>
+<h2 id="concurrentexpr">ConcurrentExpr</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-45-1" name="__codelineno-45-1" href="#__codelineno-45-1"></a>flowchart LR
+<a id="__codelineno-45-2" name="__codelineno-45-2" href="#__codelineno-45-2"></a>ConcurrentExpr -.-&gt;|Token| tok
+<a id="__codelineno-45-3" name="__codelineno-45-3" href="#__codelineno-45-3"></a>ConcurrentExpr --&gt;|Expr| target
+</code></pre></div>
+<p>ConcurrentExpr node type for Jac Ast. </p>
+<h2 id="binaryexpr">BinaryExpr</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-46-1" name="__codelineno-46-1" href="#__codelineno-46-1"></a>flowchart LR
+<a id="__codelineno-46-2" name="__codelineno-46-2" href="#__codelineno-46-2"></a>BinaryExpr --&gt;|Expr| left
+<a id="__codelineno-46-3" name="__codelineno-46-3" href="#__codelineno-46-3"></a>BinaryExpr --&gt;|Expr| right
+<a id="__codelineno-46-4" name="__codelineno-46-4" href="#__codelineno-46-4"></a>BinaryExpr --&gt;|Token , DisconnectOp , ConnectOp| op
+</code></pre></div>
+<p>BinaryExpr node type for Jac Ast. </p>
+<h2 id="compareexpr">CompareExpr</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-47-1" name="__codelineno-47-1" href="#__codelineno-47-1"></a>flowchart LR
+<a id="__codelineno-47-2" name="__codelineno-47-2" href="#__codelineno-47-2"></a>CompareExpr --&gt;|Expr| left
+<a id="__codelineno-47-3" name="__codelineno-47-3" href="#__codelineno-47-3"></a>CompareExpr --&gt;|list - Expr| rights
+<a id="__codelineno-47-4" name="__codelineno-47-4" href="#__codelineno-47-4"></a>CompareExpr --&gt;|list - Token| ops
+</code></pre></div>
+<p>CompareExpr node type for Jac Ast. </p>
+<h2 id="bool">Bool</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-48-1" name="__codelineno-48-1" href="#__codelineno-48-1"></a>flowchart LR
+<a id="__codelineno-48-2" name="__codelineno-48-2" href="#__codelineno-48-2"></a>Bool --&gt;|Source| orig_src
+<a id="__codelineno-48-3" name="__codelineno-48-3" href="#__codelineno-48-3"></a>Bool --&gt;|str| name
+<a id="__codelineno-48-4" name="__codelineno-48-4" href="#__codelineno-48-4"></a>Bool --&gt;|str| value
+<a id="__codelineno-48-5" name="__codelineno-48-5" href="#__codelineno-48-5"></a>Bool --&gt;|int| end_line
+<a id="__codelineno-48-6" name="__codelineno-48-6" href="#__codelineno-48-6"></a>Bool --&gt;|int| col_start
+<a id="__codelineno-48-7" name="__codelineno-48-7" href="#__codelineno-48-7"></a>Bool --&gt;|int| col_end_
+<a id="__codelineno-48-8" name="__codelineno-48-8" href="#__codelineno-48-8"></a>Bool --&gt;|int| pos_start
+<a id="__codelineno-48-9" name="__codelineno-48-9" href="#__codelineno-48-9"></a>Bool --&gt;|int| pos_end_
+</code></pre></div>
+<p>Bool node type for Jac Ast. </p>
+<h2 id="boolexpr">BoolExpr</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-49-1" name="__codelineno-49-1" href="#__codelineno-49-1"></a>flowchart LR
+<a id="__codelineno-49-2" name="__codelineno-49-2" href="#__codelineno-49-2"></a>BoolExpr --&gt;|Token| op
+<a id="__codelineno-49-3" name="__codelineno-49-3" href="#__codelineno-49-3"></a>BoolExpr --&gt;|list - Expr| values
+</code></pre></div>
+<p>BoolExpr node type for Jac Ast. </p>
+<h2 id="lambdaexpr">LambdaExpr</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-50-1" name="__codelineno-50-1" href="#__codelineno-50-1"></a>flowchart LR
+<a id="__codelineno-50-2" name="__codelineno-50-2" href="#__codelineno-50-2"></a>LambdaExpr --&gt;|Expr| body
+<a id="__codelineno-50-3" name="__codelineno-50-3" href="#__codelineno-50-3"></a>LambdaExpr -.-&gt;|FuncSignature| signature
+</code></pre></div>
+<p>LambdaExpr node type for Jac Ast. </p>
+<h2 id="unaryexpr">UnaryExpr</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-51-1" name="__codelineno-51-1" href="#__codelineno-51-1"></a>flowchart LR
+<a id="__codelineno-51-2" name="__codelineno-51-2" href="#__codelineno-51-2"></a>UnaryExpr --&gt;|Expr| operand
+<a id="__codelineno-51-3" name="__codelineno-51-3" href="#__codelineno-51-3"></a>UnaryExpr --&gt;|Token| op
+</code></pre></div>
+<p>UnaryExpr node type for Jac Ast. </p>
+<h2 id="ifelseexpr">IfElseExpr</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-52-1" name="__codelineno-52-1" href="#__codelineno-52-1"></a>flowchart LR
+<a id="__codelineno-52-2" name="__codelineno-52-2" href="#__codelineno-52-2"></a>IfElseExpr --&gt;|Expr| condition
+<a id="__codelineno-52-3" name="__codelineno-52-3" href="#__codelineno-52-3"></a>IfElseExpr --&gt;|Expr| value
+<a id="__codelineno-52-4" name="__codelineno-52-4" href="#__codelineno-52-4"></a>IfElseExpr --&gt;|Expr| else_value
+</code></pre></div>
+<p>IfElseExpr node type for Jac Ast. </p>
+<h2 id="multistring">MultiString</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-53-1" name="__codelineno-53-1" href="#__codelineno-53-1"></a>flowchart LR
+<a id="__codelineno-53-2" name="__codelineno-53-2" href="#__codelineno-53-2"></a>MultiString --&gt;|String , FString| strings
+</code></pre></div>
+<p>MultiString node type for Jac Ast. </p>
+<h2 id="fstring">FString</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-54-1" name="__codelineno-54-1" href="#__codelineno-54-1"></a>flowchart LR
+<a id="__codelineno-54-2" name="__codelineno-54-2" href="#__codelineno-54-2"></a>FString --&gt;|String , ExprStmt| parts
+</code></pre></div>
+<p>FString node type for Jac Ast. </p>
+<h2 id="listval">ListVal</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-55-1" name="__codelineno-55-1" href="#__codelineno-55-1"></a>flowchart LR
+<a id="__codelineno-55-2" name="__codelineno-55-2" href="#__codelineno-55-2"></a>ListVal --&gt;|Expr| values
+</code></pre></div>
+<p>ListVal node type for Jac Ast. </p>
+<h2 id="setval">SetVal</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-56-1" name="__codelineno-56-1" href="#__codelineno-56-1"></a>flowchart LR
+<a id="__codelineno-56-2" name="__codelineno-56-2" href="#__codelineno-56-2"></a>SetVal --&gt;|Expr , None| values
+</code></pre></div>
+<p>SetVal node type for Jac Ast. </p>
+<h2 id="tupleval">TupleVal</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-57-1" name="__codelineno-57-1" href="#__codelineno-57-1"></a>flowchart LR
+<a id="__codelineno-57-2" name="__codelineno-57-2" href="#__codelineno-57-2"></a>TupleVal --&gt;|Expr , KWPair| values
+</code></pre></div>
+<p>TupleVal node type for Jac Ast. </p>
+<h2 id="dictval">DictVal</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-58-1" name="__codelineno-58-1" href="#__codelineno-58-1"></a>flowchart LR
+<a id="__codelineno-58-2" name="__codelineno-58-2" href="#__codelineno-58-2"></a>DictVal --&gt;|KVPair| kv_pairs
+</code></pre></div>
+<p>DictVal node type for Jac Ast. </p>
+<h2 id="kvpair">KVPair</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-59-1" name="__codelineno-59-1" href="#__codelineno-59-1"></a>flowchart LR
+<a id="__codelineno-59-2" name="__codelineno-59-2" href="#__codelineno-59-2"></a>KVPair -.-&gt;|Expr| key
+<a id="__codelineno-59-3" name="__codelineno-59-3" href="#__codelineno-59-3"></a>KVPair --&gt;|Expr| value
+</code></pre></div>
+<p>KVPair node type for Jac Ast. </p>
+<h2 id="kwpair">KWPair</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-60-1" name="__codelineno-60-1" href="#__codelineno-60-1"></a>flowchart LR
+<a id="__codelineno-60-2" name="__codelineno-60-2" href="#__codelineno-60-2"></a>KWPair -.-&gt;|NameAtom| key
+<a id="__codelineno-60-3" name="__codelineno-60-3" href="#__codelineno-60-3"></a>KWPair --&gt;|Expr| value
+</code></pre></div>
+<p>KWPair node type for Jac Ast. </p>
+<h2 id="innercompr">InnerCompr</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-61-1" name="__codelineno-61-1" href="#__codelineno-61-1"></a>flowchart LR
+<a id="__codelineno-61-2" name="__codelineno-61-2" href="#__codelineno-61-2"></a>InnerCompr --&gt;|bool| is_async
+<a id="__codelineno-61-3" name="__codelineno-61-3" href="#__codelineno-61-3"></a>InnerCompr --&gt;|Expr| target
+<a id="__codelineno-61-4" name="__codelineno-61-4" href="#__codelineno-61-4"></a>InnerCompr --&gt;|Expr| collection
+<a id="__codelineno-61-5" name="__codelineno-61-5" href="#__codelineno-61-5"></a>InnerCompr -.-&gt;|list - Expr| conditional
+</code></pre></div>
+<p>InnerCompr node type for Jac Ast. </p>
+<h2 id="listcompr">ListCompr</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-62-1" name="__codelineno-62-1" href="#__codelineno-62-1"></a>flowchart LR
+<a id="__codelineno-62-2" name="__codelineno-62-2" href="#__codelineno-62-2"></a>ListCompr --&gt;|Expr| out_expr
+<a id="__codelineno-62-3" name="__codelineno-62-3" href="#__codelineno-62-3"></a>ListCompr --&gt;|list - InnerCompr| compr
+</code></pre></div>
+<p>ListCompr node type for Jac Ast. </p>
+<h2 id="gencompr">GenCompr</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-63-1" name="__codelineno-63-1" href="#__codelineno-63-1"></a>flowchart LR
+<a id="__codelineno-63-2" name="__codelineno-63-2" href="#__codelineno-63-2"></a>GenCompr --&gt;|Expr| out_expr
+<a id="__codelineno-63-3" name="__codelineno-63-3" href="#__codelineno-63-3"></a>GenCompr --&gt;|list - InnerCompr| compr
+</code></pre></div>
+<p>GenCompr node type for Jac Ast. </p>
+<h2 id="setcompr">SetCompr</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-64-1" name="__codelineno-64-1" href="#__codelineno-64-1"></a>flowchart LR
+<a id="__codelineno-64-2" name="__codelineno-64-2" href="#__codelineno-64-2"></a>SetCompr --&gt;|Expr| out_expr
+<a id="__codelineno-64-3" name="__codelineno-64-3" href="#__codelineno-64-3"></a>SetCompr --&gt;|list - InnerCompr| compr
+</code></pre></div>
+<p>SetCompr node type for Jac Ast. </p>
+<h2 id="dictcompr">DictCompr</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-65-1" name="__codelineno-65-1" href="#__codelineno-65-1"></a>flowchart LR
+<a id="__codelineno-65-2" name="__codelineno-65-2" href="#__codelineno-65-2"></a>DictCompr --&gt;|KVPair| kv_pair
+<a id="__codelineno-65-3" name="__codelineno-65-3" href="#__codelineno-65-3"></a>DictCompr --&gt;|list - InnerCompr| compr
+</code></pre></div>
+<p>DictCompr node type for Jac Ast. </p>
+<h2 id="atomtrailer">AtomTrailer</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-66-1" name="__codelineno-66-1" href="#__codelineno-66-1"></a>flowchart LR
+<a id="__codelineno-66-2" name="__codelineno-66-2" href="#__codelineno-66-2"></a>AtomTrailer --&gt;|Expr| target
+<a id="__codelineno-66-3" name="__codelineno-66-3" href="#__codelineno-66-3"></a>AtomTrailer --&gt;|AtomExpr , Expr| right
+<a id="__codelineno-66-4" name="__codelineno-66-4" href="#__codelineno-66-4"></a>AtomTrailer --&gt;|bool| is_attr
+<a id="__codelineno-66-5" name="__codelineno-66-5" href="#__codelineno-66-5"></a>AtomTrailer --&gt;|bool| is_null_ok
+<a id="__codelineno-66-6" name="__codelineno-66-6" href="#__codelineno-66-6"></a>AtomTrailer --&gt;|bool| is_genai
+</code></pre></div>
+<p>AtomTrailer node type for Jac Ast. </p>
+<h2 id="atomunit">AtomUnit</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-67-1" name="__codelineno-67-1" href="#__codelineno-67-1"></a>flowchart LR
+<a id="__codelineno-67-2" name="__codelineno-67-2" href="#__codelineno-67-2"></a>AtomUnit --&gt;|Expr , YieldExpr| value
+</code></pre></div>
+<p>AtomUnit node type for Jac Ast. </p>
+<h2 id="yieldexpr">YieldExpr</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-68-1" name="__codelineno-68-1" href="#__codelineno-68-1"></a>flowchart LR
+<a id="__codelineno-68-2" name="__codelineno-68-2" href="#__codelineno-68-2"></a>YieldExpr -.-&gt;|Expr| expr
+<a id="__codelineno-68-3" name="__codelineno-68-3" href="#__codelineno-68-3"></a>YieldExpr --&gt;|bool| with_from
+</code></pre></div>
+<p>YieldExpr node type for Jac Ast. </p>
+<h2 id="funccall">FuncCall</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-69-1" name="__codelineno-69-1" href="#__codelineno-69-1"></a>flowchart LR
+<a id="__codelineno-69-2" name="__codelineno-69-2" href="#__codelineno-69-2"></a>FuncCall --&gt;|Expr| target
+<a id="__codelineno-69-3" name="__codelineno-69-3" href="#__codelineno-69-3"></a>FuncCall --&gt;|Expr , KWPair , None| params
+<a id="__codelineno-69-4" name="__codelineno-69-4" href="#__codelineno-69-4"></a>FuncCall -.-&gt;|FuncCall| genai_call
+<a id="__codelineno-69-5" name="__codelineno-69-5" href="#__codelineno-69-5"></a>FuncCall -.-&gt;|FuncCall| body_genai_call
+</code></pre></div>
+<p>FuncCall node type for Jac Ast. </p>
+<h2 id="indexslice">IndexSlice</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-70-1" name="__codelineno-70-1" href="#__codelineno-70-1"></a>flowchart LR
+<a id="__codelineno-70-2" name="__codelineno-70-2" href="#__codelineno-70-2"></a>IndexSlice --&gt;|list - Slice| slices
+<a id="__codelineno-70-3" name="__codelineno-70-3" href="#__codelineno-70-3"></a>IndexSlice --&gt;|bool| is_range
+</code></pre></div>
+<p>IndexSlice node type for Jac Ast. </p>
+<h2 id="typeref">TypeRef</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-71-1" name="__codelineno-71-1" href="#__codelineno-71-1"></a>flowchart LR
+<a id="__codelineno-71-2" name="__codelineno-71-2" href="#__codelineno-71-2"></a>TypeRef --&gt;|NameAtom| target
+</code></pre></div>
+<p>ArchRef node type for Jac Ast. </p>
+<h2 id="edgereftrailer">EdgeRefTrailer</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-72-1" name="__codelineno-72-1" href="#__codelineno-72-1"></a>flowchart LR
+<a id="__codelineno-72-2" name="__codelineno-72-2" href="#__codelineno-72-2"></a>EdgeRefTrailer --&gt;|list - Expr , FilterCompr| chain
+<a id="__codelineno-72-3" name="__codelineno-72-3" href="#__codelineno-72-3"></a>EdgeRefTrailer --&gt;|bool| edges_only
+</code></pre></div>
+<p>EdgeRefTrailer node type for Jac Ast. </p>
+<h2 id="edgeopref">EdgeOpRef</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-73-1" name="__codelineno-73-1" href="#__codelineno-73-1"></a>flowchart LR
+<a id="__codelineno-73-2" name="__codelineno-73-2" href="#__codelineno-73-2"></a>EdgeOpRef -.-&gt;|FilterCompr| filter_cond
+<a id="__codelineno-73-3" name="__codelineno-73-3" href="#__codelineno-73-3"></a>EdgeOpRef --&gt;|EdgeDir| edge_dir
+</code></pre></div>
+<p>EdgeOpRef node type for Jac Ast. </p>
+<h2 id="disconnectop">DisconnectOp</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-74-1" name="__codelineno-74-1" href="#__codelineno-74-1"></a>flowchart LR
+<a id="__codelineno-74-2" name="__codelineno-74-2" href="#__codelineno-74-2"></a>DisconnectOp --&gt;|EdgeOpRef| edge_spec
+</code></pre></div>
+<p>DisconnectOp node type for Jac Ast. </p>
+<h2 id="connectop">ConnectOp</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-75-1" name="__codelineno-75-1" href="#__codelineno-75-1"></a>flowchart LR
+<a id="__codelineno-75-2" name="__codelineno-75-2" href="#__codelineno-75-2"></a>ConnectOp -.-&gt;|Expr| conn_type
+<a id="__codelineno-75-3" name="__codelineno-75-3" href="#__codelineno-75-3"></a>ConnectOp -.-&gt;|AssignCompr| conn_assign
+<a id="__codelineno-75-4" name="__codelineno-75-4" href="#__codelineno-75-4"></a>ConnectOp --&gt;|EdgeDir| edge_dir
+</code></pre></div>
+<p>ConnectOpRef node type for Jac Ast. </p>
+<h2 id="filtercompr">FilterCompr</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-76-1" name="__codelineno-76-1" href="#__codelineno-76-1"></a>flowchart LR
+<a id="__codelineno-76-2" name="__codelineno-76-2" href="#__codelineno-76-2"></a>FilterCompr -.-&gt;|Expr| f_type
+<a id="__codelineno-76-3" name="__codelineno-76-3" href="#__codelineno-76-3"></a>FilterCompr --&gt;|CompareExpr| compares
+</code></pre></div>
+<p>FilterCompr node type for Jac Ast. </p>
+<h2 id="assigncompr">AssignCompr</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-77-1" name="__codelineno-77-1" href="#__codelineno-77-1"></a>flowchart LR
+<a id="__codelineno-77-2" name="__codelineno-77-2" href="#__codelineno-77-2"></a>AssignCompr --&gt;|KWPair| assigns
+</code></pre></div>
+<p>AssignCompr node type for Jac Ast. </p>
+<h2 id="matchstmt">MatchStmt</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-78-1" name="__codelineno-78-1" href="#__codelineno-78-1"></a>flowchart LR
+<a id="__codelineno-78-2" name="__codelineno-78-2" href="#__codelineno-78-2"></a>MatchStmt --&gt;|Expr| target
+<a id="__codelineno-78-3" name="__codelineno-78-3" href="#__codelineno-78-3"></a>MatchStmt --&gt;|list - MatchCase| cases
+</code></pre></div>
+<p>MatchStmt node type for Jac Ast. </p>
+<h2 id="matchcase">MatchCase</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-79-1" name="__codelineno-79-1" href="#__codelineno-79-1"></a>flowchart LR
+<a id="__codelineno-79-2" name="__codelineno-79-2" href="#__codelineno-79-2"></a>MatchCase --&gt;|MatchPattern| pattern
+<a id="__codelineno-79-3" name="__codelineno-79-3" href="#__codelineno-79-3"></a>MatchCase -.-&gt;|Expr| guard
+<a id="__codelineno-79-4" name="__codelineno-79-4" href="#__codelineno-79-4"></a>MatchCase --&gt;|list - CodeBlockStmt| body
+</code></pre></div>
+<p>MatchCase node type for Jac Ast. </p>
+<h2 id="matchor">MatchOr</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-80-1" name="__codelineno-80-1" href="#__codelineno-80-1"></a>flowchart LR
+<a id="__codelineno-80-2" name="__codelineno-80-2" href="#__codelineno-80-2"></a>MatchOr --&gt;|list - MatchPattern| patterns
+</code></pre></div>
+<p>MatchOr node type for Jac Ast. </p>
+<h2 id="matchas">MatchAs</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-81-1" name="__codelineno-81-1" href="#__codelineno-81-1"></a>flowchart LR
+<a id="__codelineno-81-2" name="__codelineno-81-2" href="#__codelineno-81-2"></a>MatchAs --&gt;|NameAtom| name
+<a id="__codelineno-81-3" name="__codelineno-81-3" href="#__codelineno-81-3"></a>MatchAs -.-&gt;|MatchPattern| pattern
+</code></pre></div>
+<p>MatchAs node type for Jac Ast. </p>
+<h2 id="matchvalue">MatchValue</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-82-1" name="__codelineno-82-1" href="#__codelineno-82-1"></a>flowchart LR
+<a id="__codelineno-82-2" name="__codelineno-82-2" href="#__codelineno-82-2"></a>MatchValue --&gt;|Expr| value
+</code></pre></div>
+<p>MatchValue node type for Jac Ast. </p>
+<h2 id="matchsingleton">MatchSingleton</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-83-1" name="__codelineno-83-1" href="#__codelineno-83-1"></a>flowchart LR
+<a id="__codelineno-83-2" name="__codelineno-83-2" href="#__codelineno-83-2"></a>MatchSingleton --&gt;|Bool , Null| value
+</code></pre></div>
+<p>MatchSingleton node type for Jac Ast. </p>
+<h2 id="matchsequence">MatchSequence</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-84-1" name="__codelineno-84-1" href="#__codelineno-84-1"></a>flowchart LR
+<a id="__codelineno-84-2" name="__codelineno-84-2" href="#__codelineno-84-2"></a>MatchSequence --&gt;|list - MatchPattern| values
+</code></pre></div>
+<p>MatchSequence node type for Jac Ast. </p>
+<h2 id="matchmapping">MatchMapping</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-85-1" name="__codelineno-85-1" href="#__codelineno-85-1"></a>flowchart LR
+<a id="__codelineno-85-2" name="__codelineno-85-2" href="#__codelineno-85-2"></a>MatchMapping --&gt;|list - MatchKVPair , MatchStar| values
+</code></pre></div>
+<p>MatchMapping node type for Jac Ast. </p>
+<h2 id="matchkvpair">MatchKVPair</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-86-1" name="__codelineno-86-1" href="#__codelineno-86-1"></a>flowchart LR
+<a id="__codelineno-86-2" name="__codelineno-86-2" href="#__codelineno-86-2"></a>MatchKVPair --&gt;|MatchPattern , NameAtom , AtomExpr| key
+<a id="__codelineno-86-3" name="__codelineno-86-3" href="#__codelineno-86-3"></a>MatchKVPair --&gt;|MatchPattern| value
+</code></pre></div>
+<p>MatchKVPair node type for Jac Ast. </p>
+<h2 id="matchstar">MatchStar</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-87-1" name="__codelineno-87-1" href="#__codelineno-87-1"></a>flowchart LR
+<a id="__codelineno-87-2" name="__codelineno-87-2" href="#__codelineno-87-2"></a>MatchStar --&gt;|NameAtom| name
+<a id="__codelineno-87-3" name="__codelineno-87-3" href="#__codelineno-87-3"></a>MatchStar --&gt;|bool| is_list
+</code></pre></div>
+<p>MatchStar node type for Jac Ast. </p>
+<h2 id="matcharch">MatchArch</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-88-1" name="__codelineno-88-1" href="#__codelineno-88-1"></a>flowchart LR
+<a id="__codelineno-88-2" name="__codelineno-88-2" href="#__codelineno-88-2"></a>MatchArch --&gt;|AtomTrailer , NameAtom| name
+<a id="__codelineno-88-3" name="__codelineno-88-3" href="#__codelineno-88-3"></a>MatchArch --&gt;|MatchPattern , None| arg_patterns
+<a id="__codelineno-88-4" name="__codelineno-88-4" href="#__codelineno-88-4"></a>MatchArch --&gt;|MatchKVPair , None| kw_patterns
+</code></pre></div>
+<p>MatchArch node type for Jac Ast. </p>
+<h2 id="token">Token</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-89-1" name="__codelineno-89-1" href="#__codelineno-89-1"></a>flowchart LR
+<a id="__codelineno-89-2" name="__codelineno-89-2" href="#__codelineno-89-2"></a>Token --&gt;|Source| orig_src
+<a id="__codelineno-89-3" name="__codelineno-89-3" href="#__codelineno-89-3"></a>Token --&gt;|str| name
+<a id="__codelineno-89-4" name="__codelineno-89-4" href="#__codelineno-89-4"></a>Token --&gt;|str| value
+<a id="__codelineno-89-5" name="__codelineno-89-5" href="#__codelineno-89-5"></a>Token --&gt;|int| end_line
+<a id="__codelineno-89-6" name="__codelineno-89-6" href="#__codelineno-89-6"></a>Token --&gt;|int| col_start
+<a id="__codelineno-89-7" name="__codelineno-89-7" href="#__codelineno-89-7"></a>Token --&gt;|int| col_end_
+<a id="__codelineno-89-8" name="__codelineno-89-8" href="#__codelineno-89-8"></a>Token --&gt;|int| pos_start
+<a id="__codelineno-89-9" name="__codelineno-89-9" href="#__codelineno-89-9"></a>Token --&gt;|int| pos_end_
+</code></pre></div>
+<p>Token node type for Jac Ast. </p>
+<h2 id="specialvarref">SpecialVarRef</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-90-1" name="__codelineno-90-1" href="#__codelineno-90-1"></a>flowchart LR
+<a id="__codelineno-90-2" name="__codelineno-90-2" href="#__codelineno-90-2"></a>SpecialVarRef --&gt;|Name| var
+<a id="__codelineno-90-3" name="__codelineno-90-3" href="#__codelineno-90-3"></a>SpecialVarRef --&gt;|bool| is_enum_stmt
+</code></pre></div>
+<p>SpecialVarRef node type for Jac Ast. </p>
+<h2 id="builtintype">BuiltinType</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-91-1" name="__codelineno-91-1" href="#__codelineno-91-1"></a>flowchart LR
+<a id="__codelineno-91-2" name="__codelineno-91-2" href="#__codelineno-91-2"></a>BuiltinType --&gt;|Source| orig_src
+<a id="__codelineno-91-3" name="__codelineno-91-3" href="#__codelineno-91-3"></a>BuiltinType --&gt;|str| name
+<a id="__codelineno-91-4" name="__codelineno-91-4" href="#__codelineno-91-4"></a>BuiltinType --&gt;|str| value
+<a id="__codelineno-91-5" name="__codelineno-91-5" href="#__codelineno-91-5"></a>BuiltinType --&gt;|int| end_line
+<a id="__codelineno-91-6" name="__codelineno-91-6" href="#__codelineno-91-6"></a>BuiltinType --&gt;|int| col_start
+<a id="__codelineno-91-7" name="__codelineno-91-7" href="#__codelineno-91-7"></a>BuiltinType --&gt;|int| col_end_
+<a id="__codelineno-91-8" name="__codelineno-91-8" href="#__codelineno-91-8"></a>BuiltinType --&gt;|int| pos_start
+<a id="__codelineno-91-9" name="__codelineno-91-9" href="#__codelineno-91-9"></a>BuiltinType --&gt;|int| pos_end_
+<a id="__codelineno-91-10" name="__codelineno-91-10" href="#__codelineno-91-10"></a>BuiltinType --&gt;|bool| is_enum_stmt
+<a id="__codelineno-91-11" name="__codelineno-91-11" href="#__codelineno-91-11"></a>BuiltinType --&gt;|bool| is_kwesc
+</code></pre></div>
+<p>BuiltinType node type for Jac Ast. </p>
+<h2 id="float">Float</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-92-1" name="__codelineno-92-1" href="#__codelineno-92-1"></a>flowchart LR
+<a id="__codelineno-92-2" name="__codelineno-92-2" href="#__codelineno-92-2"></a>Float --&gt;|Source| orig_src
+<a id="__codelineno-92-3" name="__codelineno-92-3" href="#__codelineno-92-3"></a>Float --&gt;|str| name
+<a id="__codelineno-92-4" name="__codelineno-92-4" href="#__codelineno-92-4"></a>Float --&gt;|str| value
+<a id="__codelineno-92-5" name="__codelineno-92-5" href="#__codelineno-92-5"></a>Float --&gt;|int| end_line
+<a id="__codelineno-92-6" name="__codelineno-92-6" href="#__codelineno-92-6"></a>Float --&gt;|int| col_start
+<a id="__codelineno-92-7" name="__codelineno-92-7" href="#__codelineno-92-7"></a>Float --&gt;|int| col_end_
+<a id="__codelineno-92-8" name="__codelineno-92-8" href="#__codelineno-92-8"></a>Float --&gt;|int| pos_start
+<a id="__codelineno-92-9" name="__codelineno-92-9" href="#__codelineno-92-9"></a>Float --&gt;|int| pos_end_
+</code></pre></div>
+<p>Float node type for Jac Ast. </p>
+<h2 id="int">Int</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-93-1" name="__codelineno-93-1" href="#__codelineno-93-1"></a>flowchart LR
+<a id="__codelineno-93-2" name="__codelineno-93-2" href="#__codelineno-93-2"></a>Int --&gt;|Source| orig_src
+<a id="__codelineno-93-3" name="__codelineno-93-3" href="#__codelineno-93-3"></a>Int --&gt;|str| name
+<a id="__codelineno-93-4" name="__codelineno-93-4" href="#__codelineno-93-4"></a>Int --&gt;|str| value
+<a id="__codelineno-93-5" name="__codelineno-93-5" href="#__codelineno-93-5"></a>Int --&gt;|int| end_line
+<a id="__codelineno-93-6" name="__codelineno-93-6" href="#__codelineno-93-6"></a>Int --&gt;|int| col_start
+<a id="__codelineno-93-7" name="__codelineno-93-7" href="#__codelineno-93-7"></a>Int --&gt;|int| col_end_
+<a id="__codelineno-93-8" name="__codelineno-93-8" href="#__codelineno-93-8"></a>Int --&gt;|int| pos_start
+<a id="__codelineno-93-9" name="__codelineno-93-9" href="#__codelineno-93-9"></a>Int --&gt;|int| pos_end_
+</code></pre></div>
+<p>Int node type for Jac Ast. </p>
+<h2 id="string">String</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-94-1" name="__codelineno-94-1" href="#__codelineno-94-1"></a>flowchart LR
+<a id="__codelineno-94-2" name="__codelineno-94-2" href="#__codelineno-94-2"></a>String --&gt;|Source| orig_src
+<a id="__codelineno-94-3" name="__codelineno-94-3" href="#__codelineno-94-3"></a>String --&gt;|str| name
+<a id="__codelineno-94-4" name="__codelineno-94-4" href="#__codelineno-94-4"></a>String --&gt;|str| value
+<a id="__codelineno-94-5" name="__codelineno-94-5" href="#__codelineno-94-5"></a>String --&gt;|int| end_line
+<a id="__codelineno-94-6" name="__codelineno-94-6" href="#__codelineno-94-6"></a>String --&gt;|int| col_start
+<a id="__codelineno-94-7" name="__codelineno-94-7" href="#__codelineno-94-7"></a>String --&gt;|int| col_end_
+<a id="__codelineno-94-8" name="__codelineno-94-8" href="#__codelineno-94-8"></a>String --&gt;|int| pos_start
+<a id="__codelineno-94-9" name="__codelineno-94-9" href="#__codelineno-94-9"></a>String --&gt;|int| pos_end_
+</code></pre></div>
+<p>String node type for Jac Ast. </p>
+<h2 id="null">Null</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-95-1" name="__codelineno-95-1" href="#__codelineno-95-1"></a>flowchart LR
+<a id="__codelineno-95-2" name="__codelineno-95-2" href="#__codelineno-95-2"></a>Null --&gt;|Source| orig_src
+<a id="__codelineno-95-3" name="__codelineno-95-3" href="#__codelineno-95-3"></a>Null --&gt;|str| name
+<a id="__codelineno-95-4" name="__codelineno-95-4" href="#__codelineno-95-4"></a>Null --&gt;|str| value
+<a id="__codelineno-95-5" name="__codelineno-95-5" href="#__codelineno-95-5"></a>Null --&gt;|int| end_line
+<a id="__codelineno-95-6" name="__codelineno-95-6" href="#__codelineno-95-6"></a>Null --&gt;|int| col_start
+<a id="__codelineno-95-7" name="__codelineno-95-7" href="#__codelineno-95-7"></a>Null --&gt;|int| col_end_
+<a id="__codelineno-95-8" name="__codelineno-95-8" href="#__codelineno-95-8"></a>Null --&gt;|int| pos_start
+<a id="__codelineno-95-9" name="__codelineno-95-9" href="#__codelineno-95-9"></a>Null --&gt;|int| pos_end_
+</code></pre></div>
+<p>Null node type for Jac Ast. </p>
+<h2 id="ellipsis">Ellipsis</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-96-1" name="__codelineno-96-1" href="#__codelineno-96-1"></a>flowchart LR
+<a id="__codelineno-96-2" name="__codelineno-96-2" href="#__codelineno-96-2"></a>Ellipsis --&gt;|Source| orig_src
+<a id="__codelineno-96-3" name="__codelineno-96-3" href="#__codelineno-96-3"></a>Ellipsis --&gt;|str| name
+<a id="__codelineno-96-4" name="__codelineno-96-4" href="#__codelineno-96-4"></a>Ellipsis --&gt;|str| value
+<a id="__codelineno-96-5" name="__codelineno-96-5" href="#__codelineno-96-5"></a>Ellipsis --&gt;|int| end_line
+<a id="__codelineno-96-6" name="__codelineno-96-6" href="#__codelineno-96-6"></a>Ellipsis --&gt;|int| col_start
+<a id="__codelineno-96-7" name="__codelineno-96-7" href="#__codelineno-96-7"></a>Ellipsis --&gt;|int| col_end_
+<a id="__codelineno-96-8" name="__codelineno-96-8" href="#__codelineno-96-8"></a>Ellipsis --&gt;|int| pos_start
+<a id="__codelineno-96-9" name="__codelineno-96-9" href="#__codelineno-96-9"></a>Ellipsis --&gt;|int| pos_end_
+</code></pre></div>
+<p>Ellipsis node type for Jac Ast. </p>
+<h2 id="semi">Semi</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-97-1" name="__codelineno-97-1" href="#__codelineno-97-1"></a>flowchart LR
+<a id="__codelineno-97-2" name="__codelineno-97-2" href="#__codelineno-97-2"></a>Semi --&gt;|Source| orig_src
+<a id="__codelineno-97-3" name="__codelineno-97-3" href="#__codelineno-97-3"></a>Semi --&gt;|str| name
+<a id="__codelineno-97-4" name="__codelineno-97-4" href="#__codelineno-97-4"></a>Semi --&gt;|str| value
+<a id="__codelineno-97-5" name="__codelineno-97-5" href="#__codelineno-97-5"></a>Semi --&gt;|int| end_line
+<a id="__codelineno-97-6" name="__codelineno-97-6" href="#__codelineno-97-6"></a>Semi --&gt;|int| col_start
+<a id="__codelineno-97-7" name="__codelineno-97-7" href="#__codelineno-97-7"></a>Semi --&gt;|int| col_end_
+<a id="__codelineno-97-8" name="__codelineno-97-8" href="#__codelineno-97-8"></a>Semi --&gt;|int| pos_start
+<a id="__codelineno-97-9" name="__codelineno-97-9" href="#__codelineno-97-9"></a>Semi --&gt;|int| pos_end_
+</code></pre></div>
+<p>Semicolon node type for Jac Ast. </p>
+<h2 id="commenttoken">CommentToken</h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-98-1" name="__codelineno-98-1" href="#__codelineno-98-1"></a>flowchart LR
+<a id="__codelineno-98-2" name="__codelineno-98-2" href="#__codelineno-98-2"></a>CommentToken --&gt;|Source| orig_src
+<a id="__codelineno-98-3" name="__codelineno-98-3" href="#__codelineno-98-3"></a>CommentToken --&gt;|str| name
+<a id="__codelineno-98-4" name="__codelineno-98-4" href="#__codelineno-98-4"></a>CommentToken --&gt;|str| value
+<a id="__codelineno-98-5" name="__codelineno-98-5" href="#__codelineno-98-5"></a>CommentToken --&gt;|int| end_line
+<a id="__codelineno-98-6" name="__codelineno-98-6" href="#__codelineno-98-6"></a>CommentToken --&gt;|int| col_start
+<a id="__codelineno-98-7" name="__codelineno-98-7" href="#__codelineno-98-7"></a>CommentToken --&gt;|int| col_end_
+<a id="__codelineno-98-8" name="__codelineno-98-8" href="#__codelineno-98-8"></a>CommentToken --&gt;|int| pos_start
+<a id="__codelineno-98-9" name="__codelineno-98-9" href="#__codelineno-98-9"></a>CommentToken --&gt;|int| pos_end_
+<a id="__codelineno-98-10" name="__codelineno-98-10" href="#__codelineno-98-10"></a>CommentToken --&gt;|bool| is_inline
+</code></pre></div>
+<p>CommentToken node type for Jac Ast. </p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 Jac Hackers Everwhere
+    </div>
+  
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+      
+    
+    
+    
+      
+      
+    
+    <a href="https://fosstodon.org/@squidfunk" target="_blank" rel="noopener me" title="fosstodon.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M433 179.11c0-97.2-63.71-125.7-63.71-125.7-62.52-28.7-228.56-28.4-290.48 0 0 0-63.72 28.5-63.72 125.7 0 115.7-6.6 259.4 105.63 289.1 40.51 10.7 75.32 13 103.33 11.4 50.81-2.8 79.32-18.1 79.32-18.1l-1.7-36.9s-36.31 11.4-77.12 10.1c-40.41-1.4-83-4.4-89.63-54a102.5 102.5 0 0 1-.9-13.9c85.63 20.9 158.65 9.1 178.75 6.7 56.12-6.7 105-41.3 111.23-72.9 9.8-49.8 9-121.5 9-121.5m-75.12 125.2h-46.63v-114.2c0-49.7-64-51.6-64 6.9v62.5h-46.33V197c0-58.5-64-56.6-64-6.9v114.2H90.19c0-122.1-5.2-147.9 18.41-175 25.9-28.9 79.82-30.8 103.83 6.1l11.6 19.5 11.6-19.5c24.11-37.1 78.12-34.8 103.83-6.1 23.71 27.3 18.4 53 18.4 175z"/></svg>
+    </a>
+  
+    
+    
+    
+    
+      
+      
+    
+    <a href="https://github.com/Jaseci-Labs/jaseci" target="_blank" rel="noopener" title="github.com" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 496 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6m-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3m44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9M244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8M97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1m-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7m32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1m-11.4-14.7c-1.6 1-1.6 3.6 0 5.9s4.3 3.3 5.6 2.3c1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.instant", "navigation.top", "search.highlight", "search.suggest", "navigation.tabs.sticky", "header.autohide", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": {"default": "latest", "provider": "mike"}}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+        <script src="../../assets/mathjax-config.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/pyodide/v0.27.0/full/pyodide.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
+      
+        <script src="../../js/jac.monarch.js"></script>
+      
+        <script src="../../js/run-code.js"></script>
+      
+    
+  </body>
+</html>
