@@ -1,0 +1,4941 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://jac-lang.org/latest/jac_book/chapter_3/">
+      
+      
+        <link rel="prev" href="../chapter_2/">
+      
+      
+        <link rel="next" href="../chapter_4/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>3. Functions, Control Flow, and Collections in Jac - The Jac Programming Language and Jaseci Stack</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#3-functions-control-flow-and-collections-in-jac" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="The Jac Programming Language and Jaseci Stack" class="md-header__button md-logo" aria-label="The Jac Programming Language and Jaseci Stack" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            The Jac Programming Language and Jaseci Stack
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              3. Functions, Control Flow, and Collections in Jac
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Jaseci-Labs/jaseci" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../learn/getting_started/" class="md-tabs__link">
+          
+  
+  
+  Learn
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../internals/contrib/" class="md-tabs__link">
+          
+  
+  
+  Internals
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../communityhub/roadmap/" class="md-tabs__link">
+          
+  
+  
+  Community Hub
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="/playground/" class="md-tabs__link">
+          
+  
+  
+  Jac Playground
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="The Jac Programming Language and Jaseci Stack" class="md-nav__button md-logo" aria-label="The Jac Programming Language and Jaseci Stack" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    The Jac Programming Language and Jaseci Stack
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Jaseci-Labs/jaseci" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Learn
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Learn
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tour of Jac/Jaseci
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac_in_a_flash/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Learn Jac in 5 Minutes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac_playground/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jac Playground
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Learn By Example
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            Learn By Example
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5_1" id="__nav_1_5_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    LittleX (your own twitter)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            LittleX (your own twitter)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/examples/littleX/tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LittleX Tutorial for Beginners
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/examples/littleX/full_guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LittleX Full Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5_2" id="__nav_1_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    RAG-based Conversational Chatbot
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            RAG-based Conversational Chatbot
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/examples/rag_chatbot/Overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RAG Chatbot Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/examples/rag_chatbot/Tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RAG Chatbot Full Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/examples/mtp_examples/rpg_game/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RPG game with AI Genarated Maps
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/examples/mtp_examples/fantasy_trading_game/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agentic Fantasy Trading Game
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_6" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1_6" id="__nav_1_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Learn Jac Language
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_6_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            Learn Jac Language
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    1. Welcome to Jac
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2. Starting Jac, Variables and Types
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    3. Functions, Control Flow, and Collections in Jac
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    3. Functions, Control Flow, and Collections in Jac
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#functions-and-type-annotations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Functions and Type Annotations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions and Type Annotations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-calculator-program" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basic Calculator Program
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#basic-object-oriented-programming" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basic Object Oriented Programming
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Basic Object Oriented Programming">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#defining-an-object" class="md-nav__link">
+    <span class="md-ellipsis">
+      Defining an Object
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enhanced-calculator-with-object-oriented-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      Enhanced Calculator with Object-Oriented Design
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#variable-scope-and-global-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Variable Scope and Global Variables
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Variable Scope and Global Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#local-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Local Variables
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#global-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Global Variables
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#collections-and-data-structures" class="md-nav__link">
+    <span class="md-ellipsis">
+      Collections and Data Structures
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Collections and Data Structures">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lists" class="md-nav__link">
+    <span class="md-ellipsis">
+      Lists
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dictionaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dictionaries
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sets
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#collection-comprehensions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Collection Comprehensions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#control-flow-with-curly-braces" class="md-nav__link">
+    <span class="md-ellipsis">
+      Control Flow with Curly Braces
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Control Flow with Curly Braces">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#if-statements" class="md-nav__link">
+    <span class="md-ellipsis">
+      If Statements
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conditional-logic-if-elif-else" class="md-nav__link">
+    <span class="md-ellipsis">
+      Conditional Logic if-elif-else
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#working-with-loops" class="md-nav__link">
+    <span class="md-ellipsis">
+      Working with Loops
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Working with Loops">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#traditional-for-loops" class="md-nav__link">
+    <span class="md-ellipsis">
+      Traditional For Loops
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jacs-unique-for-to-by-loops" class="md-nav__link">
+    <span class="md-ellipsis">
+      Jac's Unique For-to-by Loops
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#while-loops" class="md-nav__link">
+    <span class="md-ellipsis">
+      While Loops
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pattern-matching-for-complex-logic" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern Matching for Complex Logic
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exception-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exception Handling
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comments-in-jac" class="md-nav__link">
+    <span class="md-ellipsis">
+      Comments in Jac
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#project-structure-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Project Structure Conventions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Project Structure Conventions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interface-and-implementation-separation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interface and Implementation Separation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-beginner-mistakes-and-solutions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Beginner Mistakes and Solutions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Beginner Mistakes and Solutions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-of-common-fixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example of Common Fixes
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-example-simple-grade-book-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complete Example: Simple Grade Book System
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wrapping-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      Wrapping Up
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    4. AI functions and Decorators
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    5. Advanced AI Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    6. Imports System and File Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    7. Enhanced OOP - Objects and Classes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_8/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    8. OSP Introduction and Paradigm Shift
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_9/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    9. Nodes and Edges
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    10. Walkers and Abilities
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_11/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    11. Advanced Object Spatial Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_12/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    12. Walkers as API Endpoints
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_13/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    13. Persistence and the Root Node
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_14/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    14. Multi-User Architecture and Permissions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_15/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    15. Advanced Jac Cloud Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    16. Type System Deep Dive
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_17/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    17. Testing and Debugging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_18/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    18. Deployment Strategies
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_19/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    19. Performance Optimization
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../chapter_20/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    20. Python to Jac Migration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_7" id="__nav_1_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Programming 'by' AI
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_7">
+            <span class="md-nav__icon md-icon"></span>
+            Programming 'by' AI
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-mtllm/with_llm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    GenAI in Jaclang - MTP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-mtllm/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quick-start
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-mtllm/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    How to use MTP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-mtllm/model_declaration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Available Models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-mtllm/multimodality/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Using Multimodal models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-mtllm/creating_mtllm_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Build your own MTLLM plugin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-mtllm/python_integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Python MTLLM Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8" id="__nav_1_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Scale-Native Programming
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8">
+            <span class="md-nav__icon md-icon"></span>
+            Scale-Native Programming
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction to Jac Cloud
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quick Start Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8_3" id="__nav_1_8_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Core Features
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_8_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8_3">
+            <span class="md-nav__icon md-icon"></span>
+            Core Features
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/permission/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Permission Management: Secure Multi-User Access
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Logging and Monitoring Your Application
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/env_vars/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Environment Variables: Configuration Made Easy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8_4" id="__nav_1_8_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Real-time & Async
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_8_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8_4">
+            <span class="md-nav__icon md-icon"></span>
+            Real-time & Async
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/websocket/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    WebSocket: Real-Time Communication
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Task Scheduling: Automate Your Jac Applications
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/async_walker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Async Walker
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/webhook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Webhooks: External API Integration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8_5" id="__nav_1_8_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Operations
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_8_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8_5">
+            <span class="md-nav__icon md-icon"></span>
+            Operations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac-cloud/deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Cloud Deployment Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_9" id="__nav_1_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Tooling
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_9">
+            <span class="md-nav__icon md-icon"></span>
+            Tooling
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/tools/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jac Language Command Line Interface (CLI)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_10" id="__nav_1_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Specifications
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_10">
+            <span class="md-nav__icon md-icon"></span>
+            Specifications
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/dspfoundation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Object-Spatial Programming Specification
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/jac_ref/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Full Language Specification
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_11" id="__nav_1_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Misc Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_11">
+            <span class="md-nav__icon md-icon"></span>
+            Misc Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_11_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_11_1" id="__nav_1_11_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Understanding Object-Spatial
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_11_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_11_1">
+            <span class="md-nav__icon md-icon"></span>
+            Understanding Object-Spatial
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/data_spatial/nodes_and_edges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Nodes and Edges
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/data_spatial/walkers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Walkers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/data_spatial/filtering/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Node and Edge Filtering
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/data_spatial/sequence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Walker and Node ability trigger sequence
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../learn/data_spatial/FAQ/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FAQ
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Internals
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Internals
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/contrib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Design Docs and Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Design Docs and Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/internals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Compiler/Runtime Design
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2_2" id="__nav_2_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Static Compilation
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Static Compilation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2_2_1" id="__nav_2_2_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Sym Table Design Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_2_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            Sym Table Design Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/symbol_tables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Tables in Jaclang
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/symbol_tables/structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Table Structure
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/symbol_tables/building/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Table Building
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/symbol_tables/def_use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Definition and Use
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/symbol_tables/linking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Table Linking
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/symbol_tables/resolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Resolution in Practice
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/uniir_node/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    UniIR Nodes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/jac_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Runtime Plugin Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Planning Specs and Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Planning Specs and Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/ref_roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Language Ref Roadmap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/error_system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Error System
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/formatter_system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Formatter System
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3_4" id="__nav_2_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Native Type System
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Native Type System
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/native_type_system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/native_type_system/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/native_type_system/type_representation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Representation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/native_type_system/type_resolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Resolution
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/native_type_system/type_rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Rules
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/native_type_system/type_inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Inference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/native_type_system/compiler_integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Compiler Integration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/native_type_system/lets_build/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Let's Build
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Community Hub
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Community Hub
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Roadmap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/release_notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Release Notes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/breaking_changes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Breaking Changes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/top_contributors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Leaderboard
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Fun Stuff
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            Fun Stuff
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5_1" id="__nav_3_5_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Project Ideas
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            Project Ideas
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/fun/projects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Project Ideas for the Jac Community
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/fun/p1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    P1
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/fun/p2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    P2
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/fun/p3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    P3
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/content_pieces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Content Pieces
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Jac Playground
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Jac Playground
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="/playground/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Playground
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#functions-and-type-annotations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Functions and Type Annotations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Functions and Type Annotations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#basic-calculator-program" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basic Calculator Program
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#basic-object-oriented-programming" class="md-nav__link">
+    <span class="md-ellipsis">
+      Basic Object Oriented Programming
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Basic Object Oriented Programming">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#defining-an-object" class="md-nav__link">
+    <span class="md-ellipsis">
+      Defining an Object
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#enhanced-calculator-with-object-oriented-design" class="md-nav__link">
+    <span class="md-ellipsis">
+      Enhanced Calculator with Object-Oriented Design
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#variable-scope-and-global-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Variable Scope and Global Variables
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Variable Scope and Global Variables">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#local-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Local Variables
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#global-variables" class="md-nav__link">
+    <span class="md-ellipsis">
+      Global Variables
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#collections-and-data-structures" class="md-nav__link">
+    <span class="md-ellipsis">
+      Collections and Data Structures
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Collections and Data Structures">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#lists" class="md-nav__link">
+    <span class="md-ellipsis">
+      Lists
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#dictionaries" class="md-nav__link">
+    <span class="md-ellipsis">
+      Dictionaries
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#sets" class="md-nav__link">
+    <span class="md-ellipsis">
+      Sets
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#collection-comprehensions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Collection Comprehensions
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#control-flow-with-curly-braces" class="md-nav__link">
+    <span class="md-ellipsis">
+      Control Flow with Curly Braces
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Control Flow with Curly Braces">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#if-statements" class="md-nav__link">
+    <span class="md-ellipsis">
+      If Statements
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conditional-logic-if-elif-else" class="md-nav__link">
+    <span class="md-ellipsis">
+      Conditional Logic if-elif-else
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#working-with-loops" class="md-nav__link">
+    <span class="md-ellipsis">
+      Working with Loops
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Working with Loops">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#traditional-for-loops" class="md-nav__link">
+    <span class="md-ellipsis">
+      Traditional For Loops
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#jacs-unique-for-to-by-loops" class="md-nav__link">
+    <span class="md-ellipsis">
+      Jac's Unique For-to-by Loops
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#while-loops" class="md-nav__link">
+    <span class="md-ellipsis">
+      While Loops
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#pattern-matching-for-complex-logic" class="md-nav__link">
+    <span class="md-ellipsis">
+      Pattern Matching for Complex Logic
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#exception-handling" class="md-nav__link">
+    <span class="md-ellipsis">
+      Exception Handling
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#comments-in-jac" class="md-nav__link">
+    <span class="md-ellipsis">
+      Comments in Jac
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#project-structure-conventions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Project Structure Conventions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Project Structure Conventions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#interface-and-implementation-separation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interface and Implementation Separation
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-beginner-mistakes-and-solutions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Beginner Mistakes and Solutions
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Beginner Mistakes and Solutions">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-of-common-fixes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example of Common Fixes
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#complete-example-simple-grade-book-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complete Example: Simple Grade Book System
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#wrapping-up" class="md-nav__link">
+    <span class="md-ellipsis">
+      Wrapping Up
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="3-functions-control-flow-and-collections-in-jac">3. Functions, Control Flow, and Collections in Jac</h1>
+<hr />
+<p>In this chapter, we will explore Jac's enhanced syntax and type system, focusing on functions, control flow, and collections. We will build upon the foundation laid in the previous chapters, introducing more complex data structures and control mechanisms.</p>
+<h2 id="functions-and-type-annotations">Functions and Type Annotations</h2>
+<hr />
+<p><strong>Functions</strong> are reusable blocks of code that perform a specific task. In Jac, functions are defined using the <code>def</code> keyword, followed by the function name and its parameters. Type annotations are mandatory for all function parameters and return types.</p>
+<p>The following example demonstrates a simple function called <code>add_numbers</code>  that takes two integers as <em>arguments</em> and adds them together, returning the result as an integer. The function is defined with type annotations for both parameters and the return type, ensuring type safety and clarity.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>def add_numbers(a: int, b: int) -&gt; int {
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    result: int = a + b;
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    return result;
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>}
+</code></pre></div>
+<h3 id="basic-calculator-program">Basic Calculator Program</h3>
+<hr />
+<p>Let's build a simple calculator to demonstrate Jac's function in action. The calculator consists of 4 functions that represent basic arithmetic operations: addition, subtraction, multiplication, and division. Each function takes two float arguments and returns the result.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a># calculator.jac
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>def add(a: float, b: float) -&gt; float {
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    return a + b;
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>}
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>def subtract(a: float, b: float) -&gt; float {
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    return a - b;
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>}
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>def multiply(a: float, b: float) -&gt; float {
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    return a * b;
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>}
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>def divide(a: float, b: float) -&gt; float {
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    return a / b;
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>}
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>with entry {
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>    print(&quot;=== Simple Calculator ===&quot;);
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>    # Test calculations
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>    num1: float = 10.0;
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>    num2: float = 3.0;
+<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>
+<a id="__codelineno-1-25" name="__codelineno-1-25" href="#__codelineno-1-25"></a>    print(f&quot;{num1} + {num2} = {add(num1, num2)}&quot;);
+<a id="__codelineno-1-26" name="__codelineno-1-26" href="#__codelineno-1-26"></a>    print(f&quot;{num1} - {num2} = {subtract(num1, num2)}&quot;);
+<a id="__codelineno-1-27" name="__codelineno-1-27" href="#__codelineno-1-27"></a>    print(f&quot;{num1} * {num2} = {multiply(num1, num2)}&quot;);
+<a id="__codelineno-1-28" name="__codelineno-1-28" href="#__codelineno-1-28"></a>    print(f&quot;{num1} / {num2} = {divide(num1, num2)}&quot;);
+<a id="__codelineno-1-29" name="__codelineno-1-29" href="#__codelineno-1-29"></a>}
+</code></pre></div>
+<br /></p>
+<p>More observant readers may notice that the <code>divide</code> function lacks error handling for division by zero—a common beginner mistake. We'll cover proper error handling techniques later in this chapter. In the meantime, use the <code>divide</code> function with care, especially when the second argument might be zero. After all, triggering a division-by-zero error might not actually launch a nuclear warhead... but let's not take any chances, shall we?
+<br /></p>
+<h2 id="basic-object-oriented-programming">Basic Object Oriented Programming</h2>
+<hr />
+<p>Jac is primarily an Object Spatial Language, but it also supports Object Oriented Programming (OOP) concepts. An object is a self-contained unit that combines data and behavior. In Jac, we can define objects using the <code>obj</code> keyword. Objects can also have methods which are defined using the <code>def</code> keyword and these represent the behavior of the object. Objects can also have attributes, which are defined using the <code>has</code> keyword. These attributes represent the data associated with the object.</p>
+<h3 id="defining-an-object">Defining an Object</h3>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>obj Student {
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    has name: str;
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    has age: int;
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    has gpa: float;
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    def get_info() -&gt; str {
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        return f&quot;Name: {self.name}, Age: {self.age}, GPA: {self.gpa}&quot;;
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>    }
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>}
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>with entry {
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>    student: Student = Student(&quot;Alice&quot;, 20, 3.8);  # Create a new Student object
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>    print(student.get_info());
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>}
+</code></pre></div>
+<br /></p>
+<p>Hey, where is the constructor? Good question! Jac does not have a constructor in the traditional sense. Instead, the object is initialized with the <code>has</code> keyword, and the attributes are set directly. This is a design choice in Jac to keep things simple and straightforward.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Jac's objects operates similar to data classes in Python, where the attributes are defined at the class level and can be set directly when creating an instance of the object. This allows for a more concise syntax while still providing the benefits of encapsulation and data organization.</p>
+</div>
+<h3 id="enhanced-calculator-with-object-oriented-design">Enhanced Calculator with Object-Oriented Design</h3>
+<p>In a later chapter, we will explore more of Jac's object-oriented features. For now, let's enhance our calculator by encapsulating its functionality in a <code>obj</code> called <code>Calculator</code>. This allows us to maintain a history of calculations and provides a cleaner interface for users.</p>
+<div class="code-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a># oop_calculator.jac
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>obj Calculator {
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    has history: list[str] = [];
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    def add(a: float, b: float) -&gt; float {
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        result: float = a + b;
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>        self.history.append(f&quot;{a} + {b} = {result}&quot;);
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        return result;
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>    }
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>    def subtract(a: float, b: float) -&gt; float {
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>        result: float = a - b;
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>        self.history.append(f&quot;{a} - {b} = {result}&quot;);
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>        return result;
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    }
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>    def get_history() -&gt; list[str] {
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>        return self.history;
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>    }
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>
+<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>    def clear_history() {
+<a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>        self.history = [];
+<a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>    }
+<a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a>}
+<a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a>
+<a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a>with entry {
+<a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a>    calc = Calculator();
+<a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a>
+<a id="__codelineno-3-29" name="__codelineno-3-29" href="#__codelineno-3-29"></a>    # Perform calculations
+<a id="__codelineno-3-30" name="__codelineno-3-30" href="#__codelineno-3-30"></a>    result1: float = calc.add(5.0, 3.0);
+<a id="__codelineno-3-31" name="__codelineno-3-31" href="#__codelineno-3-31"></a>    result2: float = calc.subtract(10.0, 4.0);
+<a id="__codelineno-3-32" name="__codelineno-3-32" href="#__codelineno-3-32"></a>
+<a id="__codelineno-3-33" name="__codelineno-3-33" href="#__codelineno-3-33"></a>    print(f&quot;Results: {result1}, {result2}&quot;);
+<a id="__codelineno-3-34" name="__codelineno-3-34" href="#__codelineno-3-34"></a>
+<a id="__codelineno-3-35" name="__codelineno-3-35" href="#__codelineno-3-35"></a>    # Show history
+<a id="__codelineno-3-36" name="__codelineno-3-36" href="#__codelineno-3-36"></a>    print(&quot;Calculation History:&quot;);
+<a id="__codelineno-3-37" name="__codelineno-3-37" href="#__codelineno-3-37"></a>    for entry in calc.get_history() {
+<a id="__codelineno-3-38" name="__codelineno-3-38" href="#__codelineno-3-38"></a>        print(f&quot;  {entry}&quot;);
+<a id="__codelineno-3-39" name="__codelineno-3-39" href="#__codelineno-3-39"></a>    }
+<a id="__codelineno-3-40" name="__codelineno-3-40" href="#__codelineno-3-40"></a>}
+</code></pre></div>
+</div>
+<p><br />
+While Jac styles itself as a Object Spatial Language, it is important to note that it is not opposed to Object Oriented Programming. In fact, Jac supports both paradigms, allowing you to choose the best approach for your project. Think of Object Spatial as Object Oriented with rocket pack boosters. You can still use all of your OOP goodness, but with the added benefits of Jac's spatial features.</p>
+<h2 id="variable-scope-and-global-variables">Variable Scope and Global Variables</h2>
+<hr />
+<p>Jac supports both local and global variables. Local variables are defined within a block and are not accessible outside it, while global variables can be accessed anywhere in the code.</p>
+<h3 id="local-variables">Local Variables</h3>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>def add_numbers(a: int, b: int) -&gt; int {
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    result: int = a + b;  # Local variable
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    return result;
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>}
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>with entry {
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    sum = add_numbers(5, 10);
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    print(f&quot;Sum: {sum}&quot;);
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>}
+</code></pre></div>
+<br /></p>
+<h3 id="global-variables">Global Variables</h3>
+<p>Global variables in Jac are declared using the <code>glob</code> keyword and are accessible from anywhere in the program. They are typically used for defining constants or sharing data across multiple contexts. However, their use should be limited, as excessive reliance on global state can lead to unintended side effects. This aligns with Jac’s core philosophy of <em>moving computation to the data</em>—favoring localized logic and context-aware execution over broad, global manipulation.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>glob school_name: str = &quot;Jac High School&quot;;
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>glob passing_grade: int = 60;
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>glob honor_threshold: float = 3.5;
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>def get_school_info() -&gt; str {
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    :g: school_name; # Accessing global variable
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    return f&quot;Welcome to {school_name}&quot;;
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>}
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>with entry {
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    print(get_school_info());
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    print(f&quot;Honor threshold is {honor_threshold}&quot;);
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>}
+</code></pre></div>
+<br /></p>
+<h2 id="collections-and-data-structures">Collections and Data Structures</h2>
+<hr />
+<p>Since Jac is a super-set of Python, it supports the same collection types: lists, dictionaries, sets, and tuples. However, Jac enforces type annotations for all collections, ensuring type safety and clarity.</p>
+<h3 id="lists">Lists</h3>
+<p>Lists are ordered collections of items that can be of mixed types. In Jac, lists are declared with the <code>list</code> type.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>with entry {
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    # Create an empty list for storing integer grades
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    alice_grades: list[int] = [];
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>    # Append grades to the list
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    alice_grades.append(88); # [88]
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>    alice_grades.append(92); # [88, 92]
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>    alice_grades.append(85); # [88, 92, 85]
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>    # Access grades by index
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>    first_grade: int = alice_grades[0];  # 88
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>    print(f&quot;Alice&#39;s first grade: {first_grade}&quot;);
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>    # print the entire list of grades
+<a id="__codelineno-6-15" name="__codelineno-6-15" href="#__codelineno-6-15"></a>    print(f&quot;Alice&#39;s grades: {alice_grades}&quot;);
+<a id="__codelineno-6-16" name="__codelineno-6-16" href="#__codelineno-6-16"></a>}
+</code></pre></div>
+<br /></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>$ jac run example.jac
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>Alice&#39;s first grade: 88
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>Alice&#39;s grades: [88, 92, 85]
+</code></pre></div>
+<h3 id="dictionaries">Dictionaries</h3>
+<p>Dictionaries are key-value pairs that allow for fast lookups. In Jac, dictionaries are declared with the <code>dict</code> type.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>with entry {
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    # Class gradebook
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    math_grades: dict[str, int] = {
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>        &quot;Alice&quot;: 92,
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>        &quot;Bob&quot;: 85,
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>        &quot;Charlie&quot;: 78
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>    };
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>    # Access grades by student name
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>    print(f&quot;Alice&#39;s Math grade: {math_grades[&#39;Alice&#39;]}&quot;);
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>    print(f&quot;Bob&#39;s Math grade: {math_grades[&#39;Bob&#39;]}&quot;);
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>    print(f&quot;Charlie&#39;s Math grade: {math_grades[&#39;Charlie&#39;]}&quot;);
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>}
+</code></pre></div>
+<br /></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>$ jac run example.jac
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>Alice&#39;s Math grade: 92
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>Bob&#39;s Math grade: 85
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>Charlie&#39;s Math grade: 78
+</code></pre></div>
+<h3 id="sets">Sets</h3>
+<p>Sets are unordered collections of unique items. In Jac, sets are declared with the <code>set</code> type.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a>with entry {
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>    # Track unique courses
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>    alice_courses: set[str] = {&quot;Math&quot;, &quot;Science&quot;, &quot;English&quot;};
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a>    bob_courses: set[str] = {&quot;Math&quot;, &quot;History&quot;, &quot;Art&quot;};
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>    # Find common courses
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a>    common_courses = alice_courses.intersection(bob_courses);
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>    print(f&quot;Common courses: {common_courses}&quot;);
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a>    # All unique courses
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>    all_courses = alice_courses.union(bob_courses);
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a>    print(f&quot;All courses: {all_courses}&quot;);
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>}
+</code></pre></div>
+<br />
+In the example above, we use the <code>intersection</code> method to identify courses that both Alice and Bob are enrolled in, and the <code>union</code> method to combine their courses into a single set of unique entries. These are standard operations provided by Python’s built-in <code>set</code> type, and Jac supports them as well. For a more comprehensive overview of collection-related functions in Python, refer to the <a href="https://docs.python.org/3/tutorial/datastructures.html">official Python documentation</a>.</p>
+<h2 id="collection-comprehensions">Collection Comprehensions</h2>
+<hr />
+<p>Jac supports list and dictionary comprehensions, allowing for concise and expressive data processing. In the following example we will explore how to use comprehensions to filter and transform data in a gradebook.</p>
+<p>Lets say we have a list of test scores stored in the variable <code>test_scores</code> and we want to filter out passing grades:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>with entry {
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    # Raw test scores
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    test_scores: list[int] = [78, 85, 92, 69, 88, 95, 72];
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>    # Get passing grades (70 and above)
+<a id="__codelineno-11-6" name="__codelineno-11-6" href="#__codelineno-11-6"></a>    passing_scores: list[int] = [score for score in test_scores if score &gt;= 70];
+<a id="__codelineno-11-7" name="__codelineno-11-7" href="#__codelineno-11-7"></a>    print(f&quot;Passing scores: {passing_scores}&quot;);
+<a id="__codelineno-11-8" name="__codelineno-11-8" href="#__codelineno-11-8"></a>}
+</code></pre></div>
+<br /></p>
+<p>The list comprehension syntax in Jac is similar to Python:
+<code>[expression for item in iterable if condition]</code> where <code>expression</code> is the value to include in the new list, <code>item</code> is the variable representing each element in the original collection, <code>iterable</code> is the collection being processed, and <code>condition</code> is an optional filter.</p>
+<p>Suppose we want to apply a curve to the scores by adding 5 points to each score, we can use a comprehension to create a new list of curved scores:</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>with entry {
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a>    # Raw test scores
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    test_scores: list[int] = [78, 85, 92, 69, 88, 95, 72];
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a>    # Get passing grades (70 and above)
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a>    passing_scores: list[int] = [score for score in test_scores if score &gt;= 70];
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>    print(f&quot;Passing scores: {passing_scores}&quot;);
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>
+<a id="__codelineno-12-9" name="__codelineno-12-9" href="#__codelineno-12-9"></a>    # Apply curve (+5 points)
+<a id="__codelineno-12-10" name="__codelineno-12-10" href="#__codelineno-12-10"></a>    curved_scores: list[int] = [score + 5 for score in test_scores];
+<a id="__codelineno-12-11" name="__codelineno-12-11" href="#__codelineno-12-11"></a>    print(f&quot;Curved scores: {curved_scores}&quot;);
+<a id="__codelineno-12-12" name="__codelineno-12-12" href="#__codelineno-12-12"></a>}
+</code></pre></div>
+<br /></p>
+<h2 id="control-flow-with-curly-braces">Control Flow with Curly Braces</h2>
+<hr />
+<p>Earlier in this chapter, we defined a simple calculator. However, our <code>divide</code> function had a critical oversight—it didn’t account for division by zero. In the interest of both robust code and global stability, we’ll now implement proper control flow to safely handle this case and enhance our calculator’s reliability.</p>
+<h3 id="if-statements">If Statements</h3>
+<p>An <code>if</code> statement allows you to execute code conditionally based on whether a certain condition is true. In Jac, we use curly braces <code>{}</code> to define the block of code that should be executed if the condition is met.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>def divide(a: float, b: float) -&gt; float | str {
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    if b == 0.0 {
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>        return &quot;Error: Cannot divide by zero!&quot;;
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    }
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    return a / b;
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>}
+</code></pre></div>
+<br />
+In the example above, we check if <code>b</code> is zero via the statement <code>if b == 0.0</code> before performing the division. If it is, we return an error message instead of attempting the division.</p>
+<h3 id="conditional-logic-if-elif-else">Conditional Logic <code>if-elif-else</code></h3>
+<p>Jac supports <code>if-elif-else</code> statements for multiple conditions. This allows you to handle various cases in a structured way. Lets extend our simple grading system to classify grades based on score ranges. In the following example, we will classify scores into letter grades by combining <code>if</code>, <code>elif</code>, and <code>else</code> statements along list comprehensions to apply the classification to a list of test scores.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a>def classify_grade(score: int) -&gt; str {
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a>    if score &gt;= 90 {
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a>        return &quot;A&quot;;
+<a id="__codelineno-14-4" name="__codelineno-14-4" href="#__codelineno-14-4"></a>    } elif score &gt;= 80 {
+<a id="__codelineno-14-5" name="__codelineno-14-5" href="#__codelineno-14-5"></a>        return &quot;B&quot;;
+<a id="__codelineno-14-6" name="__codelineno-14-6" href="#__codelineno-14-6"></a>    } elif score &gt;= 70 {
+<a id="__codelineno-14-7" name="__codelineno-14-7" href="#__codelineno-14-7"></a>        return &quot;C&quot;;
+<a id="__codelineno-14-8" name="__codelineno-14-8" href="#__codelineno-14-8"></a>    } elif score &gt;= 60 {
+<a id="__codelineno-14-9" name="__codelineno-14-9" href="#__codelineno-14-9"></a>        return &quot;D&quot;;
+<a id="__codelineno-14-10" name="__codelineno-14-10" href="#__codelineno-14-10"></a>    } else {
+<a id="__codelineno-14-11" name="__codelineno-14-11" href="#__codelineno-14-11"></a>        return &quot;F&quot;;
+<a id="__codelineno-14-12" name="__codelineno-14-12" href="#__codelineno-14-12"></a>    }
+<a id="__codelineno-14-13" name="__codelineno-14-13" href="#__codelineno-14-13"></a>}
+<a id="__codelineno-14-14" name="__codelineno-14-14" href="#__codelineno-14-14"></a>
+<a id="__codelineno-14-15" name="__codelineno-14-15" href="#__codelineno-14-15"></a>with entry {
+<a id="__codelineno-14-16" name="__codelineno-14-16" href="#__codelineno-14-16"></a>    # Raw test scores
+<a id="__codelineno-14-17" name="__codelineno-14-17" href="#__codelineno-14-17"></a>    test_scores: list[int] = [78, 85, 92, 69, 88, 95, 72];
+<a id="__codelineno-14-18" name="__codelineno-14-18" href="#__codelineno-14-18"></a>
+<a id="__codelineno-14-19" name="__codelineno-14-19" href="#__codelineno-14-19"></a>    # Get passing grades (70 and above)
+<a id="__codelineno-14-20" name="__codelineno-14-20" href="#__codelineno-14-20"></a>    passing_scores: list[int] = [score for score in test_scores if score &gt;= 70];
+<a id="__codelineno-14-21" name="__codelineno-14-21" href="#__codelineno-14-21"></a>    print(f&quot;Passing scores: {passing_scores}&quot;);
+<a id="__codelineno-14-22" name="__codelineno-14-22" href="#__codelineno-14-22"></a>
+<a id="__codelineno-14-23" name="__codelineno-14-23" href="#__codelineno-14-23"></a>    # Apply curve (+5 points)
+<a id="__codelineno-14-24" name="__codelineno-14-24" href="#__codelineno-14-24"></a>    curved_scores: list[int] = [score + 5 for score in test_scores];
+<a id="__codelineno-14-25" name="__codelineno-14-25" href="#__codelineno-14-25"></a>    print(f&quot;Curved scores: {curved_scores}&quot;);
+<a id="__codelineno-14-26" name="__codelineno-14-26" href="#__codelineno-14-26"></a>
+<a id="__codelineno-14-27" name="__codelineno-14-27" href="#__codelineno-14-27"></a>    # Classify each score
+<a id="__codelineno-14-28" name="__codelineno-14-28" href="#__codelineno-14-28"></a>    grades: list[str] = [classify_grade(score) for score in test_scores];
+<a id="__codelineno-14-29" name="__codelineno-14-29" href="#__codelineno-14-29"></a>    print(f&quot;Grades: {grades}&quot;);
+<a id="__codelineno-14-30" name="__codelineno-14-30" href="#__codelineno-14-30"></a>}
+</code></pre></div>
+<br /></p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a>$ jac run example.jac
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a>Passing scores: [78, 85, 92, 88, 95, 72]
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a>Curved scores: [83, 90, 97, 74, 93, 100, 77]
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a>Grades: [&#39;C&#39;, &#39;B&#39;, &#39;A&#39;, &#39;D&#39;, &#39;B&#39;, &#39;A&#39;, &#39;C&#39;]
+</code></pre></div>
+<h2 id="working-with-loops">Working with Loops</h2>
+<hr />
+<p>Jac provides multiple loop constructs including traditional <code>for</code> loops, Jac's unique <code>for-to-by</code> loops, and clear, structured <code>while</code> loops.</p>
+<h3 id="traditional-for-loops">Traditional For Loops</h3>
+<p>The traditional for loop is useful when iterating over collections, such as lists or dictionaries.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a>def process_class_grades(grades: dict[str, list[int]]) -&gt; None {
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a>    for (student, student_grades) in grades.items() {
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a>        total = 0;
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a>        for grade in student_grades {
+<a id="__codelineno-16-5" name="__codelineno-16-5" href="#__codelineno-16-5"></a>            total += grade;
+<a id="__codelineno-16-6" name="__codelineno-16-6" href="#__codelineno-16-6"></a>        }
+<a id="__codelineno-16-7" name="__codelineno-16-7" href="#__codelineno-16-7"></a>        average = total / len(student_grades);
+<a id="__codelineno-16-8" name="__codelineno-16-8" href="#__codelineno-16-8"></a>        print(f&quot;{student}: Average = {average}&quot;);
+<a id="__codelineno-16-9" name="__codelineno-16-9" href="#__codelineno-16-9"></a>    }
+<a id="__codelineno-16-10" name="__codelineno-16-10" href="#__codelineno-16-10"></a>}
+<a id="__codelineno-16-11" name="__codelineno-16-11" href="#__codelineno-16-11"></a>
+<a id="__codelineno-16-12" name="__codelineno-16-12" href="#__codelineno-16-12"></a>with entry {
+<a id="__codelineno-16-13" name="__codelineno-16-13" href="#__codelineno-16-13"></a>    class_grades = {
+<a id="__codelineno-16-14" name="__codelineno-16-14" href="#__codelineno-16-14"></a>        &quot;Alice&quot;: [88, 92, 85],
+<a id="__codelineno-16-15" name="__codelineno-16-15" href="#__codelineno-16-15"></a>        &quot;Bob&quot;: [79, 83, 77],
+<a id="__codelineno-16-16" name="__codelineno-16-16" href="#__codelineno-16-16"></a>        &quot;Charlie&quot;: [95, 89, 92]
+<a id="__codelineno-16-17" name="__codelineno-16-17" href="#__codelineno-16-17"></a>    };
+<a id="__codelineno-16-18" name="__codelineno-16-18" href="#__codelineno-16-18"></a>
+<a id="__codelineno-16-19" name="__codelineno-16-19" href="#__codelineno-16-19"></a>    # Process all students
+<a id="__codelineno-16-20" name="__codelineno-16-20" href="#__codelineno-16-20"></a>    process_class_grades(class_grades);
+<a id="__codelineno-16-21" name="__codelineno-16-21" href="#__codelineno-16-21"></a>}
+</code></pre></div>
+ <br /></p>
+<h3 id="jacs-unique-for-to-by-loops">Jac's Unique For-to-by Loops</h3>
+<p>Jac introduces the unique <code>for-to-by</code> loop, allowing clear and explicit iteration control.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a>with entry {
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a>    print(&quot;Scaled scores (0-100 to 0-4.0 GPA):&quot;);
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a>    for score = 60 to score &lt;= 100 by score += 10 {
+<a id="__codelineno-17-4" name="__codelineno-17-4" href="#__codelineno-17-4"></a>        gpa = (score - 60) * 4.0 / 40.0;
+<a id="__codelineno-17-5" name="__codelineno-17-5" href="#__codelineno-17-5"></a>        print(f&quot;Score {score} -&gt; GPA {gpa}&quot;);
+<a id="__codelineno-17-6" name="__codelineno-17-6" href="#__codelineno-17-6"></a>    }
+<a id="__codelineno-17-7" name="__codelineno-17-7" href="#__codelineno-17-7"></a>}
+</code></pre></div>
+<br /></p>
+<h3 id="while-loops">While Loops</h3>
+<p>Jac supports traditional <code>while</code> loops with clear curly brace syntax for iterative logic.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a>with entry {
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a>    count: int = 1;
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a>    total: int = 0;
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a>    while count &lt;= 5 {
+<a id="__codelineno-18-5" name="__codelineno-18-5" href="#__codelineno-18-5"></a>        print(f&quot;Adding {count} to total&quot;);
+<a id="__codelineno-18-6" name="__codelineno-18-6" href="#__codelineno-18-6"></a>        total += count;
+<a id="__codelineno-18-7" name="__codelineno-18-7" href="#__codelineno-18-7"></a>        count += 1;
+<a id="__codelineno-18-8" name="__codelineno-18-8" href="#__codelineno-18-8"></a>    }
+<a id="__codelineno-18-9" name="__codelineno-18-9" href="#__codelineno-18-9"></a>    print(f&quot;Final total: {total}&quot;);
+<a id="__codelineno-18-10" name="__codelineno-18-10" href="#__codelineno-18-10"></a>}
+</code></pre></div>
+<br /></p>
+<h2 id="pattern-matching-for-complex-logic">Pattern Matching for Complex Logic</h2>
+<hr />
+<p>Use pattern matching to handle complex grading scenarios elegantly.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a>def process_grade_input(input: any) -&gt; str {
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a>    match input {
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a>        case int() if 90 &lt;= input &lt;= 100:
+<a id="__codelineno-19-4" name="__codelineno-19-4" href="#__codelineno-19-4"></a>            return f&quot;Excellent work! Score: {input}&quot;;
+<a id="__codelineno-19-5" name="__codelineno-19-5" href="#__codelineno-19-5"></a>        case int() if 80 &lt;= input &lt; 90:
+<a id="__codelineno-19-6" name="__codelineno-19-6" href="#__codelineno-19-6"></a>            return f&quot;Good job! Score: {input}&quot;;
+<a id="__codelineno-19-7" name="__codelineno-19-7" href="#__codelineno-19-7"></a>        case int() if 70 &lt;= input &lt; 80:
+<a id="__codelineno-19-8" name="__codelineno-19-8" href="#__codelineno-19-8"></a>            return f&quot;Satisfactory. Score: {input}&quot;;
+<a id="__codelineno-19-9" name="__codelineno-19-9" href="#__codelineno-19-9"></a>        case int() if 0 &lt;= input &lt; 70:
+<a id="__codelineno-19-10" name="__codelineno-19-10" href="#__codelineno-19-10"></a>            return f&quot;Needs improvement. Score: {input}&quot;;
+<a id="__codelineno-19-11" name="__codelineno-19-11" href="#__codelineno-19-11"></a>        case str() if input in [&quot;A&quot;, &quot;B&quot;, &quot;C&quot;, &quot;D&quot;, &quot;F&quot;]:
+<a id="__codelineno-19-12" name="__codelineno-19-12" href="#__codelineno-19-12"></a>            return f&quot;Letter grade received: {input}&quot;;
+<a id="__codelineno-19-13" name="__codelineno-19-13" href="#__codelineno-19-13"></a>        case list() if len(input) &gt; 0:
+<a id="__codelineno-19-14" name="__codelineno-19-14" href="#__codelineno-19-14"></a>            avg = sum(input) / len(input);
+<a id="__codelineno-19-15" name="__codelineno-19-15" href="#__codelineno-19-15"></a>            return f&quot;Average of {len(input)} grades: {avg}&quot;;
+<a id="__codelineno-19-16" name="__codelineno-19-16" href="#__codelineno-19-16"></a>        case _:
+<a id="__codelineno-19-17" name="__codelineno-19-17" href="#__codelineno-19-17"></a>            return &quot;Invalid grade input&quot;;
+<a id="__codelineno-19-18" name="__codelineno-19-18" href="#__codelineno-19-18"></a>    }
+<a id="__codelineno-19-19" name="__codelineno-19-19" href="#__codelineno-19-19"></a>}
+<a id="__codelineno-19-20" name="__codelineno-19-20" href="#__codelineno-19-20"></a>
+<a id="__codelineno-19-21" name="__codelineno-19-21" href="#__codelineno-19-21"></a>with entry {
+<a id="__codelineno-19-22" name="__codelineno-19-22" href="#__codelineno-19-22"></a>    print(process_grade_input(95));        # Number grade
+<a id="__codelineno-19-23" name="__codelineno-19-23" href="#__codelineno-19-23"></a>    print(process_grade_input(&quot;A&quot;));       # Letter grade
+<a id="__codelineno-19-24" name="__codelineno-19-24" href="#__codelineno-19-24"></a>    print(process_grade_input([88, 92, 85])); # List of grades
+<a id="__codelineno-19-25" name="__codelineno-19-25" href="#__codelineno-19-25"></a>}
+</code></pre></div>
+<br /></p>
+<h2 id="exception-handling">Exception Handling</h2>
+<hr />
+<p>Handle errors gracefully when processing student data.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a>def safe_calculate_gpa(grades: list[int]) -&gt; float {
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a>    try {
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a>        if len(grades) == 0 {
+<a id="__codelineno-20-4" name="__codelineno-20-4" href="#__codelineno-20-4"></a>            raise ValueError(&quot;No grades provided&quot;);
+<a id="__codelineno-20-5" name="__codelineno-20-5" href="#__codelineno-20-5"></a>        }
+<a id="__codelineno-20-6" name="__codelineno-20-6" href="#__codelineno-20-6"></a>        total = sum(grades);
+<a id="__codelineno-20-7" name="__codelineno-20-7" href="#__codelineno-20-7"></a>        return total / len(grades);
+<a id="__codelineno-20-8" name="__codelineno-20-8" href="#__codelineno-20-8"></a>    } except ValueError as e {
+<a id="__codelineno-20-9" name="__codelineno-20-9" href="#__codelineno-20-9"></a>        print(f&quot;Error: {e}&quot;);
+<a id="__codelineno-20-10" name="__codelineno-20-10" href="#__codelineno-20-10"></a>        return 0.0;
+<a id="__codelineno-20-11" name="__codelineno-20-11" href="#__codelineno-20-11"></a>    }
+<a id="__codelineno-20-12" name="__codelineno-20-12" href="#__codelineno-20-12"></a>}
+<a id="__codelineno-20-13" name="__codelineno-20-13" href="#__codelineno-20-13"></a>
+<a id="__codelineno-20-14" name="__codelineno-20-14" href="#__codelineno-20-14"></a>def validate_grade(grade: int) -&gt; None {
+<a id="__codelineno-20-15" name="__codelineno-20-15" href="#__codelineno-20-15"></a>    if grade &lt; 0 or grade &gt; 100 {
+<a id="__codelineno-20-16" name="__codelineno-20-16" href="#__codelineno-20-16"></a>        raise ValueError(f&quot;Grade {grade} is out of valid range (0-100)&quot;);
+<a id="__codelineno-20-17" name="__codelineno-20-17" href="#__codelineno-20-17"></a>    }
+<a id="__codelineno-20-18" name="__codelineno-20-18" href="#__codelineno-20-18"></a>}
+<a id="__codelineno-20-19" name="__codelineno-20-19" href="#__codelineno-20-19"></a>
+<a id="__codelineno-20-20" name="__codelineno-20-20" href="#__codelineno-20-20"></a>with entry {
+<a id="__codelineno-20-21" name="__codelineno-20-21" href="#__codelineno-20-21"></a>    # Test safe calculation
+<a id="__codelineno-20-22" name="__codelineno-20-22" href="#__codelineno-20-22"></a>    valid_grades = [85, 90, 78];
+<a id="__codelineno-20-23" name="__codelineno-20-23" href="#__codelineno-20-23"></a>    gpa = safe_calculate_gpa(valid_grades);
+<a id="__codelineno-20-24" name="__codelineno-20-24" href="#__codelineno-20-24"></a>    print(f&quot;GPA: {gpa}&quot;);
+<a id="__codelineno-20-25" name="__codelineno-20-25" href="#__codelineno-20-25"></a>
+<a id="__codelineno-20-26" name="__codelineno-20-26" href="#__codelineno-20-26"></a>    # Test error handling
+<a id="__codelineno-20-27" name="__codelineno-20-27" href="#__codelineno-20-27"></a>    try {
+<a id="__codelineno-20-28" name="__codelineno-20-28" href="#__codelineno-20-28"></a>        validate_grade(150);  # Invalid grade
+<a id="__codelineno-20-29" name="__codelineno-20-29" href="#__codelineno-20-29"></a>    } except ValueError as e {
+<a id="__codelineno-20-30" name="__codelineno-20-30" href="#__codelineno-20-30"></a>        print(f&quot;Validation error: {e}&quot;);
+<a id="__codelineno-20-31" name="__codelineno-20-31" href="#__codelineno-20-31"></a>    }
+<a id="__codelineno-20-32" name="__codelineno-20-32" href="#__codelineno-20-32"></a>}
+</code></pre></div>
+<br /></p>
+<h2 id="comments-in-jac">Comments in Jac</h2>
+<hr />
+<p>Comments help document your Jac code clearly. Jac supports both single-line and multiline comments.</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a>with entry {
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a>    # This is a single-line comment
+<a id="__codelineno-21-3" name="__codelineno-21-3" href="#__codelineno-21-3"></a>    student_name: str = &quot;Alice&quot;;
+<a id="__codelineno-21-4" name="__codelineno-21-4" href="#__codelineno-21-4"></a>
+<a id="__codelineno-21-5" name="__codelineno-21-5" href="#__codelineno-21-5"></a>    #*
+<a id="__codelineno-21-6" name="__codelineno-21-6" href="#__codelineno-21-6"></a>        This is a
+<a id="__codelineno-21-7" name="__codelineno-21-7" href="#__codelineno-21-7"></a>        multi-line comment.
+<a id="__codelineno-21-8" name="__codelineno-21-8" href="#__codelineno-21-8"></a>    *#
+<a id="__codelineno-21-9" name="__codelineno-21-9" href="#__codelineno-21-9"></a>
+<a id="__codelineno-21-10" name="__codelineno-21-10" href="#__codelineno-21-10"></a>    grades: list[int] = [88, 92, 85];
+<a id="__codelineno-21-11" name="__codelineno-21-11" href="#__codelineno-21-11"></a>
+<a id="__codelineno-21-12" name="__codelineno-21-12" href="#__codelineno-21-12"></a>    print(student_name);
+<a id="__codelineno-21-13" name="__codelineno-21-13" href="#__codelineno-21-13"></a>    print(grades);
+<a id="__codelineno-21-14" name="__codelineno-21-14" href="#__codelineno-21-14"></a>}
+</code></pre></div>
+<br /></p>
+<h2 id="project-structure-conventions">Project Structure Conventions</h2>
+<hr />
+<p>Jac encourages separating interface declarations from implementations, making code more maintainable as projects grow.</p>
+<p>As your projects grow, following these conventions will help:</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a>my_project/
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a>├── main.jac              # Main program
+<a id="__codelineno-22-3" name="__codelineno-22-3" href="#__codelineno-22-3"></a>├── models/
+<a id="__codelineno-22-4" name="__codelineno-22-4" href="#__codelineno-22-4"></a>│   ├── user.jac          # User interface
+<a id="__codelineno-22-5" name="__codelineno-22-5" href="#__codelineno-22-5"></a>│   ├── user.impl.jac     # User implementation
+<a id="__codelineno-22-6" name="__codelineno-22-6" href="#__codelineno-22-6"></a>│   └── user.test.jac     # User tests
+<a id="__codelineno-22-7" name="__codelineno-22-7" href="#__codelineno-22-7"></a>└── utils/
+<a id="__codelineno-22-8" name="__codelineno-22-8" href="#__codelineno-22-8"></a>    ├── helpers.jac       # Helper functions
+<a id="__codelineno-22-9" name="__codelineno-22-9" href="#__codelineno-22-9"></a>    └── constants.jac     # Application constants
+</code></pre></div>
+<br /></p>
+<h3 id="interface-and-implementation-separation">Interface and Implementation Separation</h3>
+<p>You many notice that from the project structure above, there is a file <code>user.jac</code> and <code>user.impl.jac</code>. This is a common pattern in Jac projects where interfaces are defined separately from their implementations. This allows for better organization and easier testing.</p>
+<p>Lets consider a simple example of a user interface and its implementation. The user has a <code>name</code> and <code>email</code> attributes, and we want to validate the email format and provide a display name via the <code>get_display_name</code> and <code>validate</code> methods.</p>
+<p>We can first define the interface in <code>user.jac</code>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a># user.jac - Interface declaration
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a>obj User {
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a>    has name: str;
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a>    has email: str;
+<a id="__codelineno-23-5" name="__codelineno-23-5" href="#__codelineno-23-5"></a>
+<a id="__codelineno-23-6" name="__codelineno-23-6" href="#__codelineno-23-6"></a>    def validate() -&gt; bool;
+<a id="__codelineno-23-7" name="__codelineno-23-7" href="#__codelineno-23-7"></a>    def get_display_name() -&gt; str;
+<a id="__codelineno-23-8" name="__codelineno-23-8" href="#__codelineno-23-8"></a>}
+</code></pre></div>
+<br /></p>
+<p>Next, we implement the interface in <code>user.impl.jac</code>:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a># user.impl.jac - Implementation
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a>impl User.validate {
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a>    return &quot;@&quot; in self.email and len(self.name) &gt; 0;
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a>}
+<a id="__codelineno-24-5" name="__codelineno-24-5" href="#__codelineno-24-5"></a>
+<a id="__codelineno-24-6" name="__codelineno-24-6" href="#__codelineno-24-6"></a>impl User.get_display_name {
+<a id="__codelineno-24-7" name="__codelineno-24-7" href="#__codelineno-24-7"></a>    return f&quot;{self.name} &lt;{self.email}&gt;&quot;;
+<a id="__codelineno-24-8" name="__codelineno-24-8" href="#__codelineno-24-8"></a>}
+</code></pre></div>
+<br /></p>
+<h2 id="common-beginner-mistakes-and-solutions">Common Beginner Mistakes and Solutions</h2>
+<hr />
+<p>Most beginner issues stem from Jac's stricter type requirements compared to Python. Here are the most common mistakes and their solutions.</p>
+<table>
+<thead>
+<tr>
+<th><strong>Issue</strong></th>
+<th><strong>Solution</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Missing semicolons</td>
+<td>Add <code>;</code> at the end of statements</td>
+</tr>
+<tr>
+<td>Missing type annotations</td>
+<td>Add types to all variables: <code>x: int = 5;</code></td>
+</tr>
+<tr>
+<td>No entry block</td>
+<td>Add <code>with entry { ... }</code> for executable scripts</td>
+</tr>
+<tr>
+<td>Python-style indentation</td>
+<td>Use <code>{ }</code> braces instead of indentation</td>
+</tr>
+</tbody>
+</table>
+<h3 id="example-of-common-fixes">Example of Common Fixes</h3>
+<p>Someone unfamiliar with Jac might write code like this:</p>
+<p><div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a># This won&#39;t work - missing types and semicolons
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a>def greet(name) {
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a>    return f&quot;Hello, {name}&quot;
+<a id="__codelineno-25-4" name="__codelineno-25-4" href="#__codelineno-25-4"></a>}
+<a id="__codelineno-25-5" name="__codelineno-25-5" href="#__codelineno-25-5"></a>
+<a id="__codelineno-25-6" name="__codelineno-25-6" href="#__codelineno-25-6"></a># Missing entry block
+<a id="__codelineno-25-7" name="__codelineno-25-7" href="#__codelineno-25-7"></a>print(greet(&quot;World&quot;))
+</code></pre></div>
+<br /></p>
+<p>The corrected version of the code would be:
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a># This works - proper types and syntax
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a>def greet(name: str) -&gt; str {
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a>    return f&quot;Hello, {name}&quot;;
+<a id="__codelineno-26-4" name="__codelineno-26-4" href="#__codelineno-26-4"></a>}
+<a id="__codelineno-26-5" name="__codelineno-26-5" href="#__codelineno-26-5"></a>
+<a id="__codelineno-26-6" name="__codelineno-26-6" href="#__codelineno-26-6"></a>with entry {
+<a id="__codelineno-26-7" name="__codelineno-26-7" href="#__codelineno-26-7"></a>    print(greet(&quot;World&quot;));
+<a id="__codelineno-26-8" name="__codelineno-26-8" href="#__codelineno-26-8"></a>}
+</code></pre></div>
+<br /></p>
+<h2 id="complete-example-simple-grade-book-system">Complete Example: Simple Grade Book System</h2>
+<hr />
+<p>Lets put everything together in a complete example of a simple grade book system. This example will demonstrate Jac's type system, functions, control flow, and collections in action. The grade book will allow adding students, recording grades, calculating averages, and displaying results.</p>
+<div class="code-block">
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a>obj GradeBook {
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a>    has students: dict[str, list[int]] = {};
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a>
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a>    def add_student(name: str) -&gt; None;
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a>    def add_grade(student: str, grade: int) -&gt; None;
+<a id="__codelineno-27-6" name="__codelineno-27-6" href="#__codelineno-27-6"></a>    def get_average(student: str) -&gt; float;
+<a id="__codelineno-27-7" name="__codelineno-27-7" href="#__codelineno-27-7"></a>    def get_all_averages() -&gt; dict[str, float];
+<a id="__codelineno-27-8" name="__codelineno-27-8" href="#__codelineno-27-8"></a>}
+<a id="__codelineno-27-9" name="__codelineno-27-9" href="#__codelineno-27-9"></a>
+<a id="__codelineno-27-10" name="__codelineno-27-10" href="#__codelineno-27-10"></a>impl GradeBook.add_student(name: str) -&gt; None {
+<a id="__codelineno-27-11" name="__codelineno-27-11" href="#__codelineno-27-11"></a>    if name not in self.students {
+<a id="__codelineno-27-12" name="__codelineno-27-12" href="#__codelineno-27-12"></a>        self.students[name] = [];
+<a id="__codelineno-27-13" name="__codelineno-27-13" href="#__codelineno-27-13"></a>        print(f&quot;Added student: {name}&quot;);
+<a id="__codelineno-27-14" name="__codelineno-27-14" href="#__codelineno-27-14"></a>    } else {
+<a id="__codelineno-27-15" name="__codelineno-27-15" href="#__codelineno-27-15"></a>        print(f&quot;Student {name} already exists&quot;);
+<a id="__codelineno-27-16" name="__codelineno-27-16" href="#__codelineno-27-16"></a>    }
+<a id="__codelineno-27-17" name="__codelineno-27-17" href="#__codelineno-27-17"></a>}
+<a id="__codelineno-27-18" name="__codelineno-27-18" href="#__codelineno-27-18"></a>
+<a id="__codelineno-27-19" name="__codelineno-27-19" href="#__codelineno-27-19"></a>impl GradeBook.add_grade(student: str, grade: int) -&gt; None {
+<a id="__codelineno-27-20" name="__codelineno-27-20" href="#__codelineno-27-20"></a>    if grade &lt; 0 or grade &gt; 100 {
+<a id="__codelineno-27-21" name="__codelineno-27-21" href="#__codelineno-27-21"></a>        print(f&quot;Invalid grade: {grade}&quot;);
+<a id="__codelineno-27-22" name="__codelineno-27-22" href="#__codelineno-27-22"></a>        return;
+<a id="__codelineno-27-23" name="__codelineno-27-23" href="#__codelineno-27-23"></a>    }
+<a id="__codelineno-27-24" name="__codelineno-27-24" href="#__codelineno-27-24"></a>
+<a id="__codelineno-27-25" name="__codelineno-27-25" href="#__codelineno-27-25"></a>    if student in self.students {
+<a id="__codelineno-27-26" name="__codelineno-27-26" href="#__codelineno-27-26"></a>        self.students[student].append(grade);
+<a id="__codelineno-27-27" name="__codelineno-27-27" href="#__codelineno-27-27"></a>        print(f&quot;Added grade {grade} for {student}&quot;);
+<a id="__codelineno-27-28" name="__codelineno-27-28" href="#__codelineno-27-28"></a>    } else {
+<a id="__codelineno-27-29" name="__codelineno-27-29" href="#__codelineno-27-29"></a>        print(f&quot;Student {student} not found&quot;);
+<a id="__codelineno-27-30" name="__codelineno-27-30" href="#__codelineno-27-30"></a>    }
+<a id="__codelineno-27-31" name="__codelineno-27-31" href="#__codelineno-27-31"></a>}
+<a id="__codelineno-27-32" name="__codelineno-27-32" href="#__codelineno-27-32"></a>
+<a id="__codelineno-27-33" name="__codelineno-27-33" href="#__codelineno-27-33"></a>impl GradeBook.get_average(student: str) -&gt; float {
+<a id="__codelineno-27-34" name="__codelineno-27-34" href="#__codelineno-27-34"></a>    if student not in self.students or len(self.students[student]) == 0 {
+<a id="__codelineno-27-35" name="__codelineno-27-35" href="#__codelineno-27-35"></a>        return 0.0;
+<a id="__codelineno-27-36" name="__codelineno-27-36" href="#__codelineno-27-36"></a>    }
+<a id="__codelineno-27-37" name="__codelineno-27-37" href="#__codelineno-27-37"></a>    grades = self.students[student];
+<a id="__codelineno-27-38" name="__codelineno-27-38" href="#__codelineno-27-38"></a>    return sum(grades) / len(grades);
+<a id="__codelineno-27-39" name="__codelineno-27-39" href="#__codelineno-27-39"></a>}
+<a id="__codelineno-27-40" name="__codelineno-27-40" href="#__codelineno-27-40"></a>
+<a id="__codelineno-27-41" name="__codelineno-27-41" href="#__codelineno-27-41"></a>impl GradeBook.get_all_averages() -&gt; dict[str, float] {
+<a id="__codelineno-27-42" name="__codelineno-27-42" href="#__codelineno-27-42"></a>    averages: dict[str, float] = {};
+<a id="__codelineno-27-43" name="__codelineno-27-43" href="#__codelineno-27-43"></a>    for (student, grades) in self.students.items() {
+<a id="__codelineno-27-44" name="__codelineno-27-44" href="#__codelineno-27-44"></a>        if len(grades) &gt; 0 {
+<a id="__codelineno-27-45" name="__codelineno-27-45" href="#__codelineno-27-45"></a>            averages[student] = sum(grades) / len(grades);
+<a id="__codelineno-27-46" name="__codelineno-27-46" href="#__codelineno-27-46"></a>        }
+<a id="__codelineno-27-47" name="__codelineno-27-47" href="#__codelineno-27-47"></a>    }
+<a id="__codelineno-27-48" name="__codelineno-27-48" href="#__codelineno-27-48"></a>    return averages;
+<a id="__codelineno-27-49" name="__codelineno-27-49" href="#__codelineno-27-49"></a>}
+<a id="__codelineno-27-50" name="__codelineno-27-50" href="#__codelineno-27-50"></a>
+<a id="__codelineno-27-51" name="__codelineno-27-51" href="#__codelineno-27-51"></a>with entry {
+<a id="__codelineno-27-52" name="__codelineno-27-52" href="#__codelineno-27-52"></a>    # Create gradebook
+<a id="__codelineno-27-53" name="__codelineno-27-53" href="#__codelineno-27-53"></a>    gradebook = GradeBook();
+<a id="__codelineno-27-54" name="__codelineno-27-54" href="#__codelineno-27-54"></a>
+<a id="__codelineno-27-55" name="__codelineno-27-55" href="#__codelineno-27-55"></a>    # Add students
+<a id="__codelineno-27-56" name="__codelineno-27-56" href="#__codelineno-27-56"></a>    gradebook.add_student(&quot;Alice&quot;);
+<a id="__codelineno-27-57" name="__codelineno-27-57" href="#__codelineno-27-57"></a>    gradebook.add_student(&quot;Bob&quot;);
+<a id="__codelineno-27-58" name="__codelineno-27-58" href="#__codelineno-27-58"></a>
+<a id="__codelineno-27-59" name="__codelineno-27-59" href="#__codelineno-27-59"></a>    # Add grades
+<a id="__codelineno-27-60" name="__codelineno-27-60" href="#__codelineno-27-60"></a>    gradebook.add_grade(&quot;Alice&quot;, 88);
+<a id="__codelineno-27-61" name="__codelineno-27-61" href="#__codelineno-27-61"></a>    gradebook.add_grade(&quot;Alice&quot;, 92);
+<a id="__codelineno-27-62" name="__codelineno-27-62" href="#__codelineno-27-62"></a>    gradebook.add_grade(&quot;Bob&quot;, 85);
+<a id="__codelineno-27-63" name="__codelineno-27-63" href="#__codelineno-27-63"></a>    gradebook.add_grade(&quot;Bob&quot;, 79);
+<a id="__codelineno-27-64" name="__codelineno-27-64" href="#__codelineno-27-64"></a>
+<a id="__codelineno-27-65" name="__codelineno-27-65" href="#__codelineno-27-65"></a>    # Get results
+<a id="__codelineno-27-66" name="__codelineno-27-66" href="#__codelineno-27-66"></a>    all_averages = gradebook.get_all_averages();
+<a id="__codelineno-27-67" name="__codelineno-27-67" href="#__codelineno-27-67"></a>    for (student, avg) in all_averages.items() {
+<a id="__codelineno-27-68" name="__codelineno-27-68" href="#__codelineno-27-68"></a>        letter = &quot;A&quot; if avg &gt;= 90 else &quot;B&quot; if avg &gt;= 80 else &quot;C&quot; if avg &gt;= 70 else &quot;F&quot;;
+<a id="__codelineno-27-69" name="__codelineno-27-69" href="#__codelineno-27-69"></a>        print(f&quot;{student}: {avg} ({letter})&quot;);
+<a id="__codelineno-27-70" name="__codelineno-27-70" href="#__codelineno-27-70"></a>    }
+<a id="__codelineno-27-71" name="__codelineno-27-71" href="#__codelineno-27-71"></a>}
+</code></pre></div>
+</div>
+<p><br /></p>
+<h2 id="wrapping-up">Wrapping Up</h2>
+<hr />
+<p>This chapter introduced Jac's type system, functions, control flow, and collections. We built a simple calculator, explored object-oriented programming, and learned how to handle errors gracefully. We also covered common beginner mistakes and provided solutions to help you avoid them.
+These foundational concepts will serve as the building blocks for more advanced Jac programming. In the next chapter, we will explore Jac's advanced features, including AI integration and more sophisticated data structures taking advantage of Jac's powerful type system and syntax.</p>
+<hr />
+<p><em>Now that you understand Jac's type system and syntax, let's build more sophisticated programs with functions and AI integration!</em></p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 Jac Hackers Everwhere
+    </div>
+  
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+      
+    
+    
+    
+      
+      
+    
+    <a href="https://fosstodon.org/@squidfunk" target="_blank" rel="noopener me" title="fosstodon.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M433 179.11c0-97.2-63.71-125.7-63.71-125.7-62.52-28.7-228.56-28.4-290.48 0 0 0-63.72 28.5-63.72 125.7 0 115.7-6.6 259.4 105.63 289.1 40.51 10.7 75.32 13 103.33 11.4 50.81-2.8 79.32-18.1 79.32-18.1l-1.7-36.9s-36.31 11.4-77.12 10.1c-40.41-1.4-83-4.4-89.63-54a102.5 102.5 0 0 1-.9-13.9c85.63 20.9 158.65 9.1 178.75 6.7 56.12-6.7 105-41.3 111.23-72.9 9.8-49.8 9-121.5 9-121.5m-75.12 125.2h-46.63v-114.2c0-49.7-64-51.6-64 6.9v62.5h-46.33V197c0-58.5-64-56.6-64-6.9v114.2H90.19c0-122.1-5.2-147.9 18.41-175 25.9-28.9 79.82-30.8 103.83 6.1l11.6 19.5 11.6-19.5c24.11-37.1 78.12-34.8 103.83-6.1 23.71 27.3 18.4 53 18.4 175z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.instant", "navigation.top", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+        <script src="../../assets/mathjax-config.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/pyodide/v0.27.0/full/pyodide.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
+      
+        <script src="../../js/jac.monarch.js"></script>
+      
+        <script src="../../js/run-code.js"></script>
+      
+    
+  </body>
+</html>

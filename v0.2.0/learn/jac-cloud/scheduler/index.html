@@ -1,0 +1,4480 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://jac-lang.org/latest/learn/jac-cloud/scheduler/">
+      
+      
+        <link rel="prev" href="../websocket/">
+      
+      
+        <link rel="next" href="../async_walker/">
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Task Scheduling: Automate Your Jac Applications - The Jac Programming Language and Jaseci Stack</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#task-scheduling-automate-your-jac-applications" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="The Jac Programming Language and Jaseci Stack" class="md-header__button md-logo" aria-label="The Jac Programming Language and Jaseci Stack" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            The Jac Programming Language and Jaseci Stack
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Task Scheduling: Automate Your Jac Applications
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Jaseci-Labs/jaseci" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../getting_started/" class="md-tabs__link">
+          
+  
+  
+  Learn
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../internals/contrib/" class="md-tabs__link">
+          
+  
+  
+  Internals
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../communityhub/roadmap/" class="md-tabs__link">
+          
+  
+  
+  Community Hub
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="/playground/" class="md-tabs__link">
+          
+  
+  
+  Jac Playground
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="The Jac Programming Language and Jaseci Stack" class="md-nav__button md-logo" aria-label="The Jac Programming Language and Jaseci Stack" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    The Jac Programming Language and Jaseci Stack
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Jaseci-Labs/jaseci" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Learn
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Learn
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tour of Jac/Jaseci
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_in_a_flash/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Learn Jac in 5 Minutes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_playground/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jac Playground
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Learn By Example
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            Learn By Example
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5_1" id="__nav_1_5_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    LittleX (your own twitter)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            LittleX (your own twitter)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/littleX/tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LittleX Tutorial for Beginners
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/littleX/full_guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LittleX Full Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5_2" id="__nav_1_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    RAG-based Conversational Chatbot
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            RAG-based Conversational Chatbot
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/rag_chatbot/Overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RAG Chatbot Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/rag_chatbot/Tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RAG Chatbot Full Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/mtp_examples/rpg_game/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RPG game with AI Genarated Maps
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/mtp_examples/fantasy_trading_game/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agentic Fantasy Trading Game
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_6" id="__nav_1_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Learn Jac Language
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            Learn Jac Language
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    1. Welcome to Jac
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2. Starting Jac, Variables and Types
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    3. Functions, Control Flow, and Collections in Jac
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    4. AI functions and Decorators
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    5. Advanced AI Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    6. Imports System and File Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    7. Enhanced OOP - Objects and Classes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_8/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    8. OSP Introduction and Paradigm Shift
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_9/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    9. Nodes and Edges
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    10. Walkers and Abilities
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_11/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    11. Advanced Object Spatial Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_12/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    12. Walkers as API Endpoints
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_13/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    13. Persistence and the Root Node
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_14/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    14. Multi-User Architecture and Permissions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_15/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    15. Advanced Jac Cloud Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    16. Type System Deep Dive
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_17/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    17. Testing and Debugging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_18/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    18. Deployment Strategies
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_19/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    19. Performance Optimization
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_20/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    20. Python to Jac Migration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_7" id="__nav_1_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Programming 'by' AI
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_7">
+            <span class="md-nav__icon md-icon"></span>
+            Programming 'by' AI
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac-mtllm/with_llm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    GenAI in Jaclang - MTP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac-mtllm/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quick-start
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac-mtllm/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    How to use MTP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac-mtllm/model_declaration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Available Models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac-mtllm/multimodality/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Using Multimodal models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac-mtllm/creating_mtllm_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Build your own MTLLM plugin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac-mtllm/python_integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Python MTLLM Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1_8" id="__nav_1_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Scale-Native Programming
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1_8">
+            <span class="md-nav__icon md-icon"></span>
+            Scale-Native Programming
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction to Jac Cloud
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quick Start Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8_3" id="__nav_1_8_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Core Features
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_8_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8_3">
+            <span class="md-nav__icon md-icon"></span>
+            Core Features
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../permission/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Permission Management: Secure Multi-User Access
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Logging and Monitoring Your Application
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../env_vars/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Environment Variables: Configuration Made Easy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1_8_4" id="__nav_1_8_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Real-time & Async
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_8_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1_8_4">
+            <span class="md-nav__icon md-icon"></span>
+            Real-time & Async
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../websocket/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    WebSocket: Real-Time Communication
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Task Scheduling: Automate Your Jac Applications
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Task Scheduling: Automate Your Jac Applications
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scheduler-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scheduler Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scheduler Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-configuration-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Configuration Options
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cron-trigger" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cron Trigger
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cron Trigger">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#additional-cron-configuration-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional Cron Configuration Options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cron-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cron Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interval-trigger" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interval Trigger
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Interval Trigger">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#additional-interval-configuration-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional Interval Configuration Options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interval-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interval Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#date-trigger" class="md-nav__link">
+    <span class="md-ellipsis">
+      Date Trigger
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Date Trigger">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#additional-date-configuration-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional Date Configuration Options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#date-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Date Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#jac-cloud-optional-task-queue" class="md-nav__link">
+    <span class="md-ellipsis">
+      Jac Cloud Optional Task Queue
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Jac Cloud Optional Task Queue">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-use-case" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example Use Case
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-tasks-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      How Tasks Work
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#debugging-scheduled-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debugging Scheduled Tasks
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../async_walker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Async Walker
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../webhook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Webhooks: External API Integration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8_5" id="__nav_1_8_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Operations
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_8_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8_5">
+            <span class="md-nav__icon md-icon"></span>
+            Operations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Cloud Deployment Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_9" id="__nav_1_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Tooling
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_9">
+            <span class="md-nav__icon md-icon"></span>
+            Tooling
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jac Language Command Line Interface (CLI)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_10" id="__nav_1_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Specifications
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_10">
+            <span class="md-nav__icon md-icon"></span>
+            Specifications
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dspfoundation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Object-Spatial Programming Specification
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_ref/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Full Language Specification
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_11" id="__nav_1_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Misc Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_11">
+            <span class="md-nav__icon md-icon"></span>
+            Misc Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_11_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_11_1" id="__nav_1_11_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Understanding Object-Spatial
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_11_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_11_1">
+            <span class="md-nav__icon md-icon"></span>
+            Understanding Object-Spatial
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_spatial/nodes_and_edges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Nodes and Edges
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_spatial/walkers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Walkers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_spatial/filtering/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Node and Edge Filtering
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_spatial/sequence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Walker and Node ability trigger sequence
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_spatial/FAQ/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FAQ
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Internals
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Internals
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/contrib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Design Docs and Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Design Docs and Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/internals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Compiler/Runtime Design
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2_2" id="__nav_2_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Static Compilation
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Static Compilation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2_2_1" id="__nav_2_2_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Sym Table Design Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_2_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            Sym Table Design Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/symbol_tables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Tables in Jaclang
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/symbol_tables/structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Table Structure
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/symbol_tables/building/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Table Building
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/symbol_tables/def_use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Definition and Use
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/symbol_tables/linking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Table Linking
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/symbol_tables/resolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Resolution in Practice
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/uniir_node/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    UniIR Nodes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/jac_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Runtime Plugin Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Planning Specs and Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Planning Specs and Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/ref_roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Language Ref Roadmap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/error_system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Error System
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/formatter_system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Formatter System
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3_4" id="__nav_2_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Native Type System
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Native Type System
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/native_type_system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/native_type_system/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/native_type_system/type_representation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Representation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/native_type_system/type_resolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Resolution
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/native_type_system/type_rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Rules
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/native_type_system/type_inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Inference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/native_type_system/compiler_integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Compiler Integration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/native_type_system/lets_build/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Let's Build
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Community Hub
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Community Hub
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../communityhub/roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Roadmap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../communityhub/release_notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Release Notes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../communityhub/breaking_changes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Breaking Changes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../communityhub/top_contributors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Leaderboard
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Fun Stuff
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            Fun Stuff
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5_1" id="__nav_3_5_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Project Ideas
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            Project Ideas
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../communityhub/fun/projects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Project Ideas for the Jac Community
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../communityhub/fun/p1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    P1
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../communityhub/fun/p2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    P2
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../communityhub/fun/p3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    P3
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../communityhub/content_pieces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Content Pieces
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Jac Playground
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Jac Playground
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="/playground/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Playground
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      Overview
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#scheduler-configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Scheduler Configuration
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Scheduler Configuration">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#common-configuration-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Configuration Options
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cron-trigger" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cron Trigger
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Cron Trigger">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#additional-cron-configuration-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional Cron Configuration Options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cron-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Cron Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#interval-trigger" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interval Trigger
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Interval Trigger">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#additional-interval-configuration-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional Interval Configuration Options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#interval-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Interval Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#date-trigger" class="md-nav__link">
+    <span class="md-ellipsis">
+      Date Trigger
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Date Trigger">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#additional-date-configuration-options" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional Date Configuration Options
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#date-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      Date Example
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#jac-cloud-optional-task-queue" class="md-nav__link">
+    <span class="md-ellipsis">
+      Jac Cloud Optional Task Queue
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Jac Cloud Optional Task Queue">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#example-use-case" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example Use Case
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#how-tasks-work" class="md-nav__link">
+    <span class="md-ellipsis">
+      How Tasks Work
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#debugging-scheduled-tasks" class="md-nav__link">
+    <span class="md-ellipsis">
+      Debugging Scheduled Tasks
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="task-scheduling-automate-your-jac-applications">Task Scheduling: Automate Your Jac Applications</h1>
+<h2 id="overview">Overview</h2>
+<p>Jac Cloud's scheduler allows you to run walkers automatically at specific times or intervals. This is useful for:</p>
+<ul>
+<li>Running periodic background tasks</li>
+<li>Processing data at scheduled intervals</li>
+<li>Sending scheduled notifications</li>
+<li>Executing maintenance operations</li>
+<li>Any task that needs to happen on a recurring basis</li>
+</ul>
+<h2 id="scheduler-configuration">Scheduler Configuration</h2>
+<p>To configure a scheduled walker, add a <code>schedule</code> dictionary to the walker's <code>__specs__</code> configuration. The schedule supports three trigger types:</p>
+<ol>
+<li><strong>Cron</strong> - Schedule using cron expressions</li>
+<li><strong>Interval</strong> - Schedule at regular time intervals</li>
+<li><strong>Date</strong> - Schedule at a specific date and time</li>
+</ol>
+<h3 id="common-configuration-options">Common Configuration Options</h3>
+<table>
+<thead>
+<tr>
+<th><strong>NAME</strong></th>
+<th><strong>TYPE</strong></th>
+<th><strong>DESCRIPTION</strong></th>
+<th><strong>DEFAULT</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>trigger</td>
+<td>str</td>
+<td>trigger type (<code>cron</code>, <code>interval</code>, <code>date</code>)</td>
+<td>N/A</td>
+</tr>
+<tr>
+<td>node</td>
+<td>str or None</td>
+<td>entry node if necessary, defaults to root</td>
+<td>None</td>
+</tr>
+<tr>
+<td>args</td>
+<td>list[Any] or None</td>
+<td>list of arguments to initialize the walker</td>
+<td>None</td>
+</tr>
+<tr>
+<td>kwargs</td>
+<td>dict[str, Any] or None</td>
+<td>dict of keyword arguments to initialize the walker</td>
+<td>None</td>
+</tr>
+<tr>
+<td>max_instances</td>
+<td>int</td>
+<td>max simultaneous running job per walker type</td>
+<td>1</td>
+</tr>
+<tr>
+<td>next_run_time</td>
+<td>datetime or None</td>
+<td>target date before the first trigger will happen</td>
+<td>None</td>
+</tr>
+<tr>
+<td>propagate</td>
+<td>bool</td>
+<td>if multiple jac-cloud service can trigger at the same time or first service only per trigger only</td>
+<td>false</td>
+</tr>
+<tr>
+<td>save</td>
+<td>bool</td>
+<td>if walker instance will be save to the db including the results</td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<h2 id="cron-trigger">Cron Trigger</h2>
+<p>The cron trigger uses a cron-like expression to schedule tasks with high precision.</p>
+<h3 id="additional-cron-configuration-options">Additional Cron Configuration Options</h3>
+<table>
+<thead>
+<tr>
+<th><strong>NAME</strong></th>
+<th><strong>TYPES</strong></th>
+<th><strong>DESCRIPTION</strong></th>
+<th><strong>DEFAULT</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>year</td>
+<td>int or str</td>
+<td>4-digit year</td>
+<td>*</td>
+</tr>
+<tr>
+<td>month</td>
+<td>int or str</td>
+<td>month (1-12)</td>
+<td>*</td>
+</tr>
+<tr>
+<td>day</td>
+<td>int or str</td>
+<td>day of month (1-31)</td>
+<td>*</td>
+</tr>
+<tr>
+<td>week</td>
+<td>int or str</td>
+<td>ISO week (1-53)</td>
+<td>*</td>
+</tr>
+<tr>
+<td>day_of_week</td>
+<td>int or str</td>
+<td>number or name of weekday (0-6 or mon,tue,wed,thu,fri,sat,sun)</td>
+<td>*</td>
+</tr>
+<tr>
+<td>hour</td>
+<td>int or str</td>
+<td>hour (0-23)</td>
+<td>*</td>
+</tr>
+<tr>
+<td>minute</td>
+<td>int or str</td>
+<td>minute (0-59)</td>
+<td>*</td>
+</tr>
+<tr>
+<td>second</td>
+<td>int or str</td>
+<td>second (0-59)</td>
+<td>*</td>
+</tr>
+<tr>
+<td>start_date</td>
+<td>datetime or str or None</td>
+<td>earliest possible date/time to trigger on (inclusive)</td>
+<td>None</td>
+</tr>
+<tr>
+<td>end_date</td>
+<td>datetime or str or None</td>
+<td>latest possible date/time to trigger on (inclusive)</td>
+<td>None</td>
+</tr>
+</tbody>
+</table>
+<h3 id="cron-example">Cron Example</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>walker walker_cron {
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    has arg1: int;
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    has arg2: str;
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    has kwarg1: int = 3;
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    has kwarg2: str = &quot;4&quot;;
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    can enter with `root entry {
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>        print(&quot;I am a scheduled walker!&quot;)
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    }
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    class __specs__ {
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        has private: bool = True;
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        has schedule: dict = {
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>            &quot;trigger&quot;: &quot;cron&quot;,
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>            &quot;args&quot;: [1, &quot;2&quot;],
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>            &quot;kwargs&quot;: {
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>                &quot;kwarg1&quot;: 30,
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>                &quot;kwarg2&quot;: &quot;40&quot;
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>            },
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>            # Run every day at midnight
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>            &quot;hour&quot;: &quot;0&quot;,
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>            &quot;minute&quot;: &quot;0&quot;,
+<a id="__codelineno-0-23" name="__codelineno-0-23" href="#__codelineno-0-23"></a>            &quot;save&quot;: True
+<a id="__codelineno-0-24" name="__codelineno-0-24" href="#__codelineno-0-24"></a>        };
+<a id="__codelineno-0-25" name="__codelineno-0-25" href="#__codelineno-0-25"></a>    }
+<a id="__codelineno-0-26" name="__codelineno-0-26" href="#__codelineno-0-26"></a>}
+</code></pre></div>
+<h2 id="interval-trigger">Interval Trigger</h2>
+<p>The interval trigger runs a task at regular time intervals.</p>
+<h3 id="additional-interval-configuration-options">Additional Interval Configuration Options</h3>
+<table>
+<thead>
+<tr>
+<th><strong>NAME</strong></th>
+<th><strong>TYPES</strong></th>
+<th><strong>DESCRIPTION</strong></th>
+<th><strong>DEFAULT</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>weeks</td>
+<td>int</td>
+<td>number of weeks to wait</td>
+<td></td>
+</tr>
+<tr>
+<td>days</td>
+<td>int</td>
+<td>number of days to wait</td>
+<td></td>
+</tr>
+<tr>
+<td>hours</td>
+<td>int</td>
+<td>number of hours to wait</td>
+<td></td>
+</tr>
+<tr>
+<td>minutes</td>
+<td>int</td>
+<td>number of minutes to wait</td>
+<td></td>
+</tr>
+<tr>
+<td>seconds</td>
+<td>int</td>
+<td>number of seconds to wait</td>
+<td>1</td>
+</tr>
+<tr>
+<td>start_date</td>
+<td>datetime or str or None</td>
+<td>starting point for the interval calculation</td>
+<td></td>
+</tr>
+<tr>
+<td>end_date</td>
+<td>datetime or str or None</td>
+<td>latest possible date/time to trigger on</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="interval-example">Interval Example</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>walker walker_interval {
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    has arg1: int;
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    has arg2: str;
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    has kwarg1: int = 3;
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    has kwarg2: str = &quot;4&quot;;
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>    can enter with `root entry {
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>        print(&quot;I am a scheduled walker running every 5 seconds!&quot;);
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>    }
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    class __specs__ {
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>        has private: bool = True;
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>        has schedule: dict = {
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>            &quot;trigger&quot;: &quot;interval&quot;,
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>            &quot;args&quot;: [1, &quot;2&quot;],
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>            &quot;kwargs&quot;: {
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>                &quot;kwarg1&quot;: 30,
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>                &quot;kwarg2&quot;: &quot;40&quot;
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>            },
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>            &quot;seconds&quot;: 5,
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>            &quot;save&quot;: True
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>        };
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>    }
+<a id="__codelineno-1-24" name="__codelineno-1-24" href="#__codelineno-1-24"></a>}
+</code></pre></div>
+<h2 id="date-trigger">Date Trigger</h2>
+<p>The date trigger runs a task once at a specific date and time.</p>
+<h3 id="additional-date-configuration-options">Additional Date Configuration Options</h3>
+<table>
+<thead>
+<tr>
+<th><strong>NAME</strong></th>
+<th><strong>TYPES</strong></th>
+<th><strong>DESCRIPTION</strong></th>
+<th><strong>DEFAULT</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>run_date</td>
+<td>datetime or str</td>
+<td>the date/time to run the job at</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h3 id="date-example">Date Example</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>walker walker_date {
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    has arg1: int;
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    has arg2: str;
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>    has kwarg1: int = 3;
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    has kwarg2: str = &quot;4&quot;;
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>    can enter with `root entry {
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        print(&quot;I am a scheduled walker running once at a specific time!&quot;);
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    }
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>    class __specs__ {
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>        has private: bool = True;
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>        has schedule: dict = {
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>            &quot;trigger&quot;: &quot;date&quot;,
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>            &quot;args&quot;: [1, &quot;2&quot;],
+<a id="__codelineno-2-16" name="__codelineno-2-16" href="#__codelineno-2-16"></a>            &quot;kwargs&quot;: {
+<a id="__codelineno-2-17" name="__codelineno-2-17" href="#__codelineno-2-17"></a>                &quot;kwarg1&quot;: 30,
+<a id="__codelineno-2-18" name="__codelineno-2-18" href="#__codelineno-2-18"></a>                &quot;kwarg2&quot;: &quot;40&quot;
+<a id="__codelineno-2-19" name="__codelineno-2-19" href="#__codelineno-2-19"></a>            },
+<a id="__codelineno-2-20" name="__codelineno-2-20" href="#__codelineno-2-20"></a>            &quot;run_date&quot;: &quot;2025-04-30T11:12:00+00:00&quot;,
+<a id="__codelineno-2-21" name="__codelineno-2-21" href="#__codelineno-2-21"></a>            &quot;save&quot;: True
+<a id="__codelineno-2-22" name="__codelineno-2-22" href="#__codelineno-2-22"></a>        };
+<a id="__codelineno-2-23" name="__codelineno-2-23" href="#__codelineno-2-23"></a>    }
+<a id="__codelineno-2-24" name="__codelineno-2-24" href="#__codelineno-2-24"></a>}
+</code></pre></div>
+<h2 id="jac-cloud-optional-task-queue">Jac Cloud Optional Task Queue</h2>
+<p>Jac Cloud also supports asynchronous task management that can be enabled by setting the <code>TASK_CONSUMER_CRON_SECOND</code> environment variable. This allows you to create tasks that will be processed by a background worker.</p>
+<h3 id="example-use-case">Example Use Case</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>import from jac_cloud.plugin.implementation {create_task}
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>node TaskCounter {
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    has val: int = 0;
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>}
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>walker get_or_create_counter {
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>    can enter1 with `root entry {
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        tc = TaskCounter();
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>        here ++&gt; tc;
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>        report tc;
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>    }
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a>    can enter2 with TaskCounter entry {
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a>        report here;
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>    }
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a>}
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>walker increment_counter {
+<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a>    has val: int;
+<a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>
+<a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>    can enter with TaskCounter entry {
+<a id="__codelineno-3-24" name="__codelineno-3-24" href="#__codelineno-3-24"></a>        here.val += self.val;
+<a id="__codelineno-3-25" name="__codelineno-3-25" href="#__codelineno-3-25"></a>    }
+<a id="__codelineno-3-26" name="__codelineno-3-26" href="#__codelineno-3-26"></a>
+<a id="__codelineno-3-27" name="__codelineno-3-27" href="#__codelineno-3-27"></a>    class __specs__ {
+<a id="__codelineno-3-28" name="__codelineno-3-28" href="#__codelineno-3-28"></a>        has private: bool = True;
+<a id="__codelineno-3-29" name="__codelineno-3-29" href="#__codelineno-3-29"></a>    }
+<a id="__codelineno-3-30" name="__codelineno-3-30" href="#__codelineno-3-30"></a>}
+<a id="__codelineno-3-31" name="__codelineno-3-31" href="#__codelineno-3-31"></a>
+<a id="__codelineno-3-32" name="__codelineno-3-32" href="#__codelineno-3-32"></a>walker trigger_counter_task {
+<a id="__codelineno-3-33" name="__codelineno-3-33" href="#__codelineno-3-33"></a>    can enter with `root entry {
+<a id="__codelineno-3-34" name="__codelineno-3-34" href="#__codelineno-3-34"></a>        tcs = [--&gt;(`?TaskCounter)];
+<a id="__codelineno-3-35" name="__codelineno-3-35" href="#__codelineno-3-35"></a>        if tcs {
+<a id="__codelineno-3-36" name="__codelineno-3-36" href="#__codelineno-3-36"></a>            report create_task(increment_counter(val=1), tcs[0]);
+<a id="__codelineno-3-37" name="__codelineno-3-37" href="#__codelineno-3-37"></a>        }
+<a id="__codelineno-3-38" name="__codelineno-3-38" href="#__codelineno-3-38"></a>    }
+<a id="__codelineno-3-39" name="__codelineno-3-39" href="#__codelineno-3-39"></a>}
+</code></pre></div>
+<h3 id="how-tasks-work">How Tasks Work</h3>
+<ul>
+<li><code>trigger_counter_task</code> creates a walker task that will be consumed by the Task Consumer</li>
+<li>The task is saved to both the database and Redis</li>
+<li>The polling mechanism uses Redis to avoid excessive database traffic</li>
+<li>The minimum polling interval is 1 second, configurable via <code>TASK_CONSUMER_CRON_SECOND</code></li>
+<li>Task consumption is atomic, ensuring only one Jac Cloud instance processes each task</li>
+<li>If Redis is cleared, pending tasks will be repopulated from the database when Jac Cloud restarts</li>
+</ul>
+<h2 id="best-practices">Best Practices</h2>
+<ol>
+<li><strong>Set Appropriate Intervals</strong>: Use intervals that match your application's needs (e.g., don't poll every second if hourly updates are sufficient)</li>
+<li><strong>Make Tasks Idempotent</strong>: Design scheduled tasks to be safely run multiple times</li>
+<li><strong>Handle Failures Gracefully</strong>: Add error handling in your scheduled walkers</li>
+<li><strong>Consider Time Zones</strong>: Be aware of server time zones when scheduling date/time-specific tasks</li>
+<li><strong>Monitor Task Performance</strong>: Log execution times and success rates for scheduled tasks</li>
+</ol>
+<h2 id="debugging-scheduled-tasks">Debugging Scheduled Tasks</h2>
+<p>If your scheduled task isn't running:</p>
+<ol>
+<li>Check that the <code>schedule</code> configuration is correctly formatted</li>
+<li>Ensure the <code>private</code> flag is set to <code>true</code> (recommended for scheduled tasks)</li>
+<li>Verify the environment variable <code>TASK_CONSUMER_CRON_SECOND</code> is set (for async tasks)</li>
+<li>Check the logs for any errors during task execution</li>
+<li>Test the walker manually to ensure it works properly</li>
+</ol>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li>Learn about <a href="../websocket/">WebSocket Communication</a> for real-time updates</li>
+<li>Explore <a href="../webhook/">Webhook Integration</a> for external service integration</li>
+<li>Set up <a href="../logging/">Logging &amp; Monitoring</a> to track task execution</li>
+<li>Deploy your application using <a href="../deployment/">Kubernetes</a> for scalable task processing</li>
+</ul>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 Jac Hackers Everwhere
+    </div>
+  
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+      
+    
+    
+    
+      
+      
+    
+    <a href="https://fosstodon.org/@squidfunk" target="_blank" rel="noopener me" title="fosstodon.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M433 179.11c0-97.2-63.71-125.7-63.71-125.7-62.52-28.7-228.56-28.4-290.48 0 0 0-63.72 28.5-63.72 125.7 0 115.7-6.6 259.4 105.63 289.1 40.51 10.7 75.32 13 103.33 11.4 50.81-2.8 79.32-18.1 79.32-18.1l-1.7-36.9s-36.31 11.4-77.12 10.1c-40.41-1.4-83-4.4-89.63-54a102.5 102.5 0 0 1-.9-13.9c85.63 20.9 158.65 9.1 178.75 6.7 56.12-6.7 105-41.3 111.23-72.9 9.8-49.8 9-121.5 9-121.5m-75.12 125.2h-46.63v-114.2c0-49.7-64-51.6-64 6.9v62.5h-46.33V197c0-58.5-64-56.6-64-6.9v114.2H90.19c0-122.1-5.2-147.9 18.41-175 25.9-28.9 79.82-30.8 103.83 6.1l11.6 19.5 11.6-19.5c24.11-37.1 78.12-34.8 103.83-6.1 23.71 27.3 18.4 53 18.4 175z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.instant", "navigation.top", "search.highlight", "search.suggest"], "search": "../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+        <script src="../../../assets/mathjax-config.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/pyodide/v0.27.0/full/pyodide.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
+      
+        <script src="../../../js/jac.monarch.js"></script>
+      
+        <script src="../../../js/run-code.js"></script>
+      
+    
+  </body>
+</html>

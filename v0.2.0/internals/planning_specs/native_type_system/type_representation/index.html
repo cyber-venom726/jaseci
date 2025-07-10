@@ -1,0 +1,4199 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://jac-lang.org/latest/internals/planning_specs/native_type_system/type_representation/">
+      
+      
+        <link rel="prev" href="../architecture/">
+      
+      
+        <link rel="next" href="../type_resolution/">
+      
+      
+      <link rel="icon" href="../../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Type Representation - The Jac Programming Language and Jaseci Stack</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../../extra.css">
+    
+    <script>__md_scope=new URL("../../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#type-representation" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../../.." title="The Jac Programming Language and Jaseci Stack" class="md-header__button md-logo" aria-label="The Jac Programming Language and Jaseci Stack" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            The Jac Programming Language and Jaseci Stack
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Type Representation
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Jaseci-Labs/jaseci" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../learn/getting_started/" class="md-tabs__link">
+          
+  
+  
+  Learn
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../../contrib/" class="md-tabs__link">
+          
+  
+  
+  Internals
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../../communityhub/roadmap/" class="md-tabs__link">
+          
+  
+  
+  Community Hub
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="/playground/" class="md-tabs__link">
+          
+  
+  
+  Jac Playground
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../../.." title="The Jac Programming Language and Jaseci Stack" class="md-nav__button md-logo" aria-label="The Jac Programming Language and Jaseci Stack" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    The Jac Programming Language and Jaseci Stack
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Jaseci-Labs/jaseci" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Learn
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Learn
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tour of Jac/Jaseci
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac_in_a_flash/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Learn Jac in 5 Minutes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac_playground/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jac Playground
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Learn By Example
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            Learn By Example
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5_1" id="__nav_1_5_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    LittleX (your own twitter)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            LittleX (your own twitter)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/examples/littleX/tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LittleX Tutorial for Beginners
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/examples/littleX/full_guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LittleX Full Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5_2" id="__nav_1_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    RAG-based Conversational Chatbot
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            RAG-based Conversational Chatbot
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/examples/rag_chatbot/Overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RAG Chatbot Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/examples/rag_chatbot/Tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RAG Chatbot Full Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/examples/mtp_examples/rpg_game/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RPG game with AI Genarated Maps
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/examples/mtp_examples/fantasy_trading_game/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agentic Fantasy Trading Game
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_6" id="__nav_1_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Learn Jac Language
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            Learn Jac Language
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    1. Welcome to Jac
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2. Starting Jac, Variables and Types
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    3. Functions, Control Flow, and Collections in Jac
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    4. AI functions and Decorators
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    5. Advanced AI Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    6. Imports System and File Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    7. Enhanced OOP - Objects and Classes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_8/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    8. OSP Introduction and Paradigm Shift
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_9/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    9. Nodes and Edges
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    10. Walkers and Abilities
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_11/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    11. Advanced Object Spatial Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_12/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    12. Walkers as API Endpoints
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_13/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    13. Persistence and the Root Node
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_14/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    14. Multi-User Architecture and Permissions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_15/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    15. Advanced Jac Cloud Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    16. Type System Deep Dive
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_17/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    17. Testing and Debugging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_18/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    18. Deployment Strategies
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_19/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    19. Performance Optimization
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../jac_book/chapter_20/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    20. Python to Jac Migration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_7" id="__nav_1_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Programming 'by' AI
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_7">
+            <span class="md-nav__icon md-icon"></span>
+            Programming 'by' AI
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac-mtllm/with_llm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    GenAI in Jaclang - MTP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac-mtllm/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quick-start
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac-mtllm/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    How to use MTP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac-mtllm/model_declaration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Available Models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac-mtllm/multimodality/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Using Multimodal models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac-mtllm/creating_mtllm_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Build your own MTLLM plugin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac-mtllm/python_integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Python MTLLM Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8" id="__nav_1_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Scale-Native Programming
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8">
+            <span class="md-nav__icon md-icon"></span>
+            Scale-Native Programming
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac-cloud/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction to Jac Cloud
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac-cloud/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quick Start Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8_3" id="__nav_1_8_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Core Features
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_8_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8_3">
+            <span class="md-nav__icon md-icon"></span>
+            Core Features
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac-cloud/permission/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Permission Management: Secure Multi-User Access
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac-cloud/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Logging and Monitoring Your Application
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac-cloud/env_vars/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Environment Variables: Configuration Made Easy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8_4" id="__nav_1_8_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Real-time & Async
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_8_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8_4">
+            <span class="md-nav__icon md-icon"></span>
+            Real-time & Async
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac-cloud/websocket/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    WebSocket: Real-Time Communication
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac-cloud/scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Task Scheduling: Automate Your Jac Applications
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac-cloud/async_walker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Async Walker
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac-cloud/webhook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Webhooks: External API Integration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8_5" id="__nav_1_8_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Operations
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_8_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8_5">
+            <span class="md-nav__icon md-icon"></span>
+            Operations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac-cloud/deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Cloud Deployment Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_9" id="__nav_1_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Tooling
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_9">
+            <span class="md-nav__icon md-icon"></span>
+            Tooling
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/tools/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jac Language Command Line Interface (CLI)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_10" id="__nav_1_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Specifications
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_10">
+            <span class="md-nav__icon md-icon"></span>
+            Specifications
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/dspfoundation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Object-Spatial Programming Specification
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/jac_ref/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Full Language Specification
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_11" id="__nav_1_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Misc Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_11">
+            <span class="md-nav__icon md-icon"></span>
+            Misc Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_11_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_11_1" id="__nav_1_11_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Understanding Object-Spatial
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_11_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_11_1">
+            <span class="md-nav__icon md-icon"></span>
+            Understanding Object-Spatial
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/data_spatial/nodes_and_edges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Nodes and Edges
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/data_spatial/walkers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Walkers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/data_spatial/filtering/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Node and Edge Filtering
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/data_spatial/sequence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Walker and Node ability trigger sequence
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../learn/data_spatial/FAQ/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FAQ
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Internals
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Internals
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../contrib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Design Docs and Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Design Docs and Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Compiler/Runtime Design
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2_2" id="__nav_2_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Static Compilation
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Static Compilation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2_2_1" id="__nav_2_2_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Sym Table Design Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_2_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            Sym Table Design Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../symbol_tables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Tables in Jaclang
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../symbol_tables/structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Table Structure
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../symbol_tables/building/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Table Building
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../symbol_tables/def_use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Definition and Use
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../symbol_tables/linking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Table Linking
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../symbol_tables/resolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Resolution in Practice
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../uniir_node/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    UniIR Nodes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Runtime Plugin Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Planning Specs and Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Planning Specs and Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../ref_roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Language Ref Roadmap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../error_system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Error System
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../formatter_system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Formatter System
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_4" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_2_3_4" id="__nav_2_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Native Type System
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_3_4_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_2_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Native Type System
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Type Representation
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Representation
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#from-strings-to-objects" class="md-nav__link">
+    <span class="md-ellipsis">
+      From Strings to Objects
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-type-hierarchy" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Type Hierarchy
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-type-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Type Classes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Type Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#primitivetype" class="md-nav__link">
+    <span class="md-ellipsis">
+      PrimitiveType
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#archetypetype" class="md-nav__link">
+    <span class="md-ellipsis">
+      ArchetypeType
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#callabletype" class="md-nav__link">
+    <span class="md-ellipsis">
+      CallableType
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#container-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Container Types
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#type-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      Type Operators
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#special-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Special Types
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#type-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Type Operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Type Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#type-equivalence" class="md-nav__link">
+    <span class="md-ellipsis">
+      Type Equivalence
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subtyping-relationships" class="md-nav__link">
+    <span class="md-ellipsis">
+      Subtyping Relationships
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#singletons-for-common-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Singletons for Common Types
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integration-with-ast" class="md-nav__link">
+    <span class="md-ellipsis">
+      Integration with AST
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#string-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      String Representation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-complex-type-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: Complex Type Representation
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../type_resolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Resolution
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../type_rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Rules
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../type_inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Inference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../compiler_integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Compiler Integration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../lets_build/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Let's Build
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Community Hub
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Community Hub
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../communityhub/roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Roadmap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../communityhub/release_notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Release Notes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../communityhub/breaking_changes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Breaking Changes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../communityhub/top_contributors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Leaderboard
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Fun Stuff
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            Fun Stuff
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5_1" id="__nav_3_5_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Project Ideas
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            Project Ideas
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../communityhub/fun/projects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Project Ideas for the Jac Community
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../communityhub/fun/p1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    P1
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../communityhub/fun/p2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    P2
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../communityhub/fun/p3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    P3
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../../communityhub/content_pieces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Content Pieces
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Jac Playground
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Jac Playground
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="/playground/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Playground
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#from-strings-to-objects" class="md-nav__link">
+    <span class="md-ellipsis">
+      From Strings to Objects
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#the-type-hierarchy" class="md-nav__link">
+    <span class="md-ellipsis">
+      The Type Hierarchy
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#core-type-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Core Type Classes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Core Type Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#primitivetype" class="md-nav__link">
+    <span class="md-ellipsis">
+      PrimitiveType
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#archetypetype" class="md-nav__link">
+    <span class="md-ellipsis">
+      ArchetypeType
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#callabletype" class="md-nav__link">
+    <span class="md-ellipsis">
+      CallableType
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#container-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Container Types
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#type-operators" class="md-nav__link">
+    <span class="md-ellipsis">
+      Type Operators
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#special-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Special Types
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#type-operations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Type Operations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Type Operations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#type-equivalence" class="md-nav__link">
+    <span class="md-ellipsis">
+      Type Equivalence
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#subtyping-relationships" class="md-nav__link">
+    <span class="md-ellipsis">
+      Subtyping Relationships
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#singletons-for-common-types" class="md-nav__link">
+    <span class="md-ellipsis">
+      Singletons for Common Types
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#integration-with-ast" class="md-nav__link">
+    <span class="md-ellipsis">
+      Integration with AST
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#string-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      String Representation
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-complex-type-representation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Example: Complex Type Representation
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="type-representation">Type Representation</h1>
+<p>This document details how types are represented internally in Jac's native type system.</p>
+<h2 id="from-strings-to-objects">From Strings to Objects</h2>
+<p>In the previous implementation, types were primarily represented as strings (e.g., <code>"int"</code>, <code>"list[str]"</code>, <code>"MyCustomType"</code>). The new system replaces these with a rich hierarchy of type objects.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>graph LR
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    A[&quot;String: &#39;list[int]&#39;&quot;] --&gt;|Old System| B[&quot;expr_type = &#39;list[int]&#39;&quot;]
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    C[&quot;AST for list[int]&quot;] --&gt;|New System| D[&quot;ListType(element_type=JAC_INT)&quot;]
+</code></pre></div>
+<h2 id="the-type-hierarchy">The Type Hierarchy</h2>
+<p>The foundation of the type system is the abstract <code>JacType</code> class, which defines the interface for all type objects.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>classDiagram
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    direction LR
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    class JacType {
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        &lt;&lt;abstract&gt;&gt;
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>        +is_equivalent(other: JacType) bool
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>        +is_subtype_of(super_type: JacType, env: TypeEnvironment) bool
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>        +__str__() str
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>    }
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    JacType &lt;|-- PrimitiveType
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>    JacType &lt;|-- AnyType
+<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>    JacType &lt;|-- NothingType
+<a id="__codelineno-1-13" name="__codelineno-1-13" href="#__codelineno-1-13"></a>    JacType &lt;|-- ArchetypeType
+<a id="__codelineno-1-14" name="__codelineno-1-14" href="#__codelineno-1-14"></a>    JacType &lt;|-- CallableType
+<a id="__codelineno-1-15" name="__codelineno-1-15" href="#__codelineno-1-15"></a>    JacType &lt;|-- ContainerType
+<a id="__codelineno-1-16" name="__codelineno-1-16" href="#__codelineno-1-16"></a>    JacType &lt;|-- OptionalType
+<a id="__codelineno-1-17" name="__codelineno-1-17" href="#__codelineno-1-17"></a>    JacType &lt;|-- UnionType
+<a id="__codelineno-1-18" name="__codelineno-1-18" href="#__codelineno-1-18"></a>    JacType &lt;|-- TypeVariable
+<a id="__codelineno-1-19" name="__codelineno-1-19" href="#__codelineno-1-19"></a>
+<a id="__codelineno-1-20" name="__codelineno-1-20" href="#__codelineno-1-20"></a>    ContainerType &lt;|-- ListType
+<a id="__codelineno-1-21" name="__codelineno-1-21" href="#__codelineno-1-21"></a>    ContainerType &lt;|-- DictType
+<a id="__codelineno-1-22" name="__codelineno-1-22" href="#__codelineno-1-22"></a>    ContainerType &lt;|-- TupleType
+<a id="__codelineno-1-23" name="__codelineno-1-23" href="#__codelineno-1-23"></a>    ContainerType &lt;|-- SetType
+</code></pre></div>
+<h2 id="core-type-classes">Core Type Classes</h2>
+<h3 id="primitivetype">PrimitiveType</h3>
+<p>Represents Jac's primitive types like <code>int</code>, <code>float</code>, <code>str</code>, <code>bool</code>, and <code>bytes</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">PrimitiveType</span><span class="p">(</span><span class="n">JacType</span><span class="p">):</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>  <span class="c1"># e.g., &quot;int&quot;, &quot;float&quot;, &quot;str&quot;</span>
+</code></pre></div>
+<h3 id="archetypetype">ArchetypeType</h3>
+<p>Represents Jac archetypes (objects, nodes, edges, walkers) and enums.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">ArchetypeType</span><span class="p">(</span><span class="n">JacType</span><span class="p">):</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sym_tab</span><span class="p">:</span> <span class="n">UniScopeNode</span><span class="p">,</span> <span class="n">arch_node</span><span class="p">:</span> <span class="n">Archetype</span><span class="p">):</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>  <span class="c1"># Fully qualified name</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">sym_tab</span> <span class="o">=</span> <span class="n">sym_tab</span>  <span class="c1"># Symbol table of the archetype</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">arch_node</span> <span class="o">=</span> <span class="n">arch_node</span>  <span class="c1"># AST node for the archetype definition</span>
+</code></pre></div>
+<p>This type maintains connections to both the symbol table and AST node of the archetype, enabling member lookups and inheritance resolution.</p>
+<h3 id="callabletype">CallableType</h3>
+<p>Represents abilities, functions, and lambdas.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">CallableType</span><span class="p">(</span><span class="n">JacType</span><span class="p">):</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">param_types</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">JacType</span><span class="p">],</span> <span class="n">return_type</span><span class="p">:</span> <span class="n">JacType</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">param_types</span> <span class="o">=</span> <span class="n">param_types</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">return_type</span> <span class="o">=</span> <span class="n">return_type</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>  <span class="c1"># Optional name of the callable</span>
+</code></pre></div>
+<h3 id="container-types">Container Types</h3>
+<p>A family of types for collections:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">ListType</span><span class="p">(</span><span class="n">ContainerType</span><span class="p">):</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">element_type</span><span class="p">:</span> <span class="n">JacType</span><span class="p">):</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">element_type</span> <span class="o">=</span> <span class="n">element_type</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="k">class</span><span class="w"> </span><span class="nc">DictType</span><span class="p">(</span><span class="n">ContainerType</span><span class="p">):</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key_type</span><span class="p">:</span> <span class="n">JacType</span><span class="p">,</span> <span class="n">value_type</span><span class="p">:</span> <span class="n">JacType</span><span class="p">):</span>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">key_type</span> <span class="o">=</span> <span class="n">key_type</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">value_type</span> <span class="o">=</span> <span class="n">value_type</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="k">class</span><span class="w"> </span><span class="nc">TupleType</span><span class="p">(</span><span class="n">ContainerType</span><span class="p">):</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item_types</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">JacType</span><span class="p">],</span> <span class="n">homogeneous_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">JacType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">item_types</span> <span class="o">=</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">item_types</span><span class="p">)</span>  <span class="c1"># For heterogeneous tuples</span>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">homogeneous_type</span> <span class="o">=</span> <span class="n">homogeneous_type</span>  <span class="c1"># For tuple[T, ...]</span>
+</code></pre></div>
+<h3 id="type-operators">Type Operators</h3>
+<p>Types that combine or modify other types:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">OptionalType</span><span class="p">(</span><span class="n">JacType</span><span class="p">):</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">wrapped_type</span><span class="p">:</span> <span class="n">JacType</span><span class="p">):</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">wrapped_type</span> <span class="o">=</span> <span class="n">wrapped_type</span>
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a><span class="k">class</span><span class="w"> </span><span class="nc">UnionType</span><span class="p">(</span><span class="n">JacType</span><span class="p">):</span>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">types</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">[</span><span class="n">JacType</span><span class="p">]):</span>
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">member_types</span> <span class="o">=</span> <span class="nb">frozenset</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_normalize_union</span><span class="p">(</span><span class="n">types</span><span class="p">))</span>
+</code></pre></div>
+<h3 id="special-types">Special Types</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">AnyType</span><span class="p">(</span><span class="n">JacType</span><span class="p">):</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents the &#39;any&#39; type.&quot;&quot;&quot;</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    <span class="k">pass</span>
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a><span class="k">class</span><span class="w"> </span><span class="nc">NothingType</span><span class="p">(</span><span class="n">JacType</span><span class="p">):</span>
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents the type for functions not returning a value.&quot;&quot;&quot;</span>
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>    <span class="k">pass</span>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a><span class="k">class</span><span class="w"> </span><span class="nc">TypeVariable</span><span class="p">(</span><span class="n">JacType</span><span class="p">):</span>
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a><span class="w">    </span><span class="sd">&quot;&quot;&quot;Represents a type variable for generics.&quot;&quot;&quot;</span>
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">scope_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">scope_id</span> <span class="o">=</span> <span class="n">scope_id</span>  <span class="c1"># Disambiguates type vars with same name</span>
+</code></pre></div>
+<h2 id="type-operations">Type Operations</h2>
+<h3 id="type-equivalence">Type Equivalence</h3>
+<p>The <code>is_equivalent</code> method determines if two types are equivalent:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="c1"># In ListType</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">is_equivalent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">JacType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    <span class="k">return</span> <span class="p">(</span><span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">ListType</span><span class="p">)</span> <span class="ow">and</span>
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>            <span class="bp">self</span><span class="o">.</span><span class="n">element_type</span><span class="o">.</span><span class="n">is_equivalent</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">element_type</span><span class="p">))</span>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a><span class="c1"># In ArchetypeType (nominal typing)</span>
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a><span class="k">def</span><span class="w"> </span><span class="nf">is_equivalent</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">JacType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>    <span class="k">return</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">ArchetypeType</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">name</span>
+</code></pre></div>
+<p>Different types have different equivalence rules:
+- <strong>Nominal equivalence</strong> for archetypes (based on name)
+- <strong>Structural equivalence</strong> for containers and callables (based on structure)</p>
+<h3 id="subtyping-relationships">Subtyping Relationships</h3>
+<p>The <code>is_subtype_of</code> method determines if one type can be used where another is expected:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># In ArchetypeType</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="k">def</span><span class="w"> </span><span class="nf">is_subtype_of</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">super_type</span><span class="p">:</span> <span class="n">JacType</span><span class="p">,</span> <span class="n">env</span><span class="p">:</span> <span class="n">TypeEnvironment</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">is_equivalent</span><span class="p">(</span><span class="n">super_type</span><span class="p">):</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>        <span class="k">return</span> <span class="kc">True</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">super_type</span><span class="p">,</span> <span class="n">AnyType</span><span class="p">):</span>
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>        <span class="k">return</span> <span class="kc">True</span>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">super_type</span><span class="p">,</span> <span class="n">ArchetypeType</span><span class="p">):</span>
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>        <span class="c1"># Check inheritance chain</span>
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>        <span class="k">for</span> <span class="n">base</span> <span class="ow">in</span> <span class="n">env</span><span class="o">.</span><span class="n">get_base_types</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>            <span class="k">if</span> <span class="n">base</span><span class="o">.</span><span class="n">is_equivalent</span><span class="p">(</span><span class="n">super_type</span><span class="p">)</span> <span class="ow">or</span> <span class="n">base</span><span class="o">.</span><span class="n">is_subtype_of</span><span class="p">(</span><span class="n">super_type</span><span class="p">,</span> <span class="n">env</span><span class="p">):</span>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>                <span class="k">return</span> <span class="kc">True</span>
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>    <span class="k">return</span> <span class="kc">False</span>
+</code></pre></div>
+<p>Subtyping relationships follow these principles:
+- A type is always a subtype of itself
+- A type is always a subtype of <code>any</code>
+- For archetypes, subtyping follows the inheritance hierarchy
+- For containers, variance rules apply (e.g., covariance for lists)
+- For callables, parameter types are contravariant and return types are covariant</p>
+<h2 id="singletons-for-common-types">Singletons for Common Types</h2>
+<p>For efficiency, common types are pre-instantiated:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="n">JAC_INT</span> <span class="o">=</span> <span class="n">PrimitiveType</span><span class="p">(</span><span class="s2">&quot;int&quot;</span><span class="p">)</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="n">JAC_FLOAT</span> <span class="o">=</span> <span class="n">PrimitiveType</span><span class="p">(</span><span class="s2">&quot;float&quot;</span><span class="p">)</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="n">JAC_STRING</span> <span class="o">=</span> <span class="n">PrimitiveType</span><span class="p">(</span><span class="s2">&quot;str&quot;</span><span class="p">)</span>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="n">JAC_BOOL</span> <span class="o">=</span> <span class="n">PrimitiveType</span><span class="p">(</span><span class="s2">&quot;bool&quot;</span><span class="p">)</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a><span class="n">JAC_BYTES</span> <span class="o">=</span> <span class="n">PrimitiveType</span><span class="p">(</span><span class="s2">&quot;bytes&quot;</span><span class="p">)</span>
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a><span class="n">JAC_NULL</span> <span class="o">=</span> <span class="n">NothingType</span><span class="p">()</span>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="n">JAC_ANY</span> <span class="o">=</span> <span class="n">AnyType</span><span class="p">()</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a><span class="n">JAC_NOTHING</span> <span class="o">=</span> <span class="n">NothingType</span><span class="p">()</span>
+</code></pre></div>
+<h2 id="integration-with-ast">Integration with AST</h2>
+<p>Type information is stored directly on AST nodes:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">Expr</span><span class="p">(</span><span class="n">UniNode</span><span class="p">):</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a>    <span class="c1"># ...</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<a id="__codelineno-11-4" name="__codelineno-11-4" href="#__codelineno-11-4"></a>        <span class="c1"># ...</span>
+<a id="__codelineno-11-5" name="__codelineno-11-5" href="#__codelineno-11-5"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">jac_type</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">JacType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+</code></pre></div>
+<p>This allows type information to be easily accessed during code generation and other compiler passes.</p>
+<h2 id="string-representation">String Representation</h2>
+<p>For error messages and debugging, types provide string representations:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="c1"># In ListType</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;list[</span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">element_type</span><span class="p">)</span><span class="si">}</span><span class="s2">]&quot;</span>
+<a id="__codelineno-12-4" name="__codelineno-12-4" href="#__codelineno-12-4"></a>
+<a id="__codelineno-12-5" name="__codelineno-12-5" href="#__codelineno-12-5"></a><span class="c1"># In CallableType</span>
+<a id="__codelineno-12-6" name="__codelineno-12-6" href="#__codelineno-12-6"></a><span class="k">def</span><span class="w"> </span><span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<a id="__codelineno-12-7" name="__codelineno-12-7" href="#__codelineno-12-7"></a>    <span class="n">params_str</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">param_types</span><span class="p">)</span>
+<a id="__codelineno-12-8" name="__codelineno-12-8" href="#__codelineno-12-8"></a>    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">params_str</span><span class="si">}</span><span class="s2">) -&gt; </span><span class="si">{</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">return_type</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+</code></pre></div>
+<h2 id="example-complex-type-representation">Example: Complex Type Representation</h2>
+<p>Let's look at how a complex type is represented:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a>graph TD
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a>    A[&quot;dict[str, list[Optional[MyClass]]]&quot;] --&gt; B[&quot;DictType&quot;]
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a>    B --&gt; C[&quot;key_type: StringType&quot;]
+<a id="__codelineno-13-4" name="__codelineno-13-4" href="#__codelineno-13-4"></a>    B --&gt; D[&quot;value_type: ListType&quot;]
+<a id="__codelineno-13-5" name="__codelineno-13-5" href="#__codelineno-13-5"></a>    D --&gt; E[&quot;element_type: OptionalType&quot;]
+<a id="__codelineno-13-6" name="__codelineno-13-6" href="#__codelineno-13-6"></a>    E --&gt; F[&quot;wrapped_type: ArchetypeType&quot;]
+<a id="__codelineno-13-7" name="__codelineno-13-7" href="#__codelineno-13-7"></a>    F --&gt; G[&quot;name: &#39;MyClass&#39;&quot;]
+<a id="__codelineno-13-8" name="__codelineno-13-8" href="#__codelineno-13-8"></a>    F --&gt; H[&quot;sym_tab: MyClass&#39;s symbol table&quot;]
+<a id="__codelineno-13-9" name="__codelineno-13-9" href="#__codelineno-13-9"></a>    F --&gt; I[&quot;arch_node: MyClass&#39;s AST node&quot;]
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 Jac Hackers Everwhere
+    </div>
+  
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+      
+    
+    
+    
+      
+      
+    
+    <a href="https://fosstodon.org/@squidfunk" target="_blank" rel="noopener me" title="fosstodon.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M433 179.11c0-97.2-63.71-125.7-63.71-125.7-62.52-28.7-228.56-28.4-290.48 0 0 0-63.72 28.5-63.72 125.7 0 115.7-6.6 259.4 105.63 289.1 40.51 10.7 75.32 13 103.33 11.4 50.81-2.8 79.32-18.1 79.32-18.1l-1.7-36.9s-36.31 11.4-77.12 10.1c-40.41-1.4-83-4.4-89.63-54a102.5 102.5 0 0 1-.9-13.9c85.63 20.9 158.65 9.1 178.75 6.7 56.12-6.7 105-41.3 111.23-72.9 9.8-49.8 9-121.5 9-121.5m-75.12 125.2h-46.63v-114.2c0-49.7-64-51.6-64 6.9v62.5h-46.33V197c0-58.5-64-56.6-64-6.9v114.2H90.19c0-122.1-5.2-147.9 18.41-175 25.9-28.9 79.82-30.8 103.83 6.1l11.6 19.5 11.6-19.5c24.11-37.1 78.12-34.8 103.83-6.1 23.71 27.3 18.4 53 18.4 175z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../../..", "features": ["navigation.tabs", "navigation.instant", "navigation.top", "search.highlight", "search.suggest"], "search": "../../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+        <script src="../../../../assets/mathjax-config.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/pyodide/v0.27.0/full/pyodide.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
+      
+        <script src="../../../../js/jac.monarch.js"></script>
+      
+        <script src="../../../../js/run-code.js"></script>
+      
+    
+  </body>
+</html>

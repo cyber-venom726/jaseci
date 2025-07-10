@@ -1,0 +1,4403 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://jac-lang.org/latest/learn/jac-cloud/permission/">
+      
+      
+        <link rel="prev" href="../quickstart/">
+      
+      
+        <link rel="next" href="../logging/">
+      
+      
+      <link rel="icon" href="../../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Permission Management: Secure Multi-User Access - The Jac Programming Language and Jaseci Stack</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../../extra.css">
+    
+    <script>__md_scope=new URL("../../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#permission-management-secure-multi-user-access" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../../.." title="The Jac Programming Language and Jaseci Stack" class="md-header__button md-logo" aria-label="The Jac Programming Language and Jaseci Stack" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            The Jac Programming Language and Jaseci Stack
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Permission Management: Secure Multi-User Access
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Jaseci-Labs/jaseci" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../../getting_started/" class="md-tabs__link">
+          
+  
+  
+  Learn
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../internals/contrib/" class="md-tabs__link">
+          
+  
+  
+  Internals
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../../communityhub/roadmap/" class="md-tabs__link">
+          
+  
+  
+  Community Hub
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="/playground/" class="md-tabs__link">
+          
+  
+  
+  Jac Playground
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../../.." title="The Jac Programming Language and Jaseci Stack" class="md-nav__button md-logo" aria-label="The Jac Programming Language and Jaseci Stack" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    The Jac Programming Language and Jaseci Stack
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Jaseci-Labs/jaseci" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Learn
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Learn
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tour of Jac/Jaseci
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_in_a_flash/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Learn Jac in 5 Minutes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_playground/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jac Playground
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Learn By Example
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            Learn By Example
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5_1" id="__nav_1_5_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    LittleX (your own twitter)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            LittleX (your own twitter)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/littleX/tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LittleX Tutorial for Beginners
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/littleX/full_guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LittleX Full Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5_2" id="__nav_1_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    RAG-based Conversational Chatbot
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            RAG-based Conversational Chatbot
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/rag_chatbot/Overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RAG Chatbot Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/rag_chatbot/Tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RAG Chatbot Full Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/mtp_examples/rpg_game/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RPG game with AI Genarated Maps
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/mtp_examples/fantasy_trading_game/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agentic Fantasy Trading Game
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_6" id="__nav_1_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Learn Jac Language
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            Learn Jac Language
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    1. Welcome to Jac
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2. Starting Jac, Variables and Types
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    3. Functions, Control Flow, and Collections in Jac
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    4. AI functions and Decorators
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    5. Advanced AI Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    6. Imports System and File Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    7. Enhanced OOP - Objects and Classes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_8/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    8. OSP Introduction and Paradigm Shift
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_9/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    9. Nodes and Edges
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    10. Walkers and Abilities
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_11/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    11. Advanced Object Spatial Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_12/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    12. Walkers as API Endpoints
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_13/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    13. Persistence and the Root Node
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_14/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    14. Multi-User Architecture and Permissions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_15/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    15. Advanced Jac Cloud Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    16. Type System Deep Dive
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_17/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    17. Testing and Debugging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_18/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    18. Deployment Strategies
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_19/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    19. Performance Optimization
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../jac_book/chapter_20/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    20. Python to Jac Migration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_7" id="__nav_1_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Programming 'by' AI
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_7">
+            <span class="md-nav__icon md-icon"></span>
+            Programming 'by' AI
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac-mtllm/with_llm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    GenAI in Jaclang - MTP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac-mtllm/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quick-start
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac-mtllm/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    How to use MTP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac-mtllm/model_declaration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Available Models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac-mtllm/multimodality/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Using Multimodal models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac-mtllm/creating_mtllm_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Build your own MTLLM plugin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac-mtllm/python_integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Python MTLLM Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1_8" id="__nav_1_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Scale-Native Programming
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_8_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1_8">
+            <span class="md-nav__icon md-icon"></span>
+            Scale-Native Programming
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction to Jac Cloud
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quick Start Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8_3" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1_8_3" id="__nav_1_8_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Core Features
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_8_3_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1_8_3">
+            <span class="md-nav__icon md-icon"></span>
+            Core Features
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Permission Management: Secure Multi-User Access
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Permission Management: Secure Multi-User Access
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-permissions-matter" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why Permissions Matter
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-concepts-for-beginners" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key Concepts for Beginners
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Key Concepts for Beginners">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#understanding-data-representations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Understanding Data Representations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Understanding Data Representations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#anchors-are-database-side-class-representations-that-contain" class="md-nav__link">
+    <span class="md-ellipsis">
+      Anchors are database-side class representations that contain:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#archetypes-are-the-runtime-class-representations-directly-reflecting-fields-declared-in-jac-source-code-dev-can-access-their-respective-anchors-via-the-__jac__-attribute" class="md-nav__link">
+    <span class="md-ellipsis">
+      Archetypes are the runtime class representations, directly reflecting fields declared in Jac source code. Dev can access their respective anchors via the __jac__ attribute
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#permission-levels-explained" class="md-nav__link">
+    <span class="md-ellipsis">
+      Permission Levels Explained
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-permissions-work-simple-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      How Permissions Work (Simple Example)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#managing-permissions-in-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Managing Permissions in Code
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Managing Permissions in Code">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#grant-access-using-helper-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Grant Access Using Helper Functions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#revoke-access-using-helper-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Revoke Access Using Helper Functions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#make-content-public" class="md-nav__link">
+    <span class="md-ellipsis">
+      Make Content Public
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#make-content-private" class="md-nav__link">
+    <span class="md-ellipsis">
+      Make Content Private
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-permission-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Permission Patterns
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Permission Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#public-read-private-write" class="md-nav__link">
+    <span class="md-ellipsis">
+      Public Read, Private Write
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#group-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      Group Access
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connection-based-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Connection-based Permissions
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices-for-beginners" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices for Beginners
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Logging and Monitoring Your Application
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../env_vars/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Environment Variables: Configuration Made Easy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8_4" id="__nav_1_8_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Real-time & Async
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_8_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8_4">
+            <span class="md-nav__icon md-icon"></span>
+            Real-time & Async
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../websocket/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    WebSocket: Real-Time Communication
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Task Scheduling: Automate Your Jac Applications
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../async_walker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Async Walker
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../webhook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Webhooks: External API Integration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8_5" id="__nav_1_8_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Operations
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_8_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8_5">
+            <span class="md-nav__icon md-icon"></span>
+            Operations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Cloud Deployment Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_9" id="__nav_1_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Tooling
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_9">
+            <span class="md-nav__icon md-icon"></span>
+            Tooling
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../tools/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jac Language Command Line Interface (CLI)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_10" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_10" id="__nav_1_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Specifications
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_10_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_10">
+            <span class="md-nav__icon md-icon"></span>
+            Specifications
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../dspfoundation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Object-Spatial Programming Specification
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_ref/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Full Language Specification
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_11" id="__nav_1_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Misc Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_11">
+            <span class="md-nav__icon md-icon"></span>
+            Misc Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_11_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_11_1" id="__nav_1_11_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Understanding Object-Spatial
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_11_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_11_1">
+            <span class="md-nav__icon md-icon"></span>
+            Understanding Object-Spatial
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_spatial/nodes_and_edges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Nodes and Edges
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_spatial/walkers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Walkers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_spatial/filtering/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Node and Edge Filtering
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_spatial/sequence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Walker and Node ability trigger sequence
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../data_spatial/FAQ/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FAQ
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Internals
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Internals
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/contrib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Design Docs and Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Design Docs and Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/internals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Compiler/Runtime Design
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2_2" id="__nav_2_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Static Compilation
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Static Compilation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2_2_1" id="__nav_2_2_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Sym Table Design Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_2_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            Sym Table Design Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/symbol_tables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Tables in Jaclang
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/symbol_tables/structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Table Structure
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/symbol_tables/building/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Table Building
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/symbol_tables/def_use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Definition and Use
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/symbol_tables/linking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Table Linking
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/symbol_tables/resolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Resolution in Practice
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/uniir_node/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    UniIR Nodes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/jac_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Runtime Plugin Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Planning Specs and Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Planning Specs and Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/ref_roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Language Ref Roadmap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/error_system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Error System
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/formatter_system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Formatter System
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3_4" id="__nav_2_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Native Type System
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Native Type System
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/native_type_system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/native_type_system/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/native_type_system/type_representation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Representation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/native_type_system/type_resolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Resolution
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/native_type_system/type_rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Rules
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/native_type_system/type_inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Inference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/native_type_system/compiler_integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Compiler Integration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../internals/planning_specs/native_type_system/lets_build/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Let's Build
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Community Hub
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Community Hub
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../communityhub/roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Roadmap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../communityhub/release_notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Release Notes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../communityhub/breaking_changes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Breaking Changes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../communityhub/top_contributors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Leaderboard
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Fun Stuff
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            Fun Stuff
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5_1" id="__nav_3_5_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Project Ideas
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            Project Ideas
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../communityhub/fun/projects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Project Ideas for the Jac Community
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../communityhub/fun/p1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    P1
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../communityhub/fun/p2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    P2
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../communityhub/fun/p3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    P3
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../../communityhub/content_pieces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Content Pieces
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Jac Playground
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Jac Playground
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="/playground/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Playground
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#why-permissions-matter" class="md-nav__link">
+    <span class="md-ellipsis">
+      Why Permissions Matter
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#key-concepts-for-beginners" class="md-nav__link">
+    <span class="md-ellipsis">
+      Key Concepts for Beginners
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Key Concepts for Beginners">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#understanding-data-representations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Understanding Data Representations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Understanding Data Representations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#anchors-are-database-side-class-representations-that-contain" class="md-nav__link">
+    <span class="md-ellipsis">
+      Anchors are database-side class representations that contain:
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#archetypes-are-the-runtime-class-representations-directly-reflecting-fields-declared-in-jac-source-code-dev-can-access-their-respective-anchors-via-the-__jac__-attribute" class="md-nav__link">
+    <span class="md-ellipsis">
+      Archetypes are the runtime class representations, directly reflecting fields declared in Jac source code. Dev can access their respective anchors via the __jac__ attribute
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#permission-levels-explained" class="md-nav__link">
+    <span class="md-ellipsis">
+      Permission Levels Explained
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-permissions-work-simple-example" class="md-nav__link">
+    <span class="md-ellipsis">
+      How Permissions Work (Simple Example)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#managing-permissions-in-code" class="md-nav__link">
+    <span class="md-ellipsis">
+      Managing Permissions in Code
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Managing Permissions in Code">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#grant-access-using-helper-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Grant Access Using Helper Functions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#revoke-access-using-helper-functions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Revoke Access Using Helper Functions
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#make-content-public" class="md-nav__link">
+    <span class="md-ellipsis">
+      Make Content Public
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#make-content-private" class="md-nav__link">
+    <span class="md-ellipsis">
+      Make Content Private
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#common-permission-patterns" class="md-nav__link">
+    <span class="md-ellipsis">
+      Common Permission Patterns
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Common Permission Patterns">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#public-read-private-write" class="md-nav__link">
+    <span class="md-ellipsis">
+      Public Read, Private Write
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#group-access" class="md-nav__link">
+    <span class="md-ellipsis">
+      Group Access
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#connection-based-permissions" class="md-nav__link">
+    <span class="md-ellipsis">
+      Connection-based Permissions
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#best-practices-for-beginners" class="md-nav__link">
+    <span class="md-ellipsis">
+      Best Practices for Beginners
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      Next Steps
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="permission-management-secure-multi-user-access">Permission Management: Secure Multi-User Access</h1>
+<h2 id="why-permissions-matter">Why Permissions Matter</h2>
+<p>Jac Cloud's permission system lets you control who can access different parts of your application. This is crucial for:</p>
+<ul>
+<li>Building multi-user applications</li>
+<li>Protecting sensitive data</li>
+<li>Enabling collaboration features</li>
+<li>Creating public/private content</li>
+<li>Implementing access control</li>
+</ul>
+<h2 id="key-concepts-for-beginners">Key Concepts for Beginners</h2>
+<h3 id="understanding-data-representations">Understanding Data Representations</h3>
+<p>In Jac Cloud, your data exists in two forms:</p>
+<ul>
+<li>Anchor</li>
+<li>EdgeAnchor</li>
+<li>NodeAnchor</li>
+<li>ObjectAnchor</li>
+<li>WalkerAnchor</li>
+<li>Archetype</li>
+<li>EdgeArchetype</li>
+<li>NodeArchetype</li>
+<li>ObjectArchetype</li>
+<li>WalkerArchetype</li>
+</ul>
+<h4 id="anchors-are-database-side-class-representations-that-contain"><strong>Anchors</strong> are database-side class representations that contain:</h4>
+<table>
+<thead>
+<tr>
+<th>Name</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>id</td>
+<td>The database identifier.</td>
+</tr>
+<tr>
+<td>name</td>
+<td>The name of the associated archetype.</td>
+</tr>
+<tr>
+<td>root</td>
+<td>The owning root anchor.</td>
+</tr>
+<tr>
+<td>access</td>
+<td>Permissions defining which nodes or roots can access this anchor.</td>
+</tr>
+<tr>
+<td>archetype</td>
+<td>The JSON representation of the actual archetype.</td>
+</tr>
+</tbody>
+</table>
+<h4 id="archetypes-are-the-runtime-class-representations-directly-reflecting-fields-declared-in-jac-source-code-dev-can-access-their-respective-anchors-via-the-__jac__-attribute"><strong>Archetypes</strong> are the runtime class representations, directly reflecting fields declared in Jac source code. Dev can access their respective anchors via the <code>__jac__</code> attribute</h4>
+<h3 id="permission-levels-explained">Permission Levels Explained</h3>
+<p>Jac Cloud has four permission levels that control what users can do:</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Description</th>
+<th>Example Use Case</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>NO_ACCESS</code></td>
+<td>Cannot see or interact with the item</td>
+<td>Private user data</td>
+</tr>
+<tr>
+<td><code>READ</code></td>
+<td>Can view but not modify the item</td>
+<td>Public profile information</td>
+</tr>
+<tr>
+<td><code>CONNECT</code></td>
+<td>Can link nodes to this node</td>
+<td>Friend requests, comments</td>
+</tr>
+<tr>
+<td><code>WRITE</code></td>
+<td>Full access to modify the item</td>
+<td>User's own content</td>
+</tr>
+</tbody>
+</table>
+<h2 id="how-permissions-work-simple-example">How Permissions Work (Simple Example)</h2>
+<p>Imagine a social media app with three users:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Root1 → User1 → Post1
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>Root2 → User2 → Post2
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>Root3 → User3 → Post3
+</code></pre></div>
+<p>By default, User2 cannot see Post1 (created by User1). To allow this:</p>
+<ol>
+<li>User1 must explicitly grant permission to User2</li>
+<li>This creates a connection in the permissions system</li>
+<li>Now User2 can access Post1 according to the permission level granted</li>
+</ol>
+<h2 id="managing-permissions-in-code">Managing Permissions in Code</h2>
+<h3 id="grant-access-using-helper-functions">Grant Access Using Helper Functions</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a># Allow User2 to read a post
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>walker grant_access {
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    has target_root_id: str;  # ID of User2&#39;s root
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    has access_level: str;    # &quot;READ&quot;, &quot;CONNECT&quot;, or &quot;WRITE&quot;
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>    can grant_access with post entry {
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>        # Grant access to the current post
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>        _.allow_root(here, NodeAnchor.ref(self.target_root_id), self.access_level);
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>        report &quot;Access granted!&quot;;
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>    }
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>}
+</code></pre></div>
+<p>The code snippet <code>_.allow_root(here, NodeAnchor.ref(self.target_root_id), self.access_level)</code> facilitates granting a specified level of access to a target root node from the current node.</p>
+<p>Here's a breakdown of the components:</p>
+<ul>
+<li>
+<p><code>here</code></p>
+</li>
+<li>
+<p>Represents the current node, which in this context is the post node.</p>
+</li>
+<li>
+<p><code>NodeAnchor.ref(self.target_root_id)</code></p>
+</li>
+<li>
+<p>This converts the target_root_id (a string identifier) into a NodeAnchor representation. This NodeAnchor then points to the specific target root node that will be granted access.</p>
+</li>
+<li>
+<p><code>self.access_level</code></p>
+</li>
+<li>This parameter specifies the level of access that the target root node will have to the current node's data (i.e., the post node's data).</li>
+</ul>
+<p>In essence, this line of code enables the post node to grant the designated target root node permission to access its data, with the access permissions defined by self.access_level.</p>
+<h3 id="revoke-access-using-helper-functions">Revoke Access Using Helper Functions</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a># Remove User2&#39;s access to a post
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>walker revoke_access {
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    has target_root_id: str;  # ID of User2&#39;s root
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>    can revoke_access with post entry {
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>        # Revoke access to the current post
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>        _.disallow_root(here, NodeAnchor.ref(self.target_root_id));
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>        report &quot;Access revoked!&quot;;
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>    }
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>}
+</code></pre></div>
+<p>The code snippet <code>_.disallow_root(here, NodeAnchor.ref(self.target_root_id))</code> performs the inverse operation of <code>_.allow_root</code>; it removes existing access permissions that a target root node had to the current node's data.</p>
+<p>Here's how it works:</p>
+<ul>
+<li><code>here</code></li>
+<li>This refers to the current node, which, as before, is the post node. This is the node from which the permission is being revoked.</li>
+<li><code>NodeAnchor.ref(self.target_root_id)</code></li>
+<li>This converts the target_root_id (a string identifier) into a NodeAnchor representation. This NodeAnchor pinpoints the specific target root node whose access privileges are being revoked.</li>
+</ul>
+<p>In essence, this line of code instructs the post node to remove the previously granted access for the designated target root node to its data.</p>
+<h3 id="make-content-public">Make Content Public</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a># Make a post readable by everyone
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>walker make_public {
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    can make_public with post entry {
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>        # Grant READ access to all users
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>        _.perm_grant(here, &quot;READ&quot;);
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        report &quot;Post is now public!&quot;;
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    }
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>}
+</code></pre></div>
+<p>The code snippet <code>_.perm_grant(here, "READ")</code> provides a mechanism to grant read access to all other root nodes concerning the data within the current node.</p>
+<p>Here's a breakdown of the elements:</p>
+<ul>
+<li><code>here</code></li>
+<li>This represents the current node, which in this case is the post node. This is the node whose data will be accessible.</li>
+<li><code>"READ"</code></li>
+<li>This literal string specifies the type of permission being granted. In this instance, it grants "READ" access, allowing other root nodes to view the data on the post node. They can choose one from permission levels.</li>
+</ul>
+<h3 id="make-content-private">Make Content Private</h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a># Make a post private (owner-only)
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>walker make_private {
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    can make_private with post entry {
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>        # Remove all access
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>        _.perm_revoke(here);
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>        report &quot;Post is now private!&quot;;
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    }
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>}
+</code></pre></div>
+<p>The code snippet <code>_.perm_revoke(here)</code> is used to remove all previously granted access permissions from all other root nodes to the current node's data. It's the inverse operation of <code>_.perm_grant</code>.</p>
+<p>Here's a breakdown:</p>
+<ul>
+<li><code>here</code></li>
+<li>This represents the current node (in this context, the post node) from which all access will be revoked.</li>
+</ul>
+<p>Essentially, this line of code completely withdraws any permissions that were previously granted to other root nodes, making the post node's data inaccessible to them.</p>
+<h2 id="common-permission-patterns">Common Permission Patterns</h2>
+<h3 id="public-read-private-write">Public Read, Private Write</h3>
+<p>Perfect for social media posts or articles:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a># Create a public post
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>walker create_public_post {
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>    has content: str;
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    can enter with `root entry {
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>        # Create the post
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>        post = Post({content: self.content});
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>        here ++&gt; post;
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>        # Make it readable by everyone, but only writable by owner
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>        _.perm_grant(post, &quot;READ&quot;);
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>        report &quot;Public post created!&quot;;
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>    }
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>}
+</code></pre></div>
+<h3 id="group-access">Group Access</h3>
+<p>Ideal for team collaboration:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a># Grant access to a team
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a>walker grant_team_access {
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a>    has team_members: list[str];  # List of root IDs
+<a id="__codelineno-6-4" name="__codelineno-6-4" href="#__codelineno-6-4"></a>    has access_level: str;        # &quot;READ&quot;, &quot;CONNECT&quot;, or &quot;WRITE&quot;
+<a id="__codelineno-6-5" name="__codelineno-6-5" href="#__codelineno-6-5"></a>
+<a id="__codelineno-6-6" name="__codelineno-6-6" href="#__codelineno-6-6"></a>    can grant_access with document entry {
+<a id="__codelineno-6-7" name="__codelineno-6-7" href="#__codelineno-6-7"></a>        # Grant access to each team member
+<a id="__codelineno-6-8" name="__codelineno-6-8" href="#__codelineno-6-8"></a>        for member_id in self.team_members {
+<a id="__codelineno-6-9" name="__codelineno-6-9" href="#__codelineno-6-9"></a>            _.allow_root(here, NodeAnchor.ref(member_id), self.access_level);
+<a id="__codelineno-6-10" name="__codelineno-6-10" href="#__codelineno-6-10"></a>        }
+<a id="__codelineno-6-11" name="__codelineno-6-11" href="#__codelineno-6-11"></a>
+<a id="__codelineno-6-12" name="__codelineno-6-12" href="#__codelineno-6-12"></a>        report &quot;Team access granted!&quot;;
+<a id="__codelineno-6-13" name="__codelineno-6-13" href="#__codelineno-6-13"></a>    }
+<a id="__codelineno-6-14" name="__codelineno-6-14" href="#__codelineno-6-14"></a>}
+</code></pre></div>
+<h3 id="connection-based-permissions">Connection-based Permissions</h3>
+<p>For friend systems or social networks:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a># Only friends can see posts
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a>walker check_access {
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a>    has viewer_id: str;
+<a id="__codelineno-7-4" name="__codelineno-7-4" href="#__codelineno-7-4"></a>
+<a id="__codelineno-7-5" name="__codelineno-7-5" href="#__codelineno-7-5"></a>    can check with post entry {
+<a id="__codelineno-7-6" name="__codelineno-7-6" href="#__codelineno-7-6"></a>        owner = [post&lt;--][0];
+<a id="__codelineno-7-7" name="__codelineno-7-7" href="#__codelineno-7-7"></a>
+<a id="__codelineno-7-8" name="__codelineno-7-8" href="#__codelineno-7-8"></a>        # Check if viewer is friends with owner
+<a id="__codelineno-7-9" name="__codelineno-7-9" href="#__codelineno-7-9"></a>        is_friend = False;
+<a id="__codelineno-7-10" name="__codelineno-7-10" href="#__codelineno-7-10"></a>        for friend in [owner --&gt;] {
+<a id="__codelineno-7-11" name="__codelineno-7-11" href="#__codelineno-7-11"></a>            if friend.id == self.viewer_id {
+<a id="__codelineno-7-12" name="__codelineno-7-12" href="#__codelineno-7-12"></a>                is_friend = True;
+<a id="__codelineno-7-13" name="__codelineno-7-13" href="#__codelineno-7-13"></a>                break;
+<a id="__codelineno-7-14" name="__codelineno-7-14" href="#__codelineno-7-14"></a>            }
+<a id="__codelineno-7-15" name="__codelineno-7-15" href="#__codelineno-7-15"></a>        }
+<a id="__codelineno-7-16" name="__codelineno-7-16" href="#__codelineno-7-16"></a>
+<a id="__codelineno-7-17" name="__codelineno-7-17" href="#__codelineno-7-17"></a>        if is_friend {
+<a id="__codelineno-7-18" name="__codelineno-7-18" href="#__codelineno-7-18"></a>            # Grant access if they&#39;re friends
+<a id="__codelineno-7-19" name="__codelineno-7-19" href="#__codelineno-7-19"></a>            _.allow_root(here, NodeAnchor.ref(self.viewer_id), &quot;READ&quot;);
+<a id="__codelineno-7-20" name="__codelineno-7-20" href="#__codelineno-7-20"></a>            report &quot;Access granted to friend!&quot;;
+<a id="__codelineno-7-21" name="__codelineno-7-21" href="#__codelineno-7-21"></a>        } else {
+<a id="__codelineno-7-22" name="__codelineno-7-22" href="#__codelineno-7-22"></a>            report &quot;Access denied - not a friend!&quot;;
+<a id="__codelineno-7-23" name="__codelineno-7-23" href="#__codelineno-7-23"></a>        }
+<a id="__codelineno-7-24" name="__codelineno-7-24" href="#__codelineno-7-24"></a>    }
+<a id="__codelineno-7-25" name="__codelineno-7-25" href="#__codelineno-7-25"></a>}
+</code></pre></div>
+<h2 id="best-practices-for-beginners">Best Practices for Beginners</h2>
+<ol>
+<li><strong>Start restrictive</strong>: Begin with tight permissions and open up as needed</li>
+<li><strong>Use helper functions</strong>: Prefer <code>_.allow_root()</code> over direct manipulation</li>
+<li><strong>Check permissions</strong>: Use <code>_.check_read_access()</code> to verify permissions</li>
+<li><strong>Document your scheme</strong>: Keep track of which nodes have which permissions</li>
+<li><strong>Batch similar permissions</strong>: Update permissions for multiple nodes at once</li>
+</ol>
+<h2 id="next-steps">Next Steps</h2>
+<ul>
+<li>Learn about <a href="../websocket/">WebSocket Communication</a> for real-time features</li>
+<li>Explore <a href="../webhook/">Webhook Integration</a> for third-party service integration</li>
+<li>Set up <a href="../logging/">Logging &amp; Monitoring</a> to track access patterns</li>
+</ul>
+<h1 id="custom-access-validation">Custom Access Validation</h1>
+<blockquote>
+<p>This will only get triggered if the target node is not owned by current root</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>node A {
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a>    # suggested to be `with access {}`
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a>    def __jac_access__ {
+<a id="__codelineno-8-4" name="__codelineno-8-4" href="#__codelineno-8-4"></a>
+<a id="__codelineno-8-5" name="__codelineno-8-5" href="#__codelineno-8-5"></a>        ###############################################
+<a id="__codelineno-8-6" name="__codelineno-8-6" href="#__codelineno-8-6"></a>        #              YOUR PROCESS HERE              #
+<a id="__codelineno-8-7" name="__codelineno-8-7" href="#__codelineno-8-7"></a>        ###############################################
+<a id="__codelineno-8-8" name="__codelineno-8-8" href="#__codelineno-8-8"></a>
+<a id="__codelineno-8-9" name="__codelineno-8-9" href="#__codelineno-8-9"></a>        # Allowed string return &quot;NO_ACCESS&quot;, &quot;READ&quot;, &quot;CONNECT&quot;, &quot;WRITE&quot;
+<a id="__codelineno-8-10" name="__codelineno-8-10" href="#__codelineno-8-10"></a>        return &quot;NO_ACCESS&quot;;
+<a id="__codelineno-8-11" name="__codelineno-8-11" href="#__codelineno-8-11"></a>
+<a id="__codelineno-8-12" name="__codelineno-8-12" href="#__codelineno-8-12"></a>        # Allowed enum return AccessLevel.NO_ACCESS, AccessLevel.READ, AccessLevel.CONNECT, AccessLevel.WRITE
+<a id="__codelineno-8-13" name="__codelineno-8-13" href="#__codelineno-8-13"></a>        # return AccessLevel.NO_ACCESS;
+<a id="__codelineno-8-14" name="__codelineno-8-14" href="#__codelineno-8-14"></a>
+<a id="__codelineno-8-15" name="__codelineno-8-15" href="#__codelineno-8-15"></a>        # Not recommended as it may change in the future
+<a id="__codelineno-8-16" name="__codelineno-8-16" href="#__codelineno-8-16"></a>        # Allowed int return -1 (NO_ACCESS), 0 (READ), 1 (CONNECT), 2 (WRITE)
+<a id="__codelineno-8-17" name="__codelineno-8-17" href="#__codelineno-8-17"></a>        # return -1;
+<a id="__codelineno-8-18" name="__codelineno-8-18" href="#__codelineno-8-18"></a>
+<a id="__codelineno-8-19" name="__codelineno-8-19" href="#__codelineno-8-19"></a>    }
+<a id="__codelineno-8-20" name="__codelineno-8-20" href="#__codelineno-8-20"></a>}
+</code></pre></div>
+<blockquote>
+<p>if you wish to prioritize current access validation and process it afterwards, you may follow this code</p>
+</blockquote>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a>node A {
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a>    # suggested to be `with access {}`
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>    def __jac_access__ {
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>        level = _Jac.check_access_level(here, True); # True means skip custom access validation trigger to avoid infinite loop
+<a id="__codelineno-9-6" name="__codelineno-9-6" href="#__codelineno-9-6"></a>
+<a id="__codelineno-9-7" name="__codelineno-9-7" href="#__codelineno-9-7"></a>        ###############################################
+<a id="__codelineno-9-8" name="__codelineno-9-8" href="#__codelineno-9-8"></a>        #              YOUR PROCESS HERE              #
+<a id="__codelineno-9-9" name="__codelineno-9-9" href="#__codelineno-9-9"></a>        ###############################################
+<a id="__codelineno-9-10" name="__codelineno-9-10" href="#__codelineno-9-10"></a>
+<a id="__codelineno-9-11" name="__codelineno-9-11" href="#__codelineno-9-11"></a>        # Allowed string return &quot;NO_ACCESS&quot;, &quot;READ&quot;, &quot;CONNECT&quot;, &quot;WRITE&quot;
+<a id="__codelineno-9-12" name="__codelineno-9-12" href="#__codelineno-9-12"></a>        return &quot;NO_ACCESS&quot;;
+<a id="__codelineno-9-13" name="__codelineno-9-13" href="#__codelineno-9-13"></a>
+<a id="__codelineno-9-14" name="__codelineno-9-14" href="#__codelineno-9-14"></a>        # Allowed enum return AccessLevel.NO_ACCESS, AccessLevel.READ, AccessLevel.CONNECT, AccessLevel.WRITE
+<a id="__codelineno-9-15" name="__codelineno-9-15" href="#__codelineno-9-15"></a>        # return AccessLevel.NO_ACCESS;
+<a id="__codelineno-9-16" name="__codelineno-9-16" href="#__codelineno-9-16"></a>
+<a id="__codelineno-9-17" name="__codelineno-9-17" href="#__codelineno-9-17"></a>        # Not recommended as it may change in the future
+<a id="__codelineno-9-18" name="__codelineno-9-18" href="#__codelineno-9-18"></a>        # Allowed int return -1 (NO_ACCESS), 0 (READ), 1 (CONNECT), 2 (WRITE)
+<a id="__codelineno-9-19" name="__codelineno-9-19" href="#__codelineno-9-19"></a>        # return -1;
+<a id="__codelineno-9-20" name="__codelineno-9-20" href="#__codelineno-9-20"></a>
+<a id="__codelineno-9-21" name="__codelineno-9-21" href="#__codelineno-9-21"></a>    }
+<a id="__codelineno-9-22" name="__codelineno-9-22" href="#__codelineno-9-22"></a>}
+</code></pre></div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 Jac Hackers Everwhere
+    </div>
+  
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+      
+    
+    
+    
+      
+      
+    
+    <a href="https://fosstodon.org/@squidfunk" target="_blank" rel="noopener me" title="fosstodon.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M433 179.11c0-97.2-63.71-125.7-63.71-125.7-62.52-28.7-228.56-28.4-290.48 0 0 0-63.72 28.5-63.72 125.7 0 115.7-6.6 259.4 105.63 289.1 40.51 10.7 75.32 13 103.33 11.4 50.81-2.8 79.32-18.1 79.32-18.1l-1.7-36.9s-36.31 11.4-77.12 10.1c-40.41-1.4-83-4.4-89.63-54a102.5 102.5 0 0 1-.9-13.9c85.63 20.9 158.65 9.1 178.75 6.7 56.12-6.7 105-41.3 111.23-72.9 9.8-49.8 9-121.5 9-121.5m-75.12 125.2h-46.63v-114.2c0-49.7-64-51.6-64 6.9v62.5h-46.33V197c0-58.5-64-56.6-64-6.9v114.2H90.19c0-122.1-5.2-147.9 18.41-175 25.9-28.9 79.82-30.8 103.83 6.1l11.6 19.5 11.6-19.5c24.11-37.1 78.12-34.8 103.83-6.1 23.71 27.3 18.4 53 18.4 175z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../../..", "features": ["navigation.tabs", "navigation.instant", "navigation.top", "search.highlight", "search.suggest"], "search": "../../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+        <script src="../../../assets/mathjax-config.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/pyodide/v0.27.0/full/pyodide.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
+      
+        <script src="../../../js/jac.monarch.js"></script>
+      
+        <script src="../../../js/run-code.js"></script>
+      
+    
+  </body>
+</html>

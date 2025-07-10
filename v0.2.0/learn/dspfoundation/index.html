@@ -1,0 +1,5058 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+      
+      
+        <link rel="canonical" href="https://jac-lang.org/latest/learn/dspfoundation/">
+      
+      
+        <link rel="prev" href="../tools/cli/">
+      
+      
+        <link rel="next" href="../jac_ref/">
+      
+      
+      <link rel="icon" href="../../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.6.14">
+    
+    
+      
+        <title>Object-Spatial Programming Specification - The Jac Programming Language and Jaseci Stack</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.342714a4.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.06af60db.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#object-spatial-programming-a-topological-approach-to-computation" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="The Jac Programming Language and Jaseci Stack" class="md-header__button md-logo" aria-label="The Jac Programming Language and Jaseci Stack" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            The Jac Programming Language and Jaseci Stack
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Object-Spatial Programming Specification
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Jaseci-Labs/jaseci" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+    
+  
+  
+    
+    
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../getting_started/" class="md-tabs__link">
+          
+  
+  
+  Learn
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../internals/contrib/" class="md-tabs__link">
+          
+  
+  
+  Internals
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../communityhub/roadmap/" class="md-tabs__link">
+          
+  
+  
+  Community Hub
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="/playground/" class="md-tabs__link">
+          
+  
+  
+  Jac Playground
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="The Jac Programming Language and Jaseci Stack" class="md-nav__button md-logo" aria-label="The Jac Programming Language and Jaseci Stack" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    The Jac Programming Language and Jaseci Stack
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Jaseci-Labs/jaseci" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M439.55 236.05 244 40.45a28.87 28.87 0 0 0-40.81 0l-40.66 40.63 51.52 51.52c27.06-9.14 52.68 16.77 43.39 43.68l49.66 49.66c34.23-11.8 61.18 31 35.47 56.69-26.49 26.49-70.21-2.87-56-37.34L240.22 199v121.85c25.3 12.54 22.26 41.85 9.08 55a34.34 34.34 0 0 1-48.55 0c-17.57-17.6-11.07-46.91 11.25-56v-123c-20.8-8.51-24.6-30.74-18.64-45L142.57 101 8.45 235.14a28.86 28.86 0 0 0 0 40.81l195.61 195.6a28.86 28.86 0 0 0 40.8 0l194.69-194.69a28.86 28.86 0 0 0 0-40.81"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1" id="__nav_1_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    Learn
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_1_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1">
+            <span class="md-nav__icon md-icon"></span>
+            Learn
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting_started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Getting Started
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Tour of Jac/Jaseci
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac_in_a_flash/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Learn Jac in 5 Minutes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac_playground/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jac Playground
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5" id="__nav_1_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Learn By Example
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5">
+            <span class="md-nav__icon md-icon"></span>
+            Learn By Example
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5_1" id="__nav_1_5_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    LittleX (your own twitter)
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            LittleX (your own twitter)
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/littleX/tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LittleX Tutorial for Beginners
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/littleX/full_guide/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    LittleX Full Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_5_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_5_2" id="__nav_1_5_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    RAG-based Conversational Chatbot
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_5_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_5_2">
+            <span class="md-nav__icon md-icon"></span>
+            RAG-based Conversational Chatbot
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/rag_chatbot/Overview/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RAG Chatbot Overview
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/rag_chatbot/Tutorial/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RAG Chatbot Full Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/mtp_examples/rpg_game/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    RPG game with AI Genarated Maps
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../examples/mtp_examples/fantasy_trading_game/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Agentic Fantasy Trading Game
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_6" id="__nav_1_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Learn Jac Language
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_6">
+            <span class="md-nav__icon md-icon"></span>
+            Learn Jac Language
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    1. Welcome to Jac
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    2. Starting Jac, Variables and Types
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    3. Functions, Control Flow, and Collections in Jac
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_4/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    4. AI functions and Decorators
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_5/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    5. Advanced AI Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_6/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    6. Imports System and File Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_7/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    7. Enhanced OOP - Objects and Classes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_8/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    8. OSP Introduction and Paradigm Shift
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_9/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    9. Nodes and Edges
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_10/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    10. Walkers and Abilities
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_11/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    11. Advanced Object Spatial Operations
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_12/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    12. Walkers as API Endpoints
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_13/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    13. Persistence and the Root Node
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_14/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    14. Multi-User Architecture and Permissions
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_15/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    15. Advanced Jac Cloud Features
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_16/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    16. Type System Deep Dive
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_17/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    17. Testing and Debugging
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_18/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    18. Deployment Strategies
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_19/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    19. Performance Optimization
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../jac_book/chapter_20/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    20. Python to Jac Migration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_7" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_7" id="__nav_1_7_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Programming 'by' AI
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_7_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_7">
+            <span class="md-nav__icon md-icon"></span>
+            Programming 'by' AI
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac-mtllm/with_llm/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    GenAI in Jaclang - MTP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac-mtllm/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quick-start
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac-mtllm/usage/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    How to use MTP
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac-mtllm/model_declaration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Available Models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac-mtllm/multimodality/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Using Multimodal models
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac-mtllm/creating_mtllm_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Build your own MTLLM plugin
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac-mtllm/python_integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Python MTLLM Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8" id="__nav_1_8_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Scale-Native Programming
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_8_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8">
+            <span class="md-nav__icon md-icon"></span>
+            Scale-Native Programming
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac-cloud/introduction/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction to Jac Cloud
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac-cloud/quickstart/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Quick Start Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8_3" id="__nav_1_8_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Core Features
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_8_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8_3">
+            <span class="md-nav__icon md-icon"></span>
+            Core Features
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac-cloud/permission/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Permission Management: Secure Multi-User Access
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac-cloud/logging/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Logging and Monitoring Your Application
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac-cloud/env_vars/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Environment Variables: Configuration Made Easy
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8_4" id="__nav_1_8_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Real-time & Async
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_8_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8_4">
+            <span class="md-nav__icon md-icon"></span>
+            Real-time & Async
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac-cloud/websocket/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    WebSocket: Real-Time Communication
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac-cloud/scheduler/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Task Scheduling: Automate Your Jac Applications
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac-cloud/async_walker/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Async Walker
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac-cloud/webhook/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Webhooks: External API Integration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_8_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_8_5" id="__nav_1_8_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Operations
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_8_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_8_5">
+            <span class="md-nav__icon md-icon"></span>
+            Operations
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac-cloud/deployment/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Cloud Deployment Guide
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_9" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_9" id="__nav_1_9_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Tooling
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_9_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_9">
+            <span class="md-nav__icon md-icon"></span>
+            Tooling
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../tools/cli/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Jac Language Command Line Interface (CLI)
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_10" checked>
+        
+          
+          <label class="md-nav__link" for="__nav_1_10" id="__nav_1_10_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Specifications
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_10_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_1_10">
+            <span class="md-nav__icon md-icon"></span>
+            Specifications
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    Object-Spatial Programming Specification
+    
+  </span>
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    Object-Spatial Programming Specification
+    
+  </span>
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#by-jason-mars-original-paper-on-arxiv" class="md-nav__link">
+    <span class="md-ellipsis">
+      By Jason Mars (Original Paper on Arxiv)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Introduction
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#object-spatial-topological-semantics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Object-Spatial Topological Semantics
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Object-Spatial Topological Semantics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unified-notation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Unified Notation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#archetypes-of-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Archetypes of Classes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Archetypes of Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#formalization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Formalization
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#path-collections-mathcalp-and-walker-destination-queues-q_w" class="md-nav__link">
+    <span class="md-ellipsis">
+      Path Collections ($\mathcal{P}$) and Walker Destination Queues ($Q_w$)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Path Collections ($\mathcal{P}$) and Walker Destination Queues ($Q_w$)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#path-collections" class="md-nav__link">
+    <span class="md-ellipsis">
+      Path Collections
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#path-construction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Path Construction
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#walker-destination-queues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Walker Destination Queues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#abilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      Abilities
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Abilities">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ability-execution-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ability Execution Order
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#self-and-contextual-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      Self and Contextual References
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complete-topological-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complete Topological Structure
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#object-spatial-execution-semantics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Object-Spatial Execution Semantics
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Object-Spatial Execution Semantics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#instantiation-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      Instantiation Rules
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lifecycle-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Lifecycle Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spawn-operator-rightarrow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Spawn Operator ($\Rightarrow$)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#visit-statement-triangleright" class="md-nav__link">
+    <span class="md-ellipsis">
+      Visit Statement ($\triangleright$)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-flow-control-statements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional Flow Control Statements
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementation Considerations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Considerations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#type-safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      Type Safety
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#concurrency" class="md-nav__link">
+    <span class="md-ellipsis">
+      Concurrency
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#efficiency" class="md-nav__link">
+    <span class="md-ellipsis">
+      Efficiency
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Integration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#walker-state-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Walker State Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#entryexit-ability-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Entry/Exit Ability Optimization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#edge-transition-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Edge Transition Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flow-control-semantics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Flow Control Semantics
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-locality-and-caching" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Locality and Caching
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../jac_ref/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Full Language Specification
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_11" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_11" id="__nav_1_11_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Misc Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_1_11_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_11">
+            <span class="md-nav__icon md-icon"></span>
+            Misc Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_1_11_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_1_11_1" id="__nav_1_11_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Understanding Object-Spatial
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_1_11_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_1_11_1">
+            <span class="md-nav__icon md-icon"></span>
+            Understanding Object-Spatial
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_spatial/nodes_and_edges/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Nodes and Edges
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_spatial/walkers/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Walkers
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_spatial/filtering/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Node and Edge Filtering
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_spatial/sequence/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Walker and Node ability trigger sequence
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../data_spatial/FAQ/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    FAQ
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Internals
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            Internals
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/contrib/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Contributing
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2" id="__nav_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Design Docs and Guides
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Design Docs and Guides
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/internals/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Compiler/Runtime Design
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2_2" id="__nav_2_2_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Static Compilation
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_2_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2_2">
+            <span class="md-nav__icon md-icon"></span>
+            Static Compilation
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_2_2_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_2_2_1" id="__nav_2_2_2_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Sym Table Design Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="4" aria-labelledby="__nav_2_2_2_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_2_2_1">
+            <span class="md-nav__icon md-icon"></span>
+            Sym Table Design Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/symbol_tables/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Tables in Jaclang
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/symbol_tables/structure/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Table Structure
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/symbol_tables/building/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Table Building
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/symbol_tables/def_use/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Definition and Use
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/symbol_tables/linking/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Table Linking
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/symbol_tables/resolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Symbol Resolution in Practice
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/uniir_node/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    UniIR Nodes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/jac_plugins/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Runtime Plugin Interface
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3" id="__nav_2_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Planning Specs and Docs
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_2_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3">
+            <span class="md-nav__icon md-icon"></span>
+            Planning Specs and Docs
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/ref_roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Language Ref Roadmap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/error_system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Error System
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/formatter_system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Formatter System
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2_3_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_2_3_4" id="__nav_2_3_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Native Type System
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_2_3_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2_3_4">
+            <span class="md-nav__icon md-icon"></span>
+            Native Type System
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/native_type_system/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Introduction
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/native_type_system/architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Architecture
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/native_type_system/type_representation/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Representation
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/native_type_system/type_resolution/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Resolution
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/native_type_system/type_rules/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Rules
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/native_type_system/type_inference/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Type Inference
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/native_type_system/compiler_integration/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Compiler Integration
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../internals/planning_specs/native_type_system/lets_build/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Let's Build
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" >
+        
+          
+          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Community Hub
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3">
+            <span class="md-nav__icon md-icon"></span>
+            Community Hub
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/roadmap/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Roadmap
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/release_notes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Release Notes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/breaking_changes/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Breaking Changes
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/top_contributors/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Leaderboard
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5" id="__nav_3_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Fun Stuff
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="2" aria-labelledby="__nav_3_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5">
+            <span class="md-nav__icon md-icon"></span>
+            Fun Stuff
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3_5_1" >
+        
+          
+          <label class="md-nav__link" for="__nav_3_5_1" id="__nav_3_5_1_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Project Ideas
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="3" aria-labelledby="__nav_3_5_1_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_3_5_1">
+            <span class="md-nav__icon md-icon"></span>
+            Project Ideas
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/fun/projects/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Project Ideas for the Jac Community
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/fun/p1/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    P1
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/fun/p2/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    P2
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/fun/p3/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    P3
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../communityhub/content_pieces/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Content Pieces
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    Jac Playground
+    
+  </span>
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            Jac Playground
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="/playground/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    Playground
+    
+  </span>
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#by-jason-mars-original-paper-on-arxiv" class="md-nav__link">
+    <span class="md-ellipsis">
+      By Jason Mars (Original Paper on Arxiv)
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#introduction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Introduction
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#object-spatial-topological-semantics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Object-Spatial Topological Semantics
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Object-Spatial Topological Semantics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#unified-notation" class="md-nav__link">
+    <span class="md-ellipsis">
+      Unified Notation
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#archetypes-of-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      Archetypes of Classes
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Archetypes of Classes">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#formalization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Formalization
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#path-collections-mathcalp-and-walker-destination-queues-q_w" class="md-nav__link">
+    <span class="md-ellipsis">
+      Path Collections ($\mathcal{P}$) and Walker Destination Queues ($Q_w$)
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Path Collections ($\mathcal{P}$) and Walker Destination Queues ($Q_w$)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#path-collections" class="md-nav__link">
+    <span class="md-ellipsis">
+      Path Collections
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#path-construction" class="md-nav__link">
+    <span class="md-ellipsis">
+      Path Construction
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#walker-destination-queues" class="md-nav__link">
+    <span class="md-ellipsis">
+      Walker Destination Queues
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#abilities" class="md-nav__link">
+    <span class="md-ellipsis">
+      Abilities
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Abilities">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ability-execution-order" class="md-nav__link">
+    <span class="md-ellipsis">
+      Ability Execution Order
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#self-and-contextual-references" class="md-nav__link">
+    <span class="md-ellipsis">
+      Self and Contextual References
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#complete-topological-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      Complete Topological Structure
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#object-spatial-execution-semantics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Object-Spatial Execution Semantics
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Object-Spatial Execution Semantics">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#instantiation-rules" class="md-nav__link">
+    <span class="md-ellipsis">
+      Instantiation Rules
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#lifecycle-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Lifecycle Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#spawn-operator-rightarrow" class="md-nav__link">
+    <span class="md-ellipsis">
+      Spawn Operator ($\Rightarrow$)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#visit-statement-triangleright" class="md-nav__link">
+    <span class="md-ellipsis">
+      Visit Statement ($\triangleright$)
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#additional-flow-control-statements" class="md-nav__link">
+    <span class="md-ellipsis">
+      Additional Flow Control Statements
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#implementation-considerations" class="md-nav__link">
+    <span class="md-ellipsis">
+      Implementation Considerations
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Implementation Considerations">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#type-safety" class="md-nav__link">
+    <span class="md-ellipsis">
+      Type Safety
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#concurrency" class="md-nav__link">
+    <span class="md-ellipsis">
+      Concurrency
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#efficiency" class="md-nav__link">
+    <span class="md-ellipsis">
+      Efficiency
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#integration" class="md-nav__link">
+    <span class="md-ellipsis">
+      Integration
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#walker-state-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Walker State Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#entryexit-ability-optimization" class="md-nav__link">
+    <span class="md-ellipsis">
+      Entry/Exit Ability Optimization
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#edge-transition-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      Edge Transition Management
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#flow-control-semantics" class="md-nav__link">
+    <span class="md-ellipsis">
+      Flow Control Semantics
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#data-locality-and-caching" class="md-nav__link">
+    <span class="md-ellipsis">
+      Data Locality and Caching
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="object-spatial-programming-a-topological-approach-to-computation">Object-Spatial Programming: A Topological Approach to Computation</h1>
+<h4 id="by-jason-mars-original-paper-on-arxiv">By Jason Mars (<a href="https://arxiv.org/abs/2503.15812">Original Paper on Arxiv</a>)</h4>
+<h2 id="introduction">Introduction</h2>
+<p>As modern software systems grow increasingly complex and interconnected, traditional programming paradigms often struggle to represent the rich spatial and topological relationships inherent in many problem domains. While Object-Oriented Programming (OOP) has served as a dominant paradigm for decades, it faces significant limitations when modeling systems with inherently graph-like structures, dynamic traversal patterns, or context-dependent behaviors. These limitations become particularly pronounced in domains such as social networks, agent-based systems, neural networks, and other topologically-oriented computational problems.</p>
+<p>Traditional programming models, including procedural, functional, and object-oriented paradigms, typically separate data structures from the algorithms that manipulate them. In this conventional model, data flows to computation through parameter passing and return values, with algorithms remaining stationary in functions and methods. This "data-to-compute" programming model is pervasive, being ubiquitous at the programming interface and can even be found as a fundamentally embedded presupposition in the von Neumann computer design itself, where data is moved from memory to the CPU for processing. Notably absent from the programming language landscape is a system of language constructs that naturally supports a complementary "compute-to-data" paradigm while maintaining compatibility with conventional popular programming languages. The lack of such a programming model creates friction when representing a wide range of computational problems where:</p>
+<ul>
+<li>The topology of connections is central to the underlying computational model</li>
+<li>Computation logically flows through a network of interconnected entities</li>
+<li>Behavior is context-dependent based on tight couplings between data and compute</li>
+<li>Traversal patterns are complex and dynamically determined</li>
+</ul>
+<p>Though graph algorithms and data structure libraries can be constructed in most programming languages, they remain secondary citizens, without first-class language support for topological semantics. This forces developers to implement complex traversal logic, maintain graph integrity, and manage event propagation through ad-hoc mechanisms that are often error-prone and difficult to maintain.</p>
+<p>Beyond the programmability advantages, embedding topological abstractions at the language level provides the runtime environment with rich semantic information about program behavior that would otherwise be obscured in conventional programming models. This heightened awareness of the spatial relationships and traversal patterns enables a new class of optimizations that are particularly relevant to modern hardware architectures. The runtime can make informed decisions about data locality, parallel execution paths, and distribution strategies based on the explicit topology of the computation graph. For instance, nodes that are frequently traversed together can be co-located in memory or on the same computational unit, reducing latency and communication overhead. Similarly, independent walker traversals can be automatically parallelized across processing cores or distributed across network nodes without developer intervention. Edge connections can inform predictive prefetching strategies, while the declarative nature of topological relationships enables automated reasoning about program correctness and performance characteristics. These runtime-level optimizations, which would require complex and error-prone manual implementation in traditional programming models, emerge naturally when the language itself encodes spatial and topological semantics as first-class citizens.</p>
+<p>To address these challenges, we introduce <strong>Object-Spatial Programming (OSP)</strong>, a novel programming model that fundamentally inverts the relationship between data and computation. Rather than moving data to stationary computation units (as in traditional programming), OSP enables computation to move to data through topologically-aware constructs. This paradigm extends the semantics of Object-Oriented Programming by introducing specialized class-like constructs called <strong>archetypes</strong> that formalize spatial and topological relationships within the programming model itself.</p>
+<p>At the core of Object-Spatial Programming are four key archetypes that extend traditional class semantics:</p>
+<ol>
+<li>
+<p><strong>Object Classes</strong> ($\tau_{\text{obj}}$): The universal supertype from which all other archetypes inherit, providing backward compatibility with traditional OOP concepts.</p>
+</li>
+<li>
+<p><strong>Node Classes</strong> ($\tau_{\text{node}}$): Extensions of object classes that represent discrete locations or entities within a topological structure, capable of hosting computation and connecting to other nodes.</p>
+</li>
+<li>
+<p><strong>Edge Classes</strong> ($\tau_{\text{edge}}$): First-class entities that represent relationships between nodes, encoding both the topology of connections and the semantics of those relationships. Edges serve not only as connections but also as potential locations where computation can reside.</p>
+</li>
+<li>
+<p><strong>Walker Classes</strong> ($\tau_{\text{walker}}$): Autonomous computational entities that traverse the node-edge structure, residing and executing on both nodes and edges as they move through the topological space, carrying state and behaviors that execute based on their current location.</p>
+</li>
+</ol>
+<p>Together, these archetypes create a complete topological representation framework where data (in nodes), relationships (as edges), and computational processes (through walkers) are explicitly modeled and integrated. This integration enables a paradigm shift from "data moving to computation" to "computation moving to data."</p>
+<p>The OSP paradigm offers significant advantages for a wide range of applications, including but not limited to: for agent-based systems, walkers provide a direct representation for autonomous agents that navigate environments, gather information, and make decisions based on local context; in distributed systems, the decoupling of data (nodes) from computation (walkers) creates a natural model for distributed execution where computational tasks can move between data locations; in social networks and graph-based systems, it enables intuitive representations of complex social structures through the natural mapping of users, relationships, and content to nodes and edges; and for finite state machines, states map naturally to nodes, transitions to edges, and execution flow to walker traversal, creating a clean representation of state-based systems. These examples represent just a few of the potential applications, as the paradigm's flexibility extends to numerous other domains. By formalizing these topological relationships at the language level, OSP enables more expressive, maintainable, and semantically rich programs for domains where connection topology is a fundamental aspect of the problem space.</p>
+<p>This paper makes the following contributions:</p>
+<ol>
+<li>
+<p>We formalize Object-Spatial Programming as an extension to Object-Oriented Programming, introducing four distinct archetypes: object classes, node classes, edge classes, and walker classes.</p>
+</li>
+<li>
+<p>We define a semantic model that specifies how these archetypes interact, including instantiation rules, lifecycle management, and execution semantics for traversal operations.</p>
+</li>
+<li>
+<p>We introduce specialized operators and statements for object-spatial execution, including the spawn operator ($\Rightarrow$) for activating computational entities and the visit statement ($\triangleright$) for traversing topological structures.</p>
+</li>
+<li>
+<p>We present the concept of <strong>abilities</strong> as a new function type with implicit execution semantics, triggered by spatial events rather than explicit invocation.</p>
+</li>
+<li>
+<p>We demonstrate the practical application of OSP through a case study of a social media application that naturally maps domain concepts to object-spatial constructs.</p>
+</li>
+</ol>
+<h2 id="object-spatial-topological-semantics">Object-Spatial Topological Semantics</h2>
+<p>The foundational concept of Object-Spatial Programming is the formalization of topological relationships through the introduction of special class types and a handful of new language constructs. This section outlines the core semantic elements of these constructs related to object-spatial topology, which fundamentally inverts the traditional relationship between data and computation.</p>
+<h3 id="unified-notation">Unified Notation</h3>
+<p>To ensure clarity and consistency throughout the formalization of Object-Spatial Programming, we define the following notation:</p>
+<table>
+<thead>
+<tr>
+<th><strong>Symbol</strong></th>
+<th><strong>Definition</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Classes and Instances</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>$C$</td>
+<td>Set of all class definitions in the programming model</td>
+</tr>
+<tr>
+<td>$\tau_{\text{obj}}$</td>
+<td>Object class type (universal supertype)</td>
+</tr>
+<tr>
+<td>$\tau_{\text{node}}$</td>
+<td>Node class type (extends object classes)</td>
+</tr>
+<tr>
+<td>$\tau_{\text{edge}}$</td>
+<td>Edge class type (extends object classes)</td>
+</tr>
+<tr>
+<td>$\tau_{\text{walker}}$</td>
+<td>Walker class type (extends object classes)</td>
+</tr>
+<tr>
+<td>$n, n_i, n_{\text{src}}, n_{\text{dst}}$</td>
+<td>Instances of node classes</td>
+</tr>
+<tr>
+<td>$e, e_i$</td>
+<td>Instances of edge classes</td>
+</tr>
+<tr>
+<td>$w, w'$</td>
+<td>Instances of walker classes</td>
+</tr>
+<tr>
+<td>$o$</td>
+<td>Generic instance of any class</td>
+</tr>
+<tr>
+<td><strong>Object-Spatial Constructs</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>$\mathcal{P}$</td>
+<td>Path collection (ordered collection of nodes or edges)</td>
+</tr>
+<tr>
+<td>$\mathcal{P}_N$</td>
+<td>Node path (ordered collection of connected nodes)</td>
+</tr>
+<tr>
+<td>$\mathcal{P}_E$</td>
+<td>Edge path (ordered collection of connected edges)</td>
+</tr>
+<tr>
+<td>$Q_w$</td>
+<td>Walker's traversal queue</td>
+</tr>
+<tr>
+<td><strong>Operations and References</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>$\Rightarrow$</td>
+<td>Spawn operator (activates a walker)</td>
+</tr>
+<tr>
+<td>$\triangleright$</td>
+<td>Visit statement (adds to walker's traversal queue)</td>
+</tr>
+<tr>
+<td>$a_{\text{walker}}$</td>
+<td>Walker ability (triggered during traversal)</td>
+</tr>
+<tr>
+<td>$a_{\text{node}}$</td>
+<td>Node ability (triggered by walker visits)</td>
+</tr>
+<tr>
+<td>$a_{\text{edge}}$</td>
+<td>Edge ability (triggered by walker traversal)</td>
+</tr>
+<tr>
+<td>$a^{\text{entry}}$</td>
+<td>Entry ability (triggered on arrival)</td>
+</tr>
+<tr>
+<td>$a^{\text{exit}}$</td>
+<td>Exit ability (triggered on departure)</td>
+</tr>
+<tr>
+<td>$\mathbf{self}$</td>
+<td>Self-reference within an instance</td>
+</tr>
+<tr>
+<td>$\mathbf{here}$</td>
+<td>Contextual reference to current walker's edge or node location</td>
+</tr>
+<tr>
+<td>$\mathbf{visitor}$</td>
+<td>Contextual reference to current location's visiting walker</td>
+</tr>
+<tr>
+<td>$\mathbf{path}$</td>
+<td>Contextual reference to current walker's destination queue $Q_w$</td>
+</tr>
+<tr>
+<td>$\prec$</td>
+<td>Execution precedence relation between operations; $a \prec b$ means operation $a$ must complete before operation $b$ begins</td>
+</tr>
+<tr>
+<td><strong>Set and Logical Notation</strong></td>
+<td></td>
+</tr>
+<tr>
+<td>$x \in X$</td>
+<td>$x$ is an element of set $X$</td>
+</tr>
+<tr>
+<td>$A \subseteq B$</td>
+<td>Set $A$ is a subset of set $B$</td>
+</tr>
+<tr>
+<td>$A \cup B$</td>
+<td>Union of sets $A$ and $B$</td>
+</tr>
+<tr>
+<td>$A \cap B$</td>
+<td>Intersection of sets $A$ and $B$</td>
+</tr>
+<tr>
+<td>$\wedge$</td>
+<td>Logical AND</td>
+</tr>
+<tr>
+<td>$\vee$</td>
+<td>Logical OR</td>
+</tr>
+<tr>
+<td>$\neg$</td>
+<td>Logical NOT</td>
+</tr>
+<tr>
+<td>$\forall$</td>
+<td>Universal quantification ("for all")</td>
+</tr>
+<tr>
+<td>$\exists$</td>
+<td>Existential quantification ("there exists")</td>
+</tr>
+<tr>
+<td>$f : X \rightarrow Y$</td>
+<td>Function $f$ mapping from domain $X$ to codomain $Y$</td>
+</tr>
+<tr>
+<td>$:=$</td>
+<td>Definition or assignment</td>
+</tr>
+<tr>
+<td>$=$</td>
+<td>Equality test</td>
+</tr>
+</tbody>
+</table>
+<h3 id="archetypes-of-classes">Archetypes of Classes</h3>
+<p>We define four distinct <strong>archetype</strong> classes, extending the traditional class paradigm to incorporate object-spatial semantics:</p>
+<ol>
+<li>
+<p><strong>Object Classes</strong> ($\tau_{\text{obj}}$): These are conventional classes, analogous to traditional OOP class types. Objects can have properties that describe their intrinsic characteristics and methods that operate on those properties. They serve as the foundational building blocks from which other archetypes derive, maintaining backward compatibility with existing OOP concepts while enabling integration with object-spatial extensions.</p>
+</li>
+<li>
+<p><strong>Node Classes</strong> ($\tau_{\text{node}}$): These extend object classes and can be connected via edges. Nodes represent discrete locations or entities within a topological graph structure. They encapsulate data, compute, and the potential for connections, serving as anchoring points in the object-spatial topology of the program. In addition to object semantics, nodes bind computation to data locations through <em>abilities</em>, allowing execution to be triggered by visitation rather than explicit invocation.</p>
+</li>
+<li>
+<p><strong>Edge Classes</strong> ($\tau_{\text{edge}}$): These represent directed relationships between two node instances and can only be instantiated when two nodes are specified. Edges encode both the topology of connections and the semantics of those connections. Unlike simple references in traditional OOP, edges are first-class object entities with their own properties and behaviors, enabling rich modeling of connection types, weights, capacities, or other relationship attributes. Importantly, edges serve not only as connections but also as traversable locations for walkers, with their own computational context.</p>
+</li>
+<li>
+<p><strong>Walker Classes</strong> ($\tau_{\text{walker}}$): These model autonomous entities that traverse node and edge objects. Walkers represent active computational elements that move through the data topological structure, processing data or triggering behaviors as they visit different nodes and edges. They enable decoupling of traversal logic from data structure, allowing for modularity in algorithm design and implementation. Walkers embody the paradigm shift of OSP, carrying computational behaviors to data rather than data being passed to computation.</p>
+</li>
+</ol>
+<p>This archetype system creates a complete topological representation framework, where data (in nodes and edges), relationships (as edges), and computational processes (through walkers) are all explicitly modeled and integrated, inverting the traditional paradigm of passing data to functions.</p>
+<h4 id="formalization">Formalization</h4>
+<p>Let $C$ be the set of all class definitions in the programming model, where:</p>
+<ol>
+<li>
+<p>$\tau_{\text{obj}} \in C$ is a standard object class type, representing the universal supertype from which all other archetypes inherit.</p>
+</li>
+<li>
+<p>$\tau_{\text{node}} \subseteq \tau_{\text{obj}}$ represents node class types, which extend object classes with connectivity capabilities and data-bound computation. This subset relationship ensures that nodes inherit all capabilities of objects while adding topological semantics and the ability to bind computation to data locations.</p>
+</li>
+<li>
+<p>$\tau_{\text{edge}} \subseteq \tau_{\text{obj}}$ represents edge class types, which extend object classes with relational semantics. Edges are not merely references but full-fledged objects that encapsulate relationship properties and behaviors, serving as both connections and traversable locations.</p>
+</li>
+<li>
+<p>$\tau_{\text{walker}} \subseteq \tau_{\text{obj}}$ represents walker class types, which extend object classes with mobility semantics within the node-edge structure. Walkers combine data, state, and traversal logic to model computational processes that flow through the topological structure, actualizing the concept of "computation moving to data."</p>
+</li>
+</ol>
+<p>Each instance $n$ of a <strong>node class</strong> $\tau_{\text{node}}$ is defined simply as: $n = ()$.
+Nodes exist as independent entities in the topological structure, serving as primary data locations. Unlike edges which require references to nodes, nodes can exist without connections to other elements, though they typically participate in the graph structure through edges that reference them.</p>
+<p>Each instance $e$ of an <strong>edge class</strong> $\tau_{\text{edge}}$ is defined as a tuple:</p>
+<p>$$e = (n_{\text{src}}, n_{\text{dst}})$$</p>
+<p>where:</p>
+<ul>
+<li>$n_{\text{src}}, n_{\text{dst}} \in \tau_{\text{node}}$ are the source and destination node instances, serving as the endpoints of the relationship. These must exist prior to edge creation, establishing a dependency constraint that maintains object-spatial graph integrity.</li>
+</ul>
+<p>This formalization ensures that edges properly connect existing nodes, maintaining topological graph consistency within the program.</p>
+<p>Each instance $w$ of a <strong>walker class</strong> $\tau_{\text{walker}}$ may exist in one of three states:</p>
+<p>$$w = \begin{cases}
+(n_{\text{loc}}) &amp; \text{if active within node topological context} \
+(e_{\text{loc}}) &amp; \text{if active within edge topological context} \
+() &amp; \text{if inactive as a standard object}
+\end{cases}$$</p>
+<p>where $n_{\text{loc}} \in \tau_{\text{node}}$ is the node the walker resides on, or $e_{\text{loc}} \in \tau_{\text{edge}}$ is the edge the walker traverses when active. This location property is dynamic and changes as the walker traverses the topological structure, allowing the walker to access different data contexts based on its current position. When inactive, the walker exists as a standard object without object-spatial context, allowing for manipulation before activation within a object-spatial context.</p>
+<p>The <strong>overall topological structure</strong> with active computational elements can be represented as:</p>
+<p>$$G = (N, E, W, L)$$</p>
+<p>where:
+- $N$ is the set of all node instances, representing data locations in the topological space
+- $E$ is the set of all edge instances, defining the connectivity between nodes
+- $W$ is the set of all walker instances, representing the computational entities
+- $L: W \rightarrow N \cup E \cup {\emptyset}$ is a location mapping function that associates each walker with its current position in the topology, where $\emptyset$ indicates an inactive walker</p>
+<p>This representation captures both the static structural components (nodes and edges) and the dynamic computational elements (walkers) of the object-spatial system, along with their current positions within the topological structure. Next, we introduce the first-class construct of a path collection which represents a traversable path through a object-spatial topology.</p>
+<h3 id="path-collections-mathcalp-and-walker-destination-queues-q_w">Path Collections ($\mathcal{P}$) and Walker Destination Queues ($Q_w$)</h3>
+<p>The Object-Spatial Programming model introduces two complementary constructs that govern traversal dynamics: <strong>path collections</strong> ($\mathcal{P}$), which represent potential traversal routes through the topology, and <strong>walker destination queues</strong> ($Q_w$), which manage the actual execution sequence during traversal. Together, these constructs create a flexible yet deterministic framework for computational movement through data spaces.</p>
+<h4 id="path-collections">Path Collections</h4>
+<p>The <strong>path collection</strong> ($\mathcal{P}$) introduces a higher-order topological construct that represents an ordered sequence of nodes and edges within the object-spatial structure. As first-class citizens in the programming model, path collections can be created, modified, and manipulated like any other data structure. This abstraction serves as a critical link between topology and traversal semantics, enabling concise expression of traversal patterns while maintaining the integrity of the object-spatial model.</p>
+<p>The intent of the path collection is to provide a unified framework that bridges graph theory and computation, creating a formal way to express how walkers move through connected data structures. Rather than treating node traversals and edge traversals as separate concerns, the path collection unifies them into a single construct that preserves topological relationships while enabling richer expression of traversal algorithms.</p>
+<p>A path collection is defined as:
+$$\mathcal{P} = [p_1, p_2, \ldots, p_k]$$
+where each $p_i \in N \cup E$ (i.e., each element is either a node or an edge), subject to the following constraints:</p>
+<ol>
+<li>
+<p><strong>Origin Connectivity:</strong> The first element $p_1$ must be connected to an origin node $n_{\text{origin}} \in N$, either by being the origin itself or by being an edge with $n_{\text{origin}}$ as an endpoint.</p>
+</li>
+<li>
+<p><strong>Sequential Connectivity:</strong> For each element $p_i$ where $i &gt; 1$ in $\mathcal{P}$, at least one of the following must hold:</p>
+</li>
+<li>
+<p>If $p_i$ is a node, then there must exist at least one element $p_j$ where $j &lt; i$ such that either:</p>
+<ul>
+<li>$p_j$ is a node and there exists an edge $e \in E$ connecting $p_j$ and $p_i$, or</li>
+<li>$p_j$ is an edge with $p_i$ as one of its endpoints</li>
+</ul>
+</li>
+<li>
+<p>If $p_i$ is an edge, then at least one of its endpoints must appear as a node in ${p_1, p_2, \ldots, p_{i-1}}$</p>
+</li>
+<li>
+<p><strong>Path Completeness:</strong> For any element $p_i$ in $\mathcal{P}$, there must exist a path from $n_{\text{origin}}$ to $p_i$ such that all intermediate elements (nodes and edges) on that path are present in the prefix ${p_1, p_2, \ldots, p_{i-1}}$. This ensures that the path collection contains at least one valid traversal route to each included element.</p>
+</li>
+<li>
+<p><strong>Traversal Coherence:</strong> When multiple elements are eligible for inclusion at a given point in the sequence (e.g., multiple nodes connected to previously included elements), their relative ordering follows breadth-first search (BFS) semantics from the most recently added elements, preserving locality of traversal.</p>
+</li>
+</ol>
+<p>This definition ensures topological validity by anchoring all nodes to a common origin while allowing flexible expression of traversal patterns. The breadth-first ordering provides predictability and consistency for walkers traversing the path, particularly when dealing with hierarchical structures where multiple branches might need to be explored.</p>
+<p>As first-class citizens, path collections support arbitrary modifications, including additions, removals, reorderings, and transformations, provided that the resulting collection maintains the properties of a valid path collection. Operations such as concatenation, slicing, filtering, and mapping can be applied to path collections, yielding new valid path collections. This flexibility enables algorithmic manipulation of potential traversal paths while preserving the topological integrity of the underlying data structure.</p>
+<p>This generalized path collection model reflects a natural way to describe, in a declarative way, potential routes as to how walker may navigate through a data topology. By allowing both nodes and edges in the same sequence while maintaining topological context, path collections enable algorithms to be expressed in terms of the connected data structures they operate on, rather than as abstract operations that receive data as input.</p>
+<h4 id="path-construction">Path Construction</h4>
+<p>Building on the definition of path collections as first-class citizens in the programming model, a path collection can be constructed in several ways:</p>
+<ol>
+<li>
+<p><strong>Explicit Construction</strong>: By directly specifying the ordered sequence of nodes and optional edges:</p>
+<p>$$\mathcal{P} = [p_1, p_2, \ldots, p_k] \text{ where } p_i \in N \cup E$$</p>
+<p>When explicitly constructing path collections, the elements must satisfy the reachability and ordering constraints defined earlier, ensuring that walkers can traverse through the path in a topologically valid sequence. Edges, when included, must immediately precede the nodes they connect to on the reachability path from the origin node.</p>
+</li>
+<li>
+<p><strong>Query-Based Construction</strong>: By specifying an origin node and a traversal predicate:</p>
+<p>$$\mathcal{P} = \text{path}(n_{\text{origin}}, \text{predicate}, \text{includeEdges}, d)$$</p>
+<p>where:
+- $n_{\text{origin}} \in N$ is the origin node from which all nodes in the path must be reachable
+- $\text{predicate}: N \cup E \rightarrow {\text{true}, \text{false}}$ is a function that determines whether an element should be included in the path
+- $\text{includeEdges} \in {\text{true}, \text{false}}$ specifies whether edges should be explicitly included in the path collection
+- $d \in {\text{outgoing}, \text{incoming}, \text{any}}$ specifies the traversal direction for constructing the path</p>
+<p>The construction algorithm performs a breadth-first traversal from the origin node, adding elements to the path collection according to the predicate and the includeEdges parameter. This ensures that the resulting path maintains proper reachability relations while allowing flexible filtering of elements.</p>
+<p>A common example of query-based construction is creating a path that follows a specific sequence of edge types:</p>
+<p>$$\mathcal{P} = \text{path}(n_{\text{origin}}, \lambda e : e \in E \land \text{type}(e) \in [\tau_{\text{edge}}^1, \tau_{\text{edge}}^2, \ldots, \tau_{\text{edge}}^k] \text{ in sequence}, \text{true}, \text{outgoing})$$</p>
+<p>This creates a path collection starting at $n_{\text{origin}}$ and following only edges that match the specified sequence of edge types. The path resolution algorithm traverses the graph, selecting edges and their connected nodes that conform to this type pattern. A walker traversing this path would follow a route determined by these edge type constraints, enabling declarative specification of complex traversal patterns based on relationship types.</p>
+</li>
+</ol>
+<p>Once constructed, these path collections can be passed to walkers to guide their traversal through the topological structure, as we'll see in the next section on walker destination queues.</p>
+<h4 id="walker-destination-queues">Walker Destination Queues</h4>
+<p>While path collections define potential traversal routes through the topology, <strong>walker destination queues</strong> ($Q_w$) represent the actual execution sequence that a walker follows during its traversal. Each active walker $w$ maintains an internal traversal queue $Q_w$ that determines its next destinations:</p>
+<p>$$Q_w = [q_1, q_2, \ldots, q_m] \text{ where } q_i \in N \cup E$$</p>
+<p>Walker destination queues have several key properties that govern traversal dynamics:</p>
+<ol>
+<li>
+<p><strong>First-In-First-Out (FIFO) Processing</strong>: Walker destination queues follow FIFO semantics, with elements processed in the order they were added. When a walker completes execution at its current location, it automatically moves to the next element in its queue.</p>
+</li>
+<li>
+<p><strong>Dynamic Modification</strong>: Walker destination queues are designed for dynamic modification during traversal through visit statements and other control flow mechanisms:</p>
+<p>$$\text{visit}(w, n) \Rightarrow Q_w \leftarrow Q_w \cup [n]$$</p>
+<p>This allows walkers to adapt their traversal paths based on discovered data or computed conditions.</p>
+</li>
+<li>
+<p><strong>Automatic Edge-to-Node Transitions</strong>: When a walker traverses an edge, the appropriate destination node is automatically added to its queue if not already present, ensuring continuity in the traversal process.</p>
+</li>
+<li>
+<p><strong>Path-to-Queue Conversion</strong>: When a walker spawns on or visits a path collection, the path is converted into queue entries according to traversal requirements:</p>
+<p>$$\text{visit}(w, \mathcal{P}) \Rightarrow Q_w \leftarrow Q_w \cup \text{expandPath}(\mathcal{P}, L(w))$$</p>
+<p>where $\text{expandPath}(\mathcal{P}, L(w))$ transforms the path collection into a physically traversable sequence from the walker's current location $L(w)$. This function ensures that:</p>
+<ul>
+<li>All elements in $\mathcal{P}$ are included in the expanded queue</li>
+<li>Any necessary intermediate nodes or edges required for physical traversal between non-adjacent elements are inserted</li>
+<li>The resulting sequence maintains the relative ordering of elements in the original path collection</li>
+<li>The expanded path respects the connectivity constraints of the topological structure</li>
+</ul>
+<p>This conversion enables walkers to traverse path collections that express higher-level traversal intent without requiring explicit specification of every intermediate step.</p>
+</li>
+<li>
+<p><strong>Activity Persistence</strong>: Once a walker transitions to an active state via spawn, it remains active until its queue is exhausted or it is explicitly disengaged. This ensures computational continuity during traversal, maintaining the walker's contextual state throughout its path exploration. When a walker's queue becomes empty after all abilities at its current location have executed, it automatically transitions back to an inactive state. However, while at a node with an empty queue, it temporarily preserves its active status, allowing for potential reactivation through new visit statements before the current execution cycle completes.</p>
+</li>
+</ol>
+<p>The relationship between the path collection ($\mathcal{P}$) and the dynamic walker queue ($Q_w$) creates a flexible yet deterministic traversal model, allowing for both declarative path specifications and runtime adaptation of traversal behavior.</p>
+<h3 id="abilities">Abilities</h3>
+<p>In addition to traditional methods $m: \tau \rightarrow \tau'$, we introduce <strong>abilities</strong>, a new function type $a: \varnothing \rightarrow \varnothing$ with <em>implicit</em> execution semantics. Unlike ordinary functions, abilities neither accept explicit arguments nor return values; instead, they gain access to relevant data through the walker or location (node or edge) that triggers them. This represents a fundamental paradigm shift: rather than moving data to computation through parameters and return values, computation is distributed throughout the topology and automatically activated by object-spatial interactions. Abilities are named using the same conventions as methods, providing a consistent interface pattern across the programming model.</p>
+<p>Each ability specifies an execution trigger that determines when it is activated during traversal:</p>
+<p><strong>Walker Abilities</strong> $a_{\text{walker}}$ are automatically triggered when a walker enters or exits a node or edge of a specified type:</p>
+<p>$$a_{\text{walker}} : (\tau_{\text{location}}, t) \rightarrow \bot$$</p>
+<p>where $\tau_{\text{location}} \in {\tau_{\text{node}}, \tau_{\text{edge}}}$ and $t \in {\text{entry}, \text{exit}}$ specifies whether the ability is triggered upon the walker's entry to or exit from a location of the specified type. This notation indicates the <em>condition</em> under which the ability is invoked, rather than a parameter list. The ability thus acts as an event handler for location arrival or departure events. Once invoked, the ability can directly access the triggering walker's data (via $\mathbf{self}$), the location it arrived at or is departing from (via $\mathbf{here}$), and its traversal path and queue (via $\mathbf{path}$). The walker can modify its traversal queue $Q_w$ through visit statements or direct manipulation of $\mathbf{path}$. This allows walkers to respond contextually to different location types they encounter, implementing type-specific processing logic without explicit conditional branching and dynamically adapting their traversal path based on discovered data. The walker serves both as a carrier of computational behavior and as an activator of location-bound computation throughout the topology.</p>
+<p><strong>Node Abilities</strong> $a_{\text{node}}$ are automatically triggered when a walker of a specified type enters or exits the node:</p>
+<p>$$a_{\text{node}} : (\tau_{\text{walker}}, t) \rightarrow \bot$$</p>
+<p>where $t \in {\text{entry}, \text{exit}}$ specifies whether the ability is triggered upon the walker's entry to or exit from the node. Similarly, this indicates the condition (arrival or departure of a walker of type $\tau_{\text{walker}}$), not an explicit parameter. The ability functions as an event handler for walker arrival or departure events. When triggered, the ability can access the node's data (via $\mathbf{self}$), the incoming or outgoing walker (via $\mathbf{visitor}$), and the walker's destination queue (via $\mathbf{path}$). This allows nodes to respond differently to different types of walkers, implementing specialized processing logic based on the visitor type and traversal stage, and potentially influencing the walker's future traversal path. Node abilities demonstrate that nodes are not merely passive data containers but active computational sites that respond to traversal events, embodying the distributed nature of computation in the OSP model.</p>
+<p><strong>Edge Abilities</strong> $a_{\text{edge}}$ are automatically triggered when a walker of a specified type enters or exits the edge:</p>
+<p>$$a_{\text{edge}} : (\tau_{\text{walker}}, t) \rightarrow \bot$$</p>
+<p>where $t \in {\text{entry}, \text{exit}}$ specifies whether the ability is triggered upon the walker's entry to or exit from the edge. This ability functions similarly to node abilities but is specific to edge contexts. When triggered, the ability can access the edge's data (via $\mathbf{self}$), the traversing walker (via $\mathbf{visitor}$), and the walker's destination queue (via $\mathbf{path}$). Edge abilities enable computational behavior to be bound to relationship transitions, allowing for processing that specifically occurs during the movement between nodes, including the possibility of modifying the walker's future traversal path. This enables modeling of transition-specific computation, such as filtering, transformation, or validation of data as it flows through the topological structure. The presence of computational abilities in edges reinforces that in the OSP model, even transitions between data locations are first-class citizens capable of containing and executing computation.</p>
+<h4 id="ability-execution-order">Ability Execution Order</h4>
+<p>When a walker traverses the topological structure, abilities are executed in a consistent, predictable order regardless of location type. This execution order respects both entry/exit specifications and the dual-perspective model of location-walker interaction:</p>
+<ol>
+<li><strong>Arrival Phase</strong> - When a walker arrives at any location (node or edge):
+   a. First, all relevant location entry abilities for the arriving walker type are executed. This allows the location (node or edge) to respond to the walker's arrival, potentially modifying its own state or the state of the walker. This represents location-bound computation triggered by mobile traversal.</li>
+</ol>
+<p>b. Next, all relevant walker entry abilities for the current location type are executed. This allows the walker to respond to its new context, potentially modifying its own state or the state of the location. This represents mobile computation processing data at its current position.</p>
+<p>c. During execution of these abilities, the walker may modify its traversal queue $Q_w$ through visit statements if at a node, or have its queue automatically updated if at an edge:
+      - At nodes: The walker may execute visit statements to enqueue new destinations
+      - At edges: The appropriate endpoint node is automatically added to $Q_w$ if not already present, based on traversal direction:
+        - If arrived from $n_{\text{src}}$, then $Q_w \leftarrow Q_w \cup [n_{\text{dst}}]$
+        - If arrived from $n_{\text{dst}}$, then $Q_w \leftarrow Q_w \cup [n_{\text{src}}]$</p>
+<ol>
+<li><strong>Departure Phase</strong> - When a walker prepares to leave any location (node or edge):
+   a. First, all relevant walker exit abilities for the current location type are executed. This allows the walker to finalize any processing before departure.</li>
+</ol>
+<p>b. Next, all relevant location exit abilities for the departing walker type are executed. This allows the location to respond to the walker's departure, potentially performing cleanup or transition operations.</p>
+<p>c. After all exit abilities have executed, the walker updates its location to the next element in its queue: $L(w) \leftarrow \text{dequeue}(Q_w)$</p>
+<ol>
+<li><strong>Queue Exhaustion</strong> - When a walker's queue $Q_w$ becomes empty after dequeuing:
+   a. If the walker is on a node, it remains at that node until further visit statements are executed or until explicitly disengaged</li>
+</ol>
+<p>b. If the walker is on an edge, the program raises an error, as edges cannot be terminal locations</p>
+<p>This unified execution order establishes a predictable pattern where locations first respond to walker arrival before walkers process their new context, and walkers prepare for departure before locations respond to their exit. The order is expressed formally as:</p>
+<p>$$\begin{array}{c}
+\forall a_{\text{loc}}^{\text{entry}} \in l, \forall a_{\text{walker}}^{\text{entry}} \in w : \text{execute}(a_{\text{loc}}^{\text{entry}}) \prec \text{execute}(a_{\text{walker}}^{\text{entry}}) \
+\forall a_{\text{walker}}^{\text{exit}} \in w, \forall a_{\text{loc}}^{\text{exit}} \in l : \text{execute}(a_{\text{walker}}^{\text{exit}}) \prec \text{execute}(a_{\text{loc}}^{\text{exit}})
+\end{array}$$</p>
+<p>Additionally, the relationship between queue operations and ability execution follows this pattern:</p>
+<p>$$\begin{array}{c}
+\forall w \in W, \forall l \in L(w) : \text{execute-all-abilities}(w, l) \prec \text{dequeue}(Q_w) \
+\forall w \in W, \forall l' \in \text{dequeue}(Q_w) : \text{dequeue}(Q_w) \prec \text{execute-all-abilities}(w, l')
+\end{array}$$</p>
+<p>where $\prec$ denotes execution precedence, $l$ represents either a node or edge location, and
+$\text{execute-all-abilities}(w, l)$ represents the complete sequence of ability executions for walker $w$ at location $l$.</p>
+<p>This execution model creates a bidirectional coupling between data and computation that is central to the OSP paradigm, allowing both locations and walkers to respond to traversal events in a coordinated sequence while maintaining the queue-based traversal mechanism that guides walkers through the topological structure.</p>
+<h4 id="self-and-contextual-references">Self and Contextual References</h4>
+<p>To support the implicit execution model of abilities, OSP provides special reference mechanisms that give abilities access to their execution context:</p>
+<ul>
+<li>
+<p><strong>Self-reference</strong> ($\mathbf{self}$): Traditional self-reference within an instance, providing access to the instance's own properties and methods. In walker abilities, $\mathbf{self}$ refers to the walker instance, while in node or edge abilities, $\mathbf{self}$ refers to the node or edge instance respectively.</p>
+</li>
+<li>
+<p><strong>Here-reference</strong> ($\mathbf{here}$): In walker abilities, $\mathbf{here}$ refers to the current location (node or edge) the walker is positioned at, providing access to the location's properties and methods from the walker's perspective. This enables walkers to interact with their current object-spatial context, representing mobile computation accessing local data.</p>
+</li>
+<li>
+<p><strong>Visitor-reference</strong> ($\mathbf{visitor}$): In node or edge abilities, $\mathbf{visitor}$ refers to the walker triggering the ability, providing access to the walker's properties and methods from the location's perspective. This enables locations to interact with visiting walkers based on their specific properties, representing data-bound computation accessing the mobile computational entity.</p>
+</li>
+<li>
+<p><strong>Path-reference</strong> ($\mathbf{path}$): In all abilities, $\mathbf{path}$ provides access to the walker's traversal path and destination queue $Q_w$, allowing inspection and manipulation of the planned traversal sequence. This enables walkers to dynamically adjust their future movement based on conditions encountered during traversal. The path reference gives runtime access to the entire destination queue, enabling operations such as:</p>
+</li>
+<li>Viewing the next planned destinations</li>
+<li>Modifying the order of destinations</li>
+<li>Inserting or removing destinations based on runtime conditions</li>
+<li>Querying path properties such as length, connectivity, or destination types</li>
+</ul>
+<p>These contextual references create a dual-perspective model where both walkers and locations can access each other's state when they interact. This bidirectional access pattern enables rich interaction models where both entities can influence each other during traversal events, actualizing the tight coupling between data and computation that characterizes the OSP paradigm.</p>
+<h3 id="complete-topological-structure">Complete Topological Structure</h3>
+<p>With the foundational elements and constructs defined, we can now formally describe the complete topological structure that embodies a Object-Spatial Program. This structure encapsulates both the interconnected elements and the distributed computational capabilities:</p>
+<p>$$G = (N, E, W, Q, L)$$</p>
+<p>where:
+- $N = {n_1, n_2, \ldots, n_m}$ is the set of all node instances, each representing both a data location and a potential site of computation in the topological space
+- $E = {e_1, e_2, \ldots, e_k}$ is the set of all edge instances, each defining not only connectivity between nodes but also computational behaviors at transitions, where each $e_i = (n_{\text{src}}, n_{\text{dst}})$
+- $W = {w_1, w_2, \ldots, w_j}$ is the set of all walker instances, representing autonomous computational entities that activate location-bound behaviors
+- $Q = {Q_{w_1}, Q_{w_2}, \ldots, Q_{w_j}}$ is the set of all walker destination queues, representing the planned traversal sequences for each active walker
+- $L: W \rightarrow N \cup E \cup {\emptyset}$ is a location mapping function that associates each walker with its current position in the topology, where $\emptyset$ indicates an inactive walker</p>
+<p>The state of the topological structure at any given moment during program execution is characterized by:</p>
+<ol>
+<li><strong>Distributed Computational Capacity</strong>: Unlike traditional models where computation is centralized in functions, the OSP model distributes computational capabilities across all elements:</li>
+<li>Nodes contain both data and computational abilities ($a_{\text{node}}$) that activate in response to walker visits</li>
+<li>Edges contain both relational data and computational abilities ($a_{\text{edge}}$) that execute during transitions</li>
+<li>
+<p>Walkers contain both traversal logic and computational abilities ($a_{\text{walker}}$) that respond to encountered locations</p>
+</li>
+<li>
+<p><strong>Static Topological State</strong>: The configuration of nodes and edges that form the underlying graph structure. This includes:</p>
+</li>
+<li>The set of all nodes $N$ with their internal data states and latent computational abilities</li>
+<li>The set of all edges $E$ with their connection patterns and transition-specific abilities</li>
+<li>
+<p>The resulting graph connectivity properties, such as reachability between nodes</p>
+</li>
+<li>
+<p><strong>Dynamic Computational State</strong>: The current positions and planned movements of walkers within the structure. This includes:</p>
+</li>
+<li>The location mapping $L$ that tracks the current position of each walker</li>
+<li>The traversal queues $Q_{w_i}$ for each active walker $w_i$, defining its future traversal path</li>
+</ol>
+<p>As the program executes, this topological structure evolves through several key mechanisms:</p>
+<ol>
+<li><strong>Computational Activation</strong>: The OSP model fundamentally inverts traditional computation:</li>
+<li>Rather than data moving to stationary computation (functions), walkers activate computation embedded within themselves and the data locations they visit</li>
+<li>Nodes and edges contain dormant computational abilities that are triggered by compatible walkers</li>
+<li>
+<p>The interaction between a walker and its current location creates a dynamic computational context where both entities can affect each other</p>
+</li>
+<li>
+<p><strong>Structural Modifications</strong>: Changes to the node-edge graph through:</p>
+</li>
+<li>Creation or deletion of nodes, affecting the set $N$</li>
+<li>
+<p>Creation or deletion of edges, affecting the set $E$ and the connectivity of the graph</p>
+</li>
+<li>
+<p><strong>Path Construction and Utilization</strong>: Although not part of the fundamental structure, path collections $\mathcal{P}$ play a crucial role as programming constructs that:</p>
+</li>
+<li>Define traversable routes through the topology</li>
+<li>Provide abstraction mechanisms for walker traversal patterns</li>
+<li>
+<p>Serve as intermediaries between static structure and dynamic traversal</p>
+</li>
+<li>
+<p><strong>Computational Movements</strong>: Changes to the positions and traversal plans of walkers through:</p>
+</li>
+<li>Activation of walkers via the spawn operator, transitioning walkers from inactive objects to active object-spatial entities positioned at specific locations</li>
+<li>Traversal between nodes and edges via the visit statement, updating the location mapping $L$ and modifying walker destination queues $Q_{w_i}$</li>
+<li>At each traversal step, triggering a cascade of ability executions that constitute the actual computational work</li>
+<li>
+<p>Termination of traversals through disengage statements, removing walkers from the active set</p>
+</li>
+<li>
+<p><strong>State Transformations</strong>: Changes to the internal states of elements through:</p>
+</li>
+<li>Execution of node and edge abilities triggered by walker visits, allowing data locations to compute in response to visitors</li>
+<li>Execution of walker abilities triggered by encountered locations, allowing computational entities to respond to data contexts</li>
+<li>Bidirectional modification of properties through the <strong>self</strong> and <strong>here</strong> references</li>
+<li>Distributed effects as computation ripples through the topology via walker traversal</li>
+</ol>
+<p>This complete topological structure $G$ provides a unified mathematical representation of the OSP paradigm's distinctive approach: computation is not centralized in functions but distributed throughout a topological structure. Nodes and edges are not merely passive data containers but active computational sites that respond to walker visits. Walkers serve as both computational entities and activation mechanisms that trigger dormant abilities embedded within the topology.</p>
+<h2 id="object-spatial-execution-semantics">Object-Spatial Execution Semantics</h2>
+<p>The execution model of Object-Spatial Programming combines traditional method invocation with object-spatial traversal operations and context-sensitive execution. This section details how instances are created and how computation flows through the topological structure, fundamentally inverting the traditional relationship where data is moved to computation.</p>
+<h3 id="instantiation-rules">Instantiation Rules</h3>
+<p>To maintain object-spatial graph consistency and support higher-order topological structures, OSP enforces specific instantiation constraints for different archetypes and references:</p>
+<ol>
+<li>
+<p><strong>Object Instantiation</strong>: Standard objects follow traditional OOP instantiation patterns, with constructors defining initial state.</p>
+</li>
+<li>
+<p><strong>Node Instantiation</strong>: Nodes are instantiated like standard objects but gain the additional capability to serve as endpoints for edges and hosts for walkers. Their constructors may initialize object-spatial properties and connection capabilities. Nodes effectively become locations where data resides and computation can be triggered, rather than passive data containers.</p>
+</li>
+<li>
+<p><strong>Edge Instantiation</strong>: An instance $e$ of an edge class $\tau_{\text{edge}}$ can only be created if two nodes $n_{\text{src}}, n_{\text{dst}}$ exist and are specified upon instantiation. This constraint ensures that edges always connect existing object-spatial elements, preventing dangling connections and maintaining referential integrity within the topological structure.</p>
+</li>
+<li>
+<p><strong>Walker Instantiation</strong>: An instance $w$ of a walker class $\tau_{\text{walker}}$ can be instantiated as a standard object without an initial location. In this state, the walker functions as a regular object with all its properties and methods accessible, but it does not participate in object-spatial traversal until activated via the spawn operator.</p>
+</li>
+</ol>
+<p>These instantiation rules ensure that all object-spatial elements—from individual nodes and edges to higher-order path collections—maintain topological consistency while providing flexible construction mechanisms. The rules for path collections are particularly important as they bridge between the static topological structure and the dynamic execution patterns of walkers, allowing for complex traversal strategies to be expressed concisely while preserving the integrity of the object-spatial model.</p>
+<h3 id="lifecycle-management">Lifecycle Management</h3>
+<p>OSP extends traditional object lifecycle management with specialized rules for object-spatial archetypes:</p>
+<ol>
+<li>
+<p><em>Object Lifecycle</em>: Standard object instances follow traditional object lifecycle patterns from OOP, with standard creation, usage, and garbage collection.</p>
+</li>
+<li>
+<p><em>Walker Lifecycle</em>: Walkers have a dual lifecycle, existing first as standard objects and then potentially transitioning to active object-spatial entities through the spawn operator. When active within the topological structure, walkers maintain their position and traversal state. They can be deactivated and return to standard object status under program control or when their traversal completes. This lifecycle reflects the mobile nature of computation in OSP, where algorithmic behaviors physically move through the data topology.</p>
+</li>
+<li>
+<p><em>Node Lifecycle</em>: When a node instance is deleted, all edge instances that connect to or from that node are automatically deleted as well. This cascading deletion ensures object-spatial integrity by preventing dangling edges that would otherwise reference non-existent nodes. This constraint is expressed formally as:</p>
+<p>$$\forall e \in \tau_{\text{edge}} \text{ where } e = (n_{\text{src}}, n_{\text{dst}}) : \text{del}(n_{\text{src}}) \lor \text{del}(n_{\text{dst}}) \Rightarrow \text{del}(e)$$</p>
+</li>
+<li>
+<p><em>Edge Lifecycle</em>: Edge instances exist as long as both their source and destination nodes exist. They are automatically garbage collected when either endpoint node is deleted, or when explicitly deleted by the program.</p>
+</li>
+</ol>
+<p>This lifecycle management system ensures that the topological structure remains consistent throughout program execution, with automatic cleanup of dependent connections when nodes are removed, while providing flexibility for walker activation and deactivation.</p>
+<h3 id="spawn-operator-rightarrow">Spawn Operator ($\Rightarrow$)</h3>
+<p>The <strong>spawn operator</strong> ($\Rightarrow$) activates a walker within the topological structure by placing it at a specified node, edge, or path. This operation transitions the walker from a standard object state to an active object-spatial entity within the graph $G$:</p>
+<p><strong>Spawning on a Single Element</strong></p>
+<p>For spawning on a node:
+$$w \Rightarrow n \rightarrow w'$$</p>
+<p>where:
+- $w$ is a walker instance currently in an inactive state ($L(w) = \emptyset$)
+- $n \in N$ is the node where the walker will be spawned
+- $w'$ is the resulting active walker with updated location $L(w') = n$
+- $Q_{w'} = []$ (empty queue) as no further destinations are automatically queued</p>
+<p>For spawning on an edge:
+$$w \Rightarrow e \rightarrow w'$$</p>
+<p>where:
+- $w$ is a walker instance currently in an inactive state ($L(w) = \emptyset$)
+- $e = (n_{\text{src}}, n_{\text{dst}}) \in E$ is the edge where the walker will be spawned
+- $w'$ is the resulting active walker with updated location $L(w') = e$
+- $Q_{w'} = [n_{\text{dst}}]$ by default, as edges cannot be terminal locations and require a subsequent node destination</p>
+<p><strong>Spawning on a Path</strong></p>
+<p>The spawn operator can also be applied to a path collection, allowing a walker to begin traversing a connected substructure:</p>
+<p>$$w \Rightarrow \mathcal{P} \rightarrow w'$$</p>
+<p>where:
+- $w$ is a walker instance currently in an inactive state ($L(w) = \emptyset$)
+- $\mathcal{P} = [p_1, p_2, \ldots, p_k]$ is a path collection where each $p_i \in N \cup E$
+- $w'$ is the resulting active walker with updated location $L(w') = p_1$
+- The remaining elements are directly added to the walker's queue: $Q_{w'} = [p_2, \ldots, p_k]$
+- Since $\mathcal{P}$ is well-formed by definition, the path maintains topological validity, ensuring the walker can traverse from each element to the next without additional path resolution</p>
+<p>This approach creates a direct mapping between the path collection and the walker's traversal queue, reflecting the assumption that path collections are already topologically valid. The spawn operation initiates the walker's journey through the specified path, activating it at the first element and scheduling visits to all subsequent elements in the exact order provided.</p>
+<p>The spawn operation has several important properties that affect the topological structure $G = (N, E, W, Q, L)$:</p>
+<ol>
+<li>
+<p>It can only be applied to a walker that is not already active within the topological structure ($L(w) = \emptyset$)</p>
+</li>
+<li>
+<p>When executed, it modifies the location mapping $L$ to position the walker at the specified location (the first element of the spawn target)</p>
+</li>
+<li>
+<p>It initializes the walker's queue $Q_w$ based on the spawn target:</p>
+</li>
+<li>For a single node: $Q_w = []$ (empty queue)</li>
+<li>For a single edge: $Q_w = [n_{\text{dst}}]$ (destination node)</li>
+<li>
+<p>For a path: $Q_w = [p_2, \ldots, p_k]$ (remaining path elements)</p>
+</li>
+<li>
+<p>The operation triggers all entry abilities associated with the walker's arrival at the spawn location:</p>
+</li>
+<li>First, relevant location entry abilities for the arriving walker type</li>
+<li>
+<p>Next, relevant walker entry abilities for the location type</p>
+</li>
+<li>
+<p>After spawning, the walker maintains its active state until either:</p>
+</li>
+<li>Its queue is exhausted and all abilities at its final location have executed, at which point it automatically returns to an inactive state</li>
+<li>
+<p>It is explicitly terminated via a disengage statement</p>
+</li>
+<li>
+<p>The spawn operator marks the transition of computation from a dormant state to an active participant in the distributed computational system</p>
+</li>
+<li>
+<p>When spawned on a path, the walker traverses the elements in the exact order specified, relying on the path's well-formed nature to maintain topological validity</p>
+</li>
+</ol>
+<p>The path-based spawn operation extends the expressiveness of the OSP model by allowing walkers to be initialized with a complete traversal plan, rather than building the traversal dynamically through visit statements. This enables more declarative expression of algorithms that operate on connected substructures.</p>
+<p>The spawn operator creates a clear separation between the initialization and activation phases of walker usage, allowing for complex setup before object-spatial traversal begins. It also marks the moment when the distributed computational model comes alive, with location-bound abilities and walker abilities beginning their interplay throughout the topological structure.</p>
+<h3 id="visit-statement-triangleright">Visit Statement ($\triangleright$)</h3>
+<p>The <strong>visit statement</strong> ($\triangleright$) enables a walker to move between nodes and edges in the topological structure, representing the dynamic traversal capability that is central to the OSP model. This statement produces side effects by adding destinations to the walker's traversal queue and can be applied to traverse either a single element, multiple elements based on directional constraints, or an entire path collection.</p>
+<p><strong>Single Element Traversal</strong></p>
+<p>For node to node traversal:
+$$w \triangleright n \rightarrow n$$</p>
+<p>where $w = (n_{\text{curr}})$ and $n \in \tau_{\text{node}}$, meaning that the walker at node $n_{\text{curr}}$ directly visits node $n$. This requires that a direct edge connection exists between $n_{\text{curr}}$ and $n$, i.e., $\exists e \in \tau_{\text{edge}} : e = (n_{\text{curr}}, n) \lor e = (n, n_{\text{curr}})$.</p>
+<p>For node to edge traversal:
+$$w \triangleright e \rightarrow {e, n_{\text{next}}}$$</p>
+<p>where $e = (n_{\text{src}}, n_{\text{dst}})$ and $w = (n_{\text{curr}})$, meaning that the walker at node $n_{\text{curr}}$ moves to edge $e$. This requires that $n_{\text{curr}}$ is one of the endpoints of $e$, i.e., $n_{\text{curr}} = n_{\text{src}} \lor n_{\text{curr}} = n_{\text{dst}}$. Importantly, when a walker visits an edge, both the edge and its appropriate endpoint node are automatically queued in sequence:</p>
+<ul>
+<li>If $n_{\text{curr}} = n_{\text{src}}$, then $n_{\text{next}} = n_{\text{dst}}$</li>
+<li>If $n_{\text{curr}} = n_{\text{dst}}$, then $n_{\text{next}} = n_{\text{src}}$</li>
+</ul>
+<p><strong>Edge Traversal Constraints</strong></p>
+<p>When a walker is positioned on an edge, the visit statement cannot be called. Instead, after completing any edge abilities, the walker automatically transitions to the appropriate endpoint node that was queued during the preceding visit operation:</p>
+<p>$$w = (e) \text{ where } e = (n_{\text{src}}, n_{\text{dst}}) \Rightarrow n_{\text{next}}$$</p>
+<p>This constraint ensures that edges serve as transitions between nodes rather than locations where traversal decisions are made, maintaining the natural flow of the walker through the topological structure.</p>
+<p><strong>Path Traversal</strong></p>
+<p>The visit statement can be applied to path collections, allowing a walker to traverse a connected substructure:</p>
+<p>$$w \triangleright \mathcal{P} \rightarrow {p_1, p_2, ..., p_k}$$</p>
+<p>where:
+- $w$ is an active walker instance currently at node $n_{\text{curr}}$
+- $\mathcal{P} = [p_1, p_2, \ldots, p_k]$ is a path collection where each $p_i \in N \cup E$
+- The path's first element $p_1$ must be directly reachable from the walker's current location:
+  - If $p_1$ is a node, either $n_{\text{curr}} = p_1$ or there exists an edge connecting $n_{\text{curr}}$ and $p_1$
+  - If $p_1$ is an edge, $n_{\text{curr}}$ must be an endpoint of $p_1$
+- All elements in the path are added to the walker's traversal queue in their path order: $Q_w \leftarrow Q_w \cup [p_1, p_2, \ldots, p_k]$
+- Since $\mathcal{P}$ is well-formed by definition, the path maintains topological validity, ensuring the walker can traverse from each element to the next without additional path resolution</p>
+<p>Note that a visit statement can only be initiated from a node, not from an edge, in accordance with the edge traversal constraints.</p>
+<p>The visit statement has several important properties:</p>
+<ol>
+<li>
+<p>It is only valid if the walker is currently active and located at a node within the topological structure. Visit statements cannot be executed while a walker is on an edge.</p>
+</li>
+<li>
+<p>When executed from a node, the walker destination queues up all selected elements to visit after completing execution at its current location.</p>
+</li>
+<li>
+<p>When visiting an edge, both the edge and its appropriate endpoint node are automatically queued, ensuring that walkers always progress through the structure in a node-edge-node pattern.</p>
+</li>
+<li>
+<p>Once the walker completes executing all exit abilities at its current node, it will move to the first queued destination and trigger all relevant entry abilities at that new location.</p>
+</li>
+<li>
+<p>When on an edge, after executing all edge abilities, the walker automatically transitions to the queued endpoint node without requiring an explicit visit statement.</p>
+</li>
+<li>
+<p>This process continues recursively, with the walker moving through all queued locations until there are no more destinations in its queue.</p>
+</li>
+<li>
+<p>When the queue becomes empty after all abilities at the walker's current location have executed, the walker automatically transitions back to an inactive state.</p>
+</li>
+<li>
+<p>Multiple calls to the visit statement from a node append destinations to the walker's existing queue, allowing for dynamic construction of traversal paths during execution.</p>
+</li>
+<li>
+<p>When visiting a path, the walker enqueues all elements in the exact order specified in the path, relying on the path's well-formed nature to maintain topological validity.</p>
+</li>
+<li>
+<p>When a path collection is used with the visit statement, the first element of the path must be directly reachable from the walker's current position, enforcing a strict reachability constraint.</p>
+</li>
+<li>
+<p>When directly visiting a node from another node, the walker implicitly traverses the connecting edge, but does not trigger any edge abilities or perform any edge-specific processing. This provides a shorthand for node-to-node traversal when the intermediate edge context is not relevant to the algorithm.</p>
+</li>
+<li>
+<p>The model ensures that walkers never "get stuck" on edges, as they always automatically progress to nodes where further traversal decisions can be made.</p>
+</li>
+</ol>
+<p>The path-based visit statement extends the expressiveness of the OSP model by allowing walkers to enqueue entire connected substructures for traversal in a single operation. This enables more concise expression of algorithms that operate on related sets of nodes or edges, such as graph search, path following, or subgraph processing.</p>
+<p>By supporting node-to-node, node-to-edge, and path-based traversal patterns, the visit statement enables programmatic expression of complex traversal paths, allowing algorithms to navigate the topological structure in a controlled and semantically meaningful way. The automatic queuing of endpoint nodes when visiting edges ensures that walkers maintain the fundamental node-edge-node traversal pattern that reflects the object-spatial topology. The clear distinction that visit statements can only be executed from nodes, not edges, reinforces the concept that nodes are decision points in the traversal process, while edges are transitions between nodes. This embodiment of computation moving to data creates a fundamentally different programming model compared to conventional approaches where data is passed to stationary functions.</p>
+<h3 id="additional-flow-control-statements">Additional Flow Control Statements</h3>
+<p>To provide finer control over walker traversal execution, OSP includes two additional specialized flow control statements that operate within the context of object-spatial execution:</p>
+<p><strong>Skip Statement</strong></p>
+<p>The <strong>skip</strong> statement allows a walker to immediately terminate execution at its current location and proceed to the next location in its traversal queue:</p>
+<p>$$\text{skip}(w) \Rightarrow L(w) \leftarrow \text{dequeue}(Q_w)$$</p>
+<p>where:
+- $w$ is the active walker instance with current location $L(w)$
+- $Q_w$ is the walker's traversal queue with at least one queued location</p>
+<p>When a skip statement is executed:
+- All remaining ability execution at the current location is immediately terminated
+- Any exit abilities for the current location type are bypassed
+- The walker immediately updates its position: $L(w) \leftarrow \text{dequeue}(Q_w)$
+- Normal entry ability execution begins at the new location following the established order:
+  - First, relevant location entry abilities for the arriving walker type
+  - Next, relevant walker entry abilities for the location type</p>
+<p>The skip statement is analogous to the <em>continue</em> statement in traditional loop constructs, allowing the walker to abort processing at the current location while continuing its overall traversal. This enables efficient implementation of conditional processing logic where certain nodes or edges might be examined but not fully processed based on their properties or the walker's state, providing fine-grained control over the distributed computation process.</p>
+<p><strong>Disengage Statement</strong></p>
+<p>The <strong>disengage</strong> statement allows a walker to immediately terminate its entire object-spatial traversal and return to an inactive object state:</p>
+<p>$$\text{disengage}(w) \Rightarrow L(w) \leftarrow \emptyset, Q_w \leftarrow []$$</p>
+<p>where:
+- $w$ is the active walker instance with current location $L(w) \in N \cup E$</p>
+<p>When a disengage statement is executed:
+- All remaining ability execution at the current location is immediately terminated
+- Any exit abilities for the current location type are bypassed
+- The walker's traversal queue is cleared: $Q_w \leftarrow []$
+- The walker's location is set to inactive: $L(w) \leftarrow \emptyset$
+- The walker transitions from an active participant in the distributed computational system to an inactive object
+- The walker retains all its properties and data accumulated during traversal</p>
+<p>The disengage statement is analogous to the <em>break</em> statement in traditional loop constructs, allowing the walker to completely exit the object-spatial execution context. This enables early termination of traversals when certain conditions are met, such as finding a target node, completing a computation, or encountering an error condition.</p>
+<p>Together with the visit statement, these flow control statements provide essential mechanisms for implementing complex traversal algorithms where the path and processing logic may adapt dynamically based on discovered data or computed conditions within the topological structure. They offer precise control over both the walker's movement through the topology and its participation in the distributed computational process that characterizes the OSP model.</p>
+<h2 id="implementation-considerations">Implementation Considerations</h2>
+<p>A practical implementation of the Object-Spatial Programming model must address several important concerns that collectively guide the development of concrete OSP implementations in various programming languages. By addressing these aspects systematically, we can ensure that the theoretical OSP model translates into practical, efficient, and usable programming tools that effectively leverage the paradigm shift from moving data to computation to moving computation to data.</p>
+<h3 id="type-safety">Type Safety</h3>
+<p>The archetype system should be integrated with the host language's type system to ensure that object-spatial constraints (such as walker traversal rules) are checked at compile time when possible. This integration enables early detection of topology violations and provides developers with immediate feedback about invalid traversal patterns.</p>
+<h3 id="concurrency">Concurrency</h3>
+<p>In multi-walker scenarios, access to shared node and edge data must be properly synchronized to prevent race conditions. Implementations may adopt various concurrency models, from simple locking mechanisms to more sophisticated actor-based approaches. The "computation moves to data" paradigm creates new challenges and opportunities for parallel execution models, particularly when multiple walkers operate on overlapping sections of the topological structure.</p>
+<h3 id="efficiency">Efficiency</h3>
+<p>Naive implementations of walker traversal could lead to performance issues in large topological structures. Optimizations such as object-spatial indexing, traversal path caching, or parallel walker execution may be necessary for practical applications. The performance characteristics of mobile computation differ from traditional models and may require specialized optimization techniques, particularly for applications with complex traversal patterns or large data structures.</p>
+<h3 id="integration">Integration</h3>
+<p>OSP should be designed to complement rather than replace existing OOP mechanisms, allowing for gradual adoption and integration with legacy codebases. Hybrid approaches may be needed to bridge the paradigm gap between conventional data-to-computation models and OSP's computation-to-data approach. This enables incremental migration of existing systems toward object-spatial programming patterns while preserving investment in existing code.</p>
+<h3 id="walker-state-management">Walker State Management</h3>
+<p>The multi-state nature of walkers (as standard objects, active on nodes, or active on edges) requires careful state management to ensure consistency between these modes of operation, particularly when transitioning between states via spawn and disengage operations. Implementations must guarantee that walker state remains coherent throughout traversal operations and across transitions between active and inactive states.</p>
+<h3 id="entryexit-ability-optimization">Entry/Exit Ability Optimization</h3>
+<p>Implementations should efficiently dispatch entry and exit abilities to minimize overhead during traversal operations, particularly in performance-critical applications. The implicit execution model of abilities requires careful design to maintain predictable performance characteristics. Techniques such as ability caching, ahead-of-time compilation, or just-in-time optimization may be necessary for high-performance systems.</p>
+<h3 id="edge-transition-management">Edge Transition Management</h3>
+<p>The automatic queuing of edge destination nodes requires efficient handling of traversal queues and execution contexts to maintain predictable walker flow through the topological structure. This includes optimizing the mechanisms for determining the appropriate destination node based on traversal direction and managing the lifecycle of edge-bound computational processes.</p>
+<h3 id="flow-control-semantics">Flow Control Semantics</h3>
+<p>Implementations must handle visit, skip, and disengage statements efficiently, ensuring proper cleanup of execution contexts and maintaining the integrity of the walker's state during these control flow transitions. This is particularly important for complex traversal patterns where walkers may dynamically alter their paths based on discovered data or computational results.</p>
+<h3 id="data-locality-and-caching">Data Locality and Caching</h3>
+<p>The computation-to-data paradigm can potentially improve data locality and cache efficiency compared to traditional approaches, but implementations must be designed to fully exploit these advantages, particularly when walkers traverse both nodes and edges. Memory layout strategies that co-locate related nodes and edges can significantly improve performance by reducing cache misses during traversal operations.</p>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+    <div class="md-copyright__highlight">
+      Copyright &copy; 2025 Jac Hackers Everwhere
+    </div>
+  
+  
+</div>
+      
+        <div class="md-social">
+  
+    
+    
+      
+    
+    
+    
+      
+      
+    
+    <a href="https://fosstodon.org/@squidfunk" target="_blank" rel="noopener me" title="fosstodon.org" class="md-social__link">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 6.7.2 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2024 Fonticons, Inc.--><path d="M433 179.11c0-97.2-63.71-125.7-63.71-125.7-62.52-28.7-228.56-28.4-290.48 0 0 0-63.72 28.5-63.72 125.7 0 115.7-6.6 259.4 105.63 289.1 40.51 10.7 75.32 13 103.33 11.4 50.81-2.8 79.32-18.1 79.32-18.1l-1.7-36.9s-36.31 11.4-77.12 10.1c-40.41-1.4-83-4.4-89.63-54a102.5 102.5 0 0 1-.9-13.9c85.63 20.9 158.65 9.1 178.75 6.7 56.12-6.7 105-41.3 111.23-72.9 9.8-49.8 9-121.5 9-121.5m-75.12 125.2h-46.63v-114.2c0-49.7-64-51.6-64 6.9v62.5h-46.33V197c0-58.5-64-56.6-64-6.9v114.2H90.19c0-122.1-5.2-147.9 18.41-175 25.9-28.9 79.82-30.8 103.83 6.1l11.6 19.5 11.6-19.5c24.11-37.1 78.12-34.8 103.83-6.1 23.71 27.3 18.4 53 18.4 175z"/></svg>
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      <script id="__config" type="application/json">{"base": "../..", "features": ["navigation.tabs", "navigation.instant", "navigation.top", "search.highlight", "search.suggest"], "search": "../../assets/javascripts/workers/search.d50fe291.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.13a4f30d.min.js"></script>
+      
+        <script src="../../assets/mathjax-config.js"></script>
+      
+        <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/pyodide/v0.27.0/full/pyodide.js"></script>
+      
+        <script src="https://cdn.jsdelivr.net/npm/requirejs@2.3.6/require.js"></script>
+      
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/monaco-editor/0.52.2/min/vs/loader.min.js"></script>
+      
+        <script src="../../js/jac.monarch.js"></script>
+      
+        <script src="../../js/run-code.js"></script>
+      
+    
+  </body>
+</html>
