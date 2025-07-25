@@ -365,7 +365,7 @@ class DocIRGenPass(UniPass):
         parts: list[doc.DocType] = []
         body_parts: list[doc.DocType] = [self.hard_line()]
         for i in node.kid:
-            if isinstance(node.body, Sequence) and self.is_within(i, node.body):
+            if isinstance(node.body, Sequence) and self.is_within(i, node.body) and not isinstance(i, uni.ElseStmt):
                 if i == node.body[0]:
                     parts.append(self.indent(self.concat(body_parts)))
                     parts.append(self.hard_line())
