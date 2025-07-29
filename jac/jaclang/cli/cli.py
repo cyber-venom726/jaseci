@@ -602,6 +602,7 @@ def py2jac(filename: str) -> None:
             ),
             prog=JacProgram(),
         ).ir_out.unparse(requires_format=False)
+        exit()
         formatted_code = JacProgram().jac_str_formatter(
             source_str=code, file_path=filename
         )

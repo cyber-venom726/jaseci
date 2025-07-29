@@ -14,7 +14,7 @@ class Settings:
     ast_symbol_info_detailed: bool = False
     pass_timer: bool = False
     collect_py_dep_debug: bool = False
-    print_py_raised_ast: bool = False
+    print_py_raised_ast: bool = True
 
     # Compiler configuration
     disable_mtllm: bool = False

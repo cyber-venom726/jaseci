@@ -53,7 +53,9 @@ class PyastBuildPass(Transform[uni.PythonModuleAst, uni.Module]):
 
     def transform(self, ir_in: uni.PythonModuleAst) -> uni.Module:
         """Transform input IR."""
+        print(py_ast.dump(ir_in.ast, indent=4))
         self.ir_out: uni.Module = self.proc_module(ir_in.ast)
+        print("IR OUT:\n", self.ir_out.pp())
         return self.ir_out
 
     def extract_with_entry(
@@ -948,15 +950,8 @@ class PyastBuildPass(Transform[uni.PythonModuleAst, uni.Module]):
             raise self.ice()
 
     def proc_constant(self, node: py_ast.Constant) -> uni.Literal:
-        """Process python node.
-
-        class Constant(expr):
-            value: Any  # None, str, bytes, bool, int, float, complex, Ellipsis
-            kind: str | None
-            # Aliases for value, for backwards compatibility
-            s: Any
-            n: int | float | complex
-        """
+        """Process python node for constants."""
+        value_type = type(node.value)
         type_mapping = {
             int: uni.Int,
             float: uni.Float,
@@ -965,46 +960,85 @@ class PyastBuildPass(Transform[uni.PythonModuleAst, uni.Module]):
             bool: uni.Bool,
             type(None): uni.Null,
         }
-        value_type = type(node.value)
+
         if value_type in type_mapping:
-            if value_type is None:
-                token_type = "NULL"
-            elif value_type == str:
-                token_type = "STRING"
-            else:
-                token_type = f"{value_type.__name__.upper()}"
+            token_type = (
+                "NULL" if value_type is None else
+                "STRING" if value_type == str else
+                f"{value_type.__name__.upper()}"
+            )
 
             if value_type == str:
-                raw_repr = repr(node.value)
-                quote = "'" if raw_repr.startswith("'") else '"'
-                value = f"{quote}{raw_repr[1:-1]}{quote}"
+                value = self._get_source_quoted_string(node, in_fstring=False)
+                print('value > ',value)
             else:
                 value = str(node.value)
+
             return type_mapping[value_type](
                 orig_src=self.orig_src,
                 name=token_type,
                 value=value,
                 line=node.lineno,
-                end_line=node.end_lineno if node.end_lineno else node.lineno,
+                end_line=getattr(node, "end_lineno", node.lineno),
                 col_start=node.col_offset,
                 col_end=node.col_offset + len(str(node.value)),
                 pos_start=0,
                 pos_end=0,
             )
+
         elif node.value == Ellipsis:
             return uni.Ellipsis(
                 orig_src=self.orig_src,
                 name=Tok.ELLIPSIS,
                 value="...",
                 line=node.lineno,
-                end_line=node.end_lineno if node.end_lineno else node.lineno,
+                end_line=getattr(node, "end_lineno", node.lineno),
                 col_start=node.col_offset,
                 col_end=node.col_offset + 3,
                 pos_start=0,
                 pos_end=0,
             )
+
         else:
             raise self.ice("Invalid type for constant")
+
+    def _get_source_quoted_string(self, node: py_ast.Constant, in_fstring: bool = False) -> str:
+        """Get string with quotes unless in an f-string."""
+        if in_fstring:
+            return node.value  # Don't add any quotes for f-string literal parts
+
+        if (
+            not hasattr(node, "lineno")
+            or not hasattr(node, "col_offset")
+            or not self.orig_src
+            or not isinstance(node.value, str)
+        ):
+            return repr(node.value)[1:-1]
+
+        try:
+            lines = self.orig_src.value.split("\n")
+            if node.lineno - 1 >= len(lines):
+                return repr(node.value)[1:-1]
+
+            source_line = lines[node.lineno - 1]
+            substr = source_line[node.col_offset:]
+            match = substr[: substr.find(node.value) + len(node.value) + 10] \
+                if node.value in substr else substr
+
+            # Heuristics to detect the quote type
+            if '"""' in match:
+                return f'"""{node.value}"""'
+            elif "'''" in match:
+                return f"'''{node.value}'''"
+            elif match.startswith('"'):
+                return f'"{node.value}"'
+            elif match.startswith("'"):
+                return f"'{node.value}'"
+            else:
+                return node.value
+        except Exception as e:
+            print(f"[Warning] Could not extract quote style: {e}")
+            return repr(node.value)[1:-1]
 
     def proc_continue(self, node: py_ast.Continue) -> uni.CtrlStmt:
         """Process python node."""
@@ -1362,23 +1396,81 @@ class PyastBuildPass(Transform[uni.PythonModuleAst, uni.Module]):
         )
         return ret
 
-    def proc_joined_str(self, node: py_ast.JoinedStr) -> uni.FString:
-        """Process python node.
+    # def proc_joined_str(self, node: py_ast.JoinedStr) -> uni.FString:
+    #     """Process python node.
 
-        class JoinedStr(expr):
-        if sys.version_info >= (3, 10):
-            __match_args__ = ("values",)
-        values: list[expr]
-        """
-        values = [self.convert(value) for value in node.values]
-        valid = [
-            value for value in values if isinstance(value, (uni.String, uni.ExprStmt))
-        ]
+    #     class JoinedStr(expr):
+    #     if sys.version_info >= (3, 10):
+    #         __match_args__ = ("values",)
+    #     values: list[expr]
+    #     """
+    #     print("Processing JoinedStr node")
+    #     print("F-string starts with:", self._get_fstring_quotes(node))
+
+    #     values = [self.convert(value) for value in node.values]
+    #     valid = [
+    #         value for value in values if isinstance(value, (uni.String, uni.ExprStmt))
+    #     ]
+    #     fstr = uni.FString(
+    #         parts=valid,
+    #         kid=[*valid] if valid else [uni.EmptyToken()],
+    #     )
+    #     return uni.MultiString(strings=[fstr], kid=[fstr])
+
+    def proc_joined_str(self, node: py_ast.JoinedStr) -> uni.FString:
+        """Process Python f-string (JoinedStr)."""
+        print("Processing JoinedStr node")
+        print("F-string starts with:", self._get_fstring_quotes(node))
+        FSTR_START= "f\""
+        FSTR_END= "\""
+        FSTR_SQ_START= "f'"
+        FSTR_SQ_END= "'"
+        valid = []
+        
+        for value_node in node.values:
+            if isinstance(value_node, py_ast.Constant):
+                # Literal part of f-string — don't add quotes!
+                str_val = self._get_source_quoted_string(value_node, in_fstring=True)
+                str_j_node = uni.String(
+                    orig_src=self.orig_src,
+                    name=Tok.STRING,
+                    value=str_val,
+                    line=value_node.lineno,
+                    end_line=getattr(value_node, "end_lineno", value_node.lineno),
+                    col_start=value_node.col_offset,
+                    col_end=value_node.col_offset + len(str_val),
+                    pos_start=0,
+                    pos_end=0,
+                )
+                valid.append(str_j_node)
+            else:
+                expr = self.convert(value_node)
+                valid.append(expr)
+
         fstr = uni.FString(
             parts=valid,
             kid=[*valid] if valid else [uni.EmptyToken()],
         )
         return uni.MultiString(strings=[fstr], kid=[fstr])
+
+
+    def _get_fstring_quotes(self, node: py_ast.JoinedStr) -> str:
+        if not hasattr(node, "lineno") or not hasattr(node, "col_offset") or not self.orig_src:
+            return 'f"'  # default
+
+        try:
+            lines = self.orig_src.value.split("\n")
+            start_line = lines[node.lineno - 1]
+            substr = start_line[node.col_offset:]
+
+            for prefix in ["f'''", 'f"""', "f'", 'f"']:
+                if substr.startswith(prefix):
+                    return prefix
+            return 'f"'  # fallback
+        except Exception as e:
+            print(f"[Warning] Quote detection failed in f-string: {e}")
+            return 'f"'
+
 
     def proc_lambda(self, node: py_ast.Lambda) -> uni.LambdaExpr:
         """Process python node.

@@ -974,6 +974,7 @@ class Module(AstDocNode, UniScopeNode):
         ).ir_out.gen.jac
 
     def unparse(self, requires_format: bool = True) -> str:
+        exit()
         unparsed = super().unparse()
         if not requires_format:
             return unparsed
@@ -3242,9 +3243,11 @@ class FString(AtomExpr):
             for part in self.parts:
                 res = res and part.normalize(deep)
         new_kid: list[UniNode] = []
+        print('kid>>',self.kid)
         is_single_quote = (
             isinstance(self.kid[0], Token) and self.kid[0].name == Tok.FSTR_SQ_START
         )
+        print('is_single_quote>>', is_single_quote)
         if is_single_quote:
             new_kid.append(self.gen_token(Tok.FSTR_SQ_START))
         else:
@@ -4650,12 +4653,12 @@ class String(Literal):
             return self.value
 
     def normalize(self, deep: bool = True) -> bool:
-        self.value = r"%s" % self.value
+        # self.value = r"%s" % self.value
         return True
 
     def unparse(self) -> str:
         super().unparse()
-        return repr(self.value)
+        return self.value
 
 
 class Bool(Literal):
