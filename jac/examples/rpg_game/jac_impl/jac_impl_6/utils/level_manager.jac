@@ -1,6 +1,7 @@
 import from mtllm { Model }
 
-glob llm = Model(model_name="gpt-4o", verbose=True);
+# glob llm = Model(model_name="gpt-4o-mini", verbose=True);
+ glob llm = Model(model_name="gemini/gemini-2.5-flash", verbose=True);
 
 obj Position {
     has x: int,
@@ -39,7 +40,10 @@ obj LevelManager {
     def create_next_level(last_levels: list[Level], difficulty: int)
     -> Level by llm(temperature=0.8);
 
-    def create_next_map(level: Level) -> Map_tiles by llm(temperature=0.8);
+    def create_next_map(level: Level) -> Map_tiles by llm(temperature=0.8,context=[
+        "Generate a map for the given level with walls, small obstacles, enemies, and player position.",'there should be a path from player to enemies, ',
+        'walls list and othe rlist should not be empty, ','bro dont enclose the player in walls, '
+    ]);
 
     '''Get the Next Level'''
     def get_next_level (current_level: int) -> tuple(Level, Map_tiles);
