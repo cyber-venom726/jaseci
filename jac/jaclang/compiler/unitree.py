@@ -17,6 +17,10 @@ from typing import (
     Sequence,
     Type,
     TypeVar,
+    Union,
+    Dict,
+    List,
+    Set,
 )
 
 
@@ -225,10 +229,10 @@ class UniNode:
         return res
 
 
-# Symbols can have mulitple definitions but resolves decl to be the
+# Symbols can have multiple definitions but resolves decl to be the
 # first such definition in a given scope.
 class Symbol:
-    """Symbol."""
+    """Symbol with Pyright-inspired enhancements."""
 
     def __init__(
         self,
@@ -245,6 +249,34 @@ class Symbol:
         self.access: SymbolAccess = access
         self.parent_tab = parent_tab
         self.semstr: str = ""
+        
+        # Pyright-inspired enhancements
+        self.is_private: bool = False
+        self.is_external_import: bool = imported
+        self.is_py_typed_import: bool = False
+        self.is_privileged_py_typed_import: bool = False
+        self.is_ignored_for_protocol_match: bool = False
+        self.is_final: bool = False
+        self.is_class_var: bool = False
+        self.is_instance_var: bool = False
+        self.is_type_alias: bool = False
+        self.is_parameter: bool = False
+        self.is_method: bool = False
+        self.is_property: bool = False
+        self.is_overloaded: bool = False
+        self.is_abstract: bool = False
+        self.is_static: bool = False
+        self.is_class_method: bool = False
+        
+        # Type information
+        self.inferred_type: Optional[str] = None
+        self.declared_type: Optional[str] = None
+        self.type_annotation_node: Optional[UniNode] = None
+        
+        # Analysis state
+        self.is_type_known: bool = False
+        self.is_type_partially_unknown: bool = False
+        self.has_declared_type: bool = False
 
     @property
     def decl(self) -> NameAtom:
@@ -287,13 +319,82 @@ class Symbol:
         self.uses.append(node)
         node.sym = self
 
+    def is_declared_in_same_module(self, other_symbol: 'Symbol') -> bool:
+        """Check if two symbols are declared in the same module."""
+        return self.parent_tab.get_module_scope() == other_symbol.parent_tab.get_module_scope()
+
+    def is_visible_from_scope(self, scope: 'UniScopeNode') -> bool:
+        """Check if symbol is visible from given scope."""
+        if self.is_private:
+            # Private symbols are only visible within their declaring class/module
+            return self._is_within_same_class_or_module(scope)
+        return True
+
+    def _is_within_same_class_or_module(self, scope: 'UniScopeNode') -> bool:
+        """Check if scope is within same class or module as symbol."""
+        symbol_module = self.parent_tab.get_module_scope()
+        scope_module = scope.get_module_scope()
+        
+        if symbol_module != scope_module:
+            return False
+            
+        # Check for class-level privacy
+        symbol_class = self.parent_tab.get_class_scope()
+        scope_class = scope.get_class_scope()
+        
+        return symbol_class == scope_class
+
+    def get_effective_type(self) -> Optional[str]:
+        """Get the effective type (declared or inferred)."""
+        return self.declared_type or self.inferred_type
+
+    def mark_as_type_known(self, type_info: str) -> None:
+        """Mark symbol as having known type."""
+        self.is_type_known = True
+        self.inferred_type = type_info
+
+    def mark_as_final(self) -> None:
+        """Mark symbol as final."""
+        self.is_final = True
+
+    def mark_as_class_var(self) -> None:
+        """Mark symbol as class variable."""
+        self.is_class_var = True
+
+    def get_all_declarations(self) -> list[NameAtom]:
+        """Get all declarations of this symbol."""
+        return self.defn.copy()
+
+    def get_first_declaration(self) -> NameAtom:
+        """Get first declaration of symbol."""
+        return self.decl
+
+    def has_type_annotation(self) -> bool:
+        """Check if symbol has explicit type annotation."""
+        return self.type_annotation_node is not None
+
     def __repr__(self) -> str:
-        """Repr."""
-        return f"Symbol({self.sym_name}, {self.sym_type}, {self.access}, {self.defn})"
+        """Repr with enhanced information."""
+        flags = []
+        if self.is_private:
+            flags.append("private")
+        if self.is_final:
+            flags.append("final")
+        if self.is_class_var:
+            flags.append("classvar")
+        if self.is_method:
+            flags.append("method")
+        if self.imported:
+            flags.append("imported")
+            
+        flag_str = f" [{', '.join(flags)}]" if flags else ""
+        type_str = f": {self.get_effective_type()}" if self.get_effective_type() else ""
+        
+        return f"Symbol({self.sym_name}{type_str}, {self.sym_type}, {self.access}{flag_str})"
 
 
 class UniScopeNode(UniNode):
-    """Symbol Table."""
+    """Symbol Table with Pyright-inspired enhancements."""
 
     def __init__(
         self,
@@ -306,6 +407,32 @@ class UniScopeNode(UniNode):
         self.kid_scope: list[UniScopeNode] = []
         self.names_in_scope: dict[str, Symbol] = {}
         self.inherited_scope: list[InheritedSymbolTable] = []
+        
+        # Pyright-inspired enhancements
+        self.scope_type: str = "unknown"
+        self.is_conditional_scope: bool = False
+        self.is_class_scope: bool = False
+        self.is_function_scope: bool = False
+        self.is_module_scope: bool = False
+        self.is_builtin_scope: bool = False
+        
+        # Symbol visibility and binding
+        self.binding_map: dict[str, Symbol] = {}
+        self.hidden_symbols: set[str] = set()
+        self.private_symbols: set[str] = set()
+        
+        # Type-related
+        self.type_parameters: list[str] = []
+        self.active_type_vars: set[str] = set()
+        self.notional_type_vars: set[str] = set()
+        
+        # Analysis state
+        self.is_type_checking_suppressed: bool = False
+        self.conditional_symbol_bindings: dict[str, list[Symbol]] = {}
+        
+        # Performance optimization
+        self._symbol_cache: dict[str, Optional[Symbol]] = {}
+        self._cache_dirty: bool = True
 
     def get_type(self) -> SymbolType:
         """Get type."""
@@ -317,17 +444,143 @@ class UniScopeNode(UniNode):
         """Get parent."""
         return self.parent_scope
 
+    def _invalidate_cache(self) -> None:
+        """Invalidate symbol lookup cache."""
+        self._symbol_cache.clear()
+        self._cache_dirty = True
+
     def lookup(self, name: str, deep: bool = True) -> Optional[Symbol]:
-        """Lookup a variable in the symbol table."""
+        """Lookup a variable in the symbol table with caching."""
+        # Check cache first
+        if not self._cache_dirty and name in self._symbol_cache:
+            return self._symbol_cache[name]
+        
+        symbol = self._lookup_uncached(name, deep)
+        
+        # Cache the result
+        self._symbol_cache[name] = symbol
+        return symbol
+
+    def _lookup_uncached(self, name: str, deep: bool = True) -> Optional[Symbol]:
+        """Uncached lookup implementation."""
+        # Check hidden symbols
+        if name in self.hidden_symbols:
+            return None
+            
+        # Check local scope
         if name in self.names_in_scope:
-            return self.names_in_scope[name]
-        for i in self.inherited_scope:
-            found = i.lookup(name, deep=False)
-            if found:
+            symbol = self.names_in_scope[name]
+            if symbol.is_visible_from_scope(self):
+                return symbol
+        
+        # Check inherited scopes
+        for inherited in self.inherited_scope:
+            found = inherited.lookup(name, deep=False)
+            if found and found.is_visible_from_scope(self):
                 return found
+        
+        # Check parent scopes
         if deep and self.parent_scope:
             return self.parent_scope.lookup(name, deep)
+        
         return None
+
+    def lookup_local_only(self, name: str) -> Optional[Symbol]:
+        """Lookup symbol only in local scope."""
+        return self.names_in_scope.get(name)
+
+    def lookup_with_inheritance(self, name: str) -> Optional[Symbol]:
+        """Lookup including inherited symbols but not parent scopes."""
+        symbol = self.lookup_local_only(name)
+        if symbol:
+            return symbol
+            
+        for inherited in self.inherited_scope:
+            found = inherited.lookup(name, deep=False)
+            if found:
+                return found
+                
+        return None
+
+    def get_module_scope(self) -> Optional['UniScopeNode']:
+        """Get the module scope in the scope chain."""
+        scope = self
+        while scope:
+            if scope.is_module_scope:
+                return scope
+            scope = scope.parent_scope
+        return None
+
+    def get_class_scope(self) -> Optional['UniScopeNode']:
+        """Get the nearest class scope in the scope chain."""
+        scope = self
+        while scope:
+            if scope.is_class_scope:
+                return scope
+            scope = scope.parent_scope
+        return None
+
+    def get_function_scope(self) -> Optional['UniScopeNode']:
+        """Get the nearest function scope in the scope chain."""
+        scope = self
+        while scope:
+            if scope.is_function_scope:
+                return scope
+            scope = scope.parent_scope
+        return None
+
+    def add_hidden_symbol(self, name: str) -> None:
+        """Add symbol to hidden list."""
+        self.hidden_symbols.add(name)
+        self._invalidate_cache()
+
+    def add_private_symbol(self, name: str) -> None:
+        """Mark symbol as private."""
+        self.private_symbols.add(name)
+        if name in self.names_in_scope:
+            self.names_in_scope[name].is_private = True
+
+    def get_all_symbols(self, include_inherited: bool = True) -> dict[str, Symbol]:
+        """Get all symbols accessible from this scope."""
+        result = {}
+        
+        # Add local symbols
+        for name, symbol in self.names_in_scope.items():
+            if symbol.is_visible_from_scope(self):
+                result[name] = symbol
+        
+        # Add inherited symbols
+        if include_inherited:
+            for inherited in self.inherited_scope:
+                for name, symbol in inherited.base_symbol_table.names_in_scope.items():
+                    if name not in result and symbol.is_visible_from_scope(self):
+                        result[name] = symbol
+        
+        return result
+
+    def get_symbol_names(self, include_inherited: bool = True) -> set[str]:
+        """Get all symbol names accessible from this scope."""
+        return set(self.get_all_symbols(include_inherited).keys())
+
+    def has_symbol(self, name: str, local_only: bool = False) -> bool:
+        """Check if symbol exists in scope."""
+        if local_only:
+            return name in self.names_in_scope
+        return self.lookup(name) is not None
+
+    def mark_as_conditional(self) -> None:
+        """Mark this scope as conditional (e.g., inside if statement)."""
+        self.is_conditional_scope = True
+
+    def add_conditional_binding(self, name: str, symbol: Symbol) -> None:
+        """Add conditional symbol binding."""
+        if name not in self.conditional_symbol_bindings:
+            self.conditional_symbol_bindings[name] = []
+        self.conditional_symbol_bindings[name].append(symbol)
+
+    def get_conditional_bindings(self, name: str) -> list[Symbol]:
+        """Get conditional bindings for symbol."""
+        return self.conditional_symbol_bindings.get(name, [])
 
     def insert(
         self,
@@ -337,31 +590,126 @@ class UniScopeNode(UniNode):
         force_overwrite: bool = False,
         imported: bool = False,
     ) -> Optional[UniNode]:
-        """Set a variable in the symbol table.
+        """Set a variable in the symbol table with Pyright-inspired enhancements.
 
         Returns original symbol as collision if single check fails, none otherwise.
         Also updates node.sym to create pointer to symbol.
         """
+        symbol_name = node.sym_name
+        
+        # Check for collision in single declaration mode
         collision = (
-            self.names_in_scope[node.sym_name].defn[-1]
-            if single and node.sym_name in self.names_in_scope
+            self.names_in_scope[symbol_name].defn[-1]
+            if single and symbol_name in self.names_in_scope
             else None
         )
-        if force_overwrite or node.sym_name not in self.names_in_scope:
-            self.names_in_scope[node.sym_name] = Symbol(
+        
+        # Determine access level
+        access_level = (
+            access_spec
+            if isinstance(access_spec, SymbolAccess)
+            else access_spec.access_type if access_spec else SymbolAccess.PUBLIC
+        )
+        
+        if force_overwrite or symbol_name not in self.names_in_scope:
+            # Create new symbol
+            symbol = Symbol(
                 defn=node.name_spec,
-                access=(
-                    access_spec
-                    if isinstance(access_spec, SymbolAccess)
-                    else access_spec.access_type if access_spec else SymbolAccess.PUBLIC
-                ),
+                access=access_level,
                 parent_tab=self,
                 imported=imported,
             )
+            
+            # Set additional properties based on context
+            self._configure_symbol_properties(symbol, node, access_spec)
+            
+            self.names_in_scope[symbol_name] = symbol
+            self.binding_map[symbol_name] = symbol
+            
+            # Handle private symbols
+            if access_level == SymbolAccess.PRIVATE:
+                self.add_private_symbol(symbol_name)
+                
         else:
-            self.names_in_scope[node.sym_name].add_defn(node.name_spec)
-        node.name_spec.sym = self.names_in_scope[node.sym_name]
+            # Add to existing symbol
+            existing_symbol = self.names_in_scope[symbol_name]
+            existing_symbol.add_defn(node.name_spec)
+        
+        # Link node to symbol
+        node.name_spec.sym = self.names_in_scope[symbol_name]
+        
+        # Invalidate cache
+        self._invalidate_cache()
+        
         return collision
+
+    def _configure_symbol_properties(self, symbol: Symbol, node: AstSymbolNode, 
+                                   access_spec: Optional[AstAccessNode] | SymbolAccess = None) -> None:
+        """Configure symbol properties based on context."""
+        # Determine symbol type based on node type and context
+        if isinstance(node, AstSymbolNode):
+            parent_node = getattr(node, 'parent', None)
+            
+            # Check if it's a method
+            if hasattr(node, 'parent') and isinstance(node.parent, (Ability,)):
+                symbol.is_method = True
+                symbol.is_function = True
+                
+            # Check if it's a class variable
+            elif hasattr(node, 'parent') and isinstance(node.parent, (ArchHas,)):
+                symbol.is_class_var = True
+                
+            # Check if it's a parameter
+            elif isinstance(node, (ParamVar,)):
+                symbol.is_parameter = True
+                
+            # Check access modifiers
+            if access_spec == SymbolAccess.PRIVATE or (
+                hasattr(access_spec, 'access_type') and 
+                access_spec.access_type == SymbolAccess.PRIVATE
+            ):
+                symbol.is_private = True
+
+    def get_symbols_by_type(self, symbol_filter: callable) -> list[Symbol]:
+        """Get symbols that match a filter predicate."""
+        return [symbol for symbol in self.names_in_scope.values() if symbol_filter(symbol)]
+
+    def get_private_symbols(self) -> list[Symbol]:
+        """Get all private symbols in this scope."""
+        return self.get_symbols_by_type(lambda s: s.is_private)
+
+    def get_public_symbols(self) -> list[Symbol]:
+        """Get all public symbols in this scope."""
+        return self.get_symbols_by_type(lambda s: not s.is_private)
+
+    def get_method_symbols(self) -> list[Symbol]:
+        """Get all method symbols in this scope."""
+        return self.get_symbols_by_type(lambda s: s.is_method)
+
+    def get_class_var_symbols(self) -> list[Symbol]:
+        """Get all class variable symbols in this scope."""
+        return self.get_symbols_by_type(lambda s: s.is_class_var)
+
+    def add_type_parameter(self, name: str) -> None:
+        """Add type parameter to scope."""
+        if name not in self.type_parameters:
+            self.type_parameters.append(name)
+
+    def has_type_parameter(self, name: str) -> bool:
+        """Check if scope has type parameter."""
+        return name in self.type_parameters
+
+    def suppress_type_checking(self) -> None:
+        """Suppress type checking for this scope."""
+        self.is_type_checking_suppressed = True
+
+    def is_type_checking_active(self) -> bool:
+        """Check if type checking is active for this scope."""
+        if self.is_type_checking_suppressed:
+            return False
+        if self.parent_scope:
+            return self.parent_scope.is_type_checking_active()
+        return True
 
     def find_scope(self, name: str) -> Optional[UniScopeNode]:
         """Find a scope in the symbol table."""
@@ -517,7 +865,157 @@ class UniScopeNode(UniNode):
         out = f"{self.scope_name} {super().__repr__()}:\n"
         for k, v in self.names_in_scope.items():
             out += f"    {k}: {v}\n"
+    def __repr__(self) -> str:
+        """Enhanced repr with more information."""
+        scope_info = []
+        if self.is_module_scope:
+            scope_info.append("module")
+        if self.is_class_scope:
+            scope_info.append("class")
+        if self.is_function_scope:
+            scope_info.append("function")
+        if self.is_conditional_scope:
+            scope_info.append("conditional")
+        
+        scope_type_str = f" [{', '.join(scope_info)}]" if scope_info else ""
+        
+        out = f"{self.scope_name}{scope_type_str} {super().__repr__()}:\n"
+        
+        # Group symbols by type
+        private_symbols = self.get_private_symbols()
+        public_symbols = self.get_public_symbols()
+        
+        if public_symbols:
+            out += "  Public symbols:\n"
+            for symbol in public_symbols:
+                out += f"    {symbol.sym_name}: {symbol}\n"
+                
+        if private_symbols:
+            out += "  Private symbols:\n"
+            for symbol in private_symbols:
+                out += f"    {symbol.sym_name}: {symbol}\n"
+                
+        if self.type_parameters:
+            out += f"  Type parameters: {', '.join(self.type_parameters)}\n"
+            
         return out
+
+
+# Pyright-inspired flow analysis nodes
+class FlowNode:
+    """Base class for flow analysis nodes (Pyright-inspired)."""
+    
+    def __init__(self, flags: str):
+        self.flags = flags
+        self.id = self._generate_id()
+        
+    @staticmethod
+    def _generate_id() -> int:
+        """Generate unique flow node ID."""
+        if not hasattr(FlowNode, '_id_counter'):
+            FlowNode._id_counter = 0
+        FlowNode._id_counter += 1
+        return FlowNode._id_counter
+
+
+class FlowStart(FlowNode):
+    """Start of flow analysis."""
+    
+    def __init__(self):
+        super().__init__("start")
+
+
+class FlowAssignment(FlowNode):
+    """Assignment flow node."""
+    
+    def __init__(self, node: 'UniNode', antecedent: FlowNode):
+        super().__init__("assignment")
+        self.node = node
+        self.antecedent = antecedent
+
+
+class FlowCall(FlowNode):
+    """Function call flow node."""
+    
+    def __init__(self, node: 'UniNode', antecedent: FlowNode):
+        super().__init__("call")
+        self.node = node
+        self.antecedent = antecedent
+
+
+class FlowConditional(FlowNode):
+    """Conditional flow node."""
+    
+    def __init__(self, expression: 'UniNode', antecedent: FlowNode, is_positive: bool):
+        super().__init__("conditional")
+        self.expression = expression
+        self.antecedent = antecedent
+        self.is_positive = is_positive
+
+
+class FlowLabel(FlowNode):
+    """Flow label for branching."""
+    
+    def __init__(self):
+        super().__init__("label")
+        self.antecedents: list[FlowNode] = []
+        
+    def add_antecedent(self, node: FlowNode) -> None:
+        """Add antecedent flow node."""
+        self.antecedents.append(node)
+
+
+# Enhanced declaration tracking
+class DeclarationBase:
+    """Base class for declarations (Pyright-inspired)."""
+    
+    def __init__(self, node: 'UniNode', path: str, range_info: tuple[int, int]):
+        self.node = node
+        self.path = path
+        self.range = range_info
+        self.type_annotation: Optional['UniNode'] = None
+        self.is_final = False
+        self.is_class_var = False
+        self.is_instance_var = False
+        self.is_method = False
+        self.is_property = False
+        self.is_overloaded = False
+        self.is_abstract = False
+        self.is_static = False
+        self.is_class_method = False
+
+
+class VariableDeclaration(DeclarationBase):
+    """Variable declaration."""
+    
+    def __init__(self, node: 'UniNode', path: str, range_info: tuple[int, int]):
+        super().__init__(node, path, range_info)
+        self.is_constant = False
+        self.is_global = False
+        self.is_nonlocal = False
+
+
+class FunctionDeclaration(DeclarationBase):
+    """Function declaration."""
+    
+    def __init__(self, node: 'UniNode', path: str, range_info: tuple[int, int]):
+        super().__init__(node, path, range_info)
+        self.is_method = True
+        self.is_generator = False
+        self.is_async = False
+        self.return_annotation: Optional['UniNode'] = None
+        self.parameters: list['UniNode'] = []
+
+
+class ClassDeclaration(DeclarationBase):
+    """Class declaration."""
+    
+    def __init__(self, node: 'UniNode', path: str, range_info: tuple[int, int]):
+        super().__init__(node, path, range_info)
+        self.base_classes: list['UniNode'] = []
+        self.metaclass: Optional['UniNode'] = None
+        self.is_protocol = False
+        self.is_final = False
 
 
 class InheritedSymbolTable:
