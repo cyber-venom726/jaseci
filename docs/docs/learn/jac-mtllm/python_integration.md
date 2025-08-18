@@ -10,7 +10,7 @@ pip install mtllm
 
 ## Importing MTLLM in Python
 
-MTLLM functionality is accessed by importing the `mtllm` module and using the `by` decorator on functions.
+MTLLM functionality is accessed by importing the `mtllm` module and using the `@by` decorator on functions.
 
 ```python linenums="1"
 import jaclang

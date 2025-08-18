@@ -2,6 +2,14 @@
 
 This guide covers different ways to use MTLLM for AI-integrated software development in Jaclang. MTLLM provides language-level abstractions for integrating Large Language Models into applications, from basic AI-powered functions to complex multi-agent systems. For agentic behavior capabilities, MTLLM includes the ReAct method with tool integration.
 
+## Installation
+
+To get started with MTLLM, install the base package:
+
+```bash
+pip install mtllm
+```
+
 ## Supported Models
 
 MTLLM uses [LiteLLM](https://docs.litellm.ai/docs) to provide integration with a wide range of models.
