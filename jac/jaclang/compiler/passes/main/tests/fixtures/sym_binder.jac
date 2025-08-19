@@ -38,10 +38,10 @@ with entry {
 }
 
 
-# import random;
+import random;
 
 
 
-# with entry{
-#     d = random.randint(1, 100);
-# }
+with entry{
+    d = random.randint(1, 100);
+}

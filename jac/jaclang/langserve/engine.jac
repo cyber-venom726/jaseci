@@ -12,6 +12,7 @@ import from jaclang.compiler.constant {SymbolType}
 import from jaclang.compiler.program { JacProgram }
 import from jaclang.compiler.unitree { UniScopeNode }
 import from sem_manager { SemTokManager }
+import from simple_type_evaluator { SimpleTypeEvaluator, SimpleTypeChecker }
 import from jaclang.vendor.pygls { uris }
 import from jaclang.vendor.pygls.server { LanguageServer }
 
@@ -66,6 +67,10 @@ class JacLangServer(JacProgram , LanguageServer) {
         self.tasks: <>dict[(str, asyncio.Task)] = {};
         self.sem_managers: <>dict[(str, SemTokManager)] = {};
         self.module_manager = ModuleManager(self, self.sem_managers);
+        
+        # Initialize type evaluator and checker
+        self.type_evaluator = SimpleTypeEvaluator(self);
+        self.type_checker = SimpleTypeChecker(self.type_evaluator);
     }
 
     """Return diagnostics for all files as a dict {uri: diagnostics}."""
@@ -142,24 +147,35 @@ class JacLangServer(JacProgram , LanguageServer) {
                     annex_view=file_path
                 );
             }
+            
+            # Use type checker for additional validation
+            additional_errors = [];
+            if self.type_checker and build.ir {
+                type_errors = self.type_checker.check_module(build.ir);
+                additional_errors.extend(type_errors);
+            }
+            
+            # Combine original errors with type checker errors
+            all_errors = self.errors_had + additional_errors;
+            
             self.publish_diagnostics(
                 annex_view if annex_view else file_path,
                 utils.gen_diagnostics(
                     annex_view if annex_view else file_path,
-                    self.errors_had,
+                    all_errors,
                     self.warnings_had
                 )
             );
             if annex_view {
                 self.publish_diagnostics(
                     file_path,
-                    utils.gen_diagnostics(file_path, self.errors_had, self.warnings_had)
+                    utils.gen_diagnostics(file_path, all_errors, self.warnings_had)
                 );
             }
             self.log_py(
                 f"'PROFILE: Deep check took '{(time.time() - start_time)}' seconds.'"
             );
-            return len(self.errors_had) == 0;
+            return len(all_errors) == 0;
         } except Exception as e {
             self.log_py(f"'Error during deep check: '{e}");
             return False;
@@ -226,6 +242,20 @@ class JacLangServer(JacProgram , LanguageServer) {
                     (position.character - 2)
                 );
             mod_tab = mod_ir.sym_tab if not node_selected else node_selected.sym_tab;
+            
+            # Use type evaluator for enhanced completions
+            if self.type_evaluator and node_selected {
+                # Get type information for the selected node
+                type_info = self.type_evaluator.get_type_of_node(node_selected);
+                if completion_trigger == '.' and type_info {
+                    # Get type-aware completions
+                    type_completions = self.type_evaluator.get_completions_for_type(type_info);
+                    completion_items.extend(type_completions);
+                    return lspt.CompletionList(is_incomplete=False, items=completion_items);
+                }
+            }
+            
+            # Fallback to original completion logic
             current_symbol_table = mod_tab;
             if completion_trigger == '.' {
                 if current_symbol_path {
@@ -294,17 +324,21 @@ class JacLangServer(JacProgram , LanguageServer) {
                         }
                     }
                 }
-            } elif node_selected and node_selected.find_parent_of_type(uni.Archetype)
-            or node_selected.find_parent_of_type(uni.ImplDef)
-             {
+            } else {
+                # Standard scope-based completions
+                completion_items += utils.collect_all_symbols_in_scope(current_symbol_table);
+                completion_items += utils.collect_all_symbols_in_scope(builtin_tab, up_tree=False);
+            }
+            
+            # Add self symbol if in appropriate context
+            if node_selected and (node_selected.find_parent_of_type(uni.Archetype)
+            or node_selected.find_parent_of_type(uni.ImplDef)) {
                 self_symbol =
-
                     [lspt.CompletionItem(
                         label='self',
                         kind=lspt.CompletionItemKind.Variable
                     )];
-            } else {
-                self_symbol = [];
+                completion_items += self_symbol;
             }
             return lspt.CompletionList(is_incomplete=False, items=completion_items);
         } except Exception as e {
