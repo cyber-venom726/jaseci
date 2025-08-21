@@ -718,16 +718,21 @@ class Expr(UniNode):
     """
 
     def __init__(self) -> None:
+        super().__init__([])  # Initialize parent UniNode
         self._sym_type: str = "NoType"
         self._type_sym_tab: Optional[UniScopeNode] = None
+        self._type_evaluated: bool = False
 
     @property
     def expr_type(self) -> str:
+        """Get the type of this expression."""
         return self._sym_type
 
     @expr_type.setter
     def expr_type(self, sym_type: str) -> None:
+        """Set the type of this expression."""
         self._sym_type = sym_type
+        self._type_evaluated = True
 
     @property
     def type_sym_tab(self) -> Optional[UniScopeNode]:
@@ -738,6 +743,21 @@ class Expr(UniNode):
     def type_sym_tab(self, type_sym_tab: UniScopeNode) -> None:
         """Set type symbol table."""
         self._type_sym_tab = type_sym_tab
+
+    @property
+    def type_evaluated(self) -> bool:
+        """Check if type has been evaluated for this expression."""
+        return self._type_evaluated
+
+    def invalidate_type(self) -> None:
+        """Invalidate the cached type information."""
+        self._type_evaluated = False
+        self._sym_type = "NoType"
+        self._type_sym_tab = None
+
+    def has_type(self) -> bool:
+        """Check if this expression has a determined type."""
+        return self._type_evaluated and self._sym_type != "NoType"
 
 
 class AtomExpr(Expr, AstSymbolStubNode):
