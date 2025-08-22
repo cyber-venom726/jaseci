@@ -42,7 +42,7 @@ class TypeCheckPass(UniPass):
         self._insert_builtin_symbols()
 
         assert TypeCheckPass._BUILTINS_MODULE is not None
-        self.evaluator = TypeEvaluator(TypeCheckPass._BUILTINS_MODULE)
+        self.prog.evaluator = TypeEvaluator(TypeCheckPass._BUILTINS_MODULE)
 
     # --------------------------------------------------------------------------
     # Internal helper functions
@@ -113,9 +113,9 @@ class TypeCheckPass(UniPass):
         # `} else if (node.d.leftExpr.nodeType === ParseNodeType.Name) {`
         #
         if len(node.target) == 1 and (node.value is not None):  # Simple assignment.
-            left_type = self.evaluator.get_type_of_expression(node.target[0])
-            right_type = self.evaluator.get_type_of_expression(node.value)
-            if not self.evaluator.assign_type(right_type, left_type):
+            left_type = self.prog.evaluator.get_type_of_expression(node.target[0])
+            right_type = self.prog.evaluator.get_type_of_expression(node.value)
+            if not self.prog.evaluator.assign_type(right_type, left_type):
                 self.log_error(f"Cannot assign {right_type} to {left_type}")
         else:
             pass

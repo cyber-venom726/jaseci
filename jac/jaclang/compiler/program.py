@@ -9,6 +9,7 @@ from typing import Optional
 
 import jaclang.compiler.unitree as uni
 from jaclang.compiler.parser import JacParser
+from jaclang.compiler.type_system.type_evaluator import TypeEvaluator
 from jaclang.compiler.passes.main import (
     Alert,
     BinderPass,
@@ -67,6 +68,7 @@ class JacProgram:
         self.py_raise_map: dict[str, str] = {}
         self.errors_had: list[Alert] = []
         self.warnings_had: list[Alert] = []
+        self.evaluator: Optional[TypeEvaluator] = None
 
     def get_bytecode(self, full_target: str) -> Optional[types.CodeType]:
         """Get the bytecode for a specific module."""
