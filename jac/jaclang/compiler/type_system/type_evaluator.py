@@ -157,6 +157,34 @@ class TypeEvaluator:
         
         result_type = None
         
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        dfgdfgdfgd
         if operator in arithmetic_ops:
             result_type = self._validate_arithmetic_operation(left_type, right_type, operator, error_node)
         elif operator in comparison_ops:
@@ -307,7 +335,6 @@ class TypeEvaluator:
                 return self._convert_to_instance(self.get_type_of_string(expr))
 
             case uni.Int():
-                print('exp>>>>',expr.unparse(), expr.loc) # remove
                 return self._convert_to_instance(self.get_type_of_int(expr))
 
             case uni.AtomTrailer():
@@ -338,7 +365,8 @@ class TypeEvaluator:
 
             case uni.BinaryExpr():
                 # operator should be checked for compatibility
-                return self.get_type_of_binary_operation(expr)
+                result = self.get_type_of_binary_operation(expr)
+                return result
 
             # TODO: More expressions.
         return types.UnknownType()
@@ -393,16 +421,16 @@ class TypeEvaluator:
         if operator == TOKEN_MAP['PLUS'] and self._are_both_string_types(left_type, right_type):
             # String concatenation: str + str -> str
             assert self.prefetch.str_class is not None
-            return self.prefetch.str_class
+            return self._convert_to_instance(self.prefetch.str_class)
         
         if operator == TOKEN_MAP['STAR_MUL']:
             # String repetition: str * int -> str or int * str -> str
             if self._is_string_type(left_type) and self._is_int_type(right_type):
                 assert self.prefetch.str_class is not None
-                return self.prefetch.str_class
+                return self._convert_to_instance(self.prefetch.str_class)
             elif self._is_int_type(left_type) and self._is_string_type(right_type):
                 assert self.prefetch.str_class is not None
-                return self.prefetch.str_class
+                return self._convert_to_instance(self.prefetch.str_class)
         
         # TODO: Handle magic methods like __add__, __sub__, etc. following Pyright's getTypeOfMagicMethodCall
         return types.UnknownType()
@@ -414,7 +442,7 @@ class TypeEvaluator:
         
         # All comparison operations return bool
         assert self.prefetch.bool_class is not None
-        return self.prefetch.bool_class
+        return self._convert_to_instance(self.prefetch.bool_class)
 
     # Pyright equivalent function name = validateBitwiseOperation() (inferred from patterns)
     def _validate_bitwise_operation(self, left_type: TypeBase, right_type: TypeBase, operator: str, error_node: uni.BinaryExpr) -> TypeBase:
@@ -424,7 +452,7 @@ class TypeEvaluator:
         # For integer bitwise operations, return int
         if self._are_both_int_types(left_type, right_type):
             assert self.prefetch.int_class is not None
-            return self.prefetch.int_class
+            return self._convert_to_instance(self.prefetch.int_class)
         
         # TODO: Handle magic methods like __and__, __or__, __xor__, etc.
         return types.UnknownType()
@@ -436,7 +464,7 @@ class TypeEvaluator:
         
         # Membership operations always return bool
         assert self.prefetch.bool_class is not None
-        return self.prefetch.bool_class
+        return self._convert_to_instance(self.prefetch.bool_class)
 
     # Pyright equivalent function name = validateIdentityOperation() (inferred from patterns)
     def _validate_identity_operation(self, left_type: TypeBase, right_type: TypeBase, operator: str, error_node: uni.BinaryExpr) -> TypeBase:
@@ -445,7 +473,7 @@ class TypeEvaluator:
         
         # Identity operations always return bool
         assert self.prefetch.bool_class is not None
-        return self.prefetch.bool_class
+        return self._convert_to_instance(self.prefetch.bool_class)
 
     # Pyright equivalent function name = calcLiteralForBinaryOp()
     def _calc_literal_for_binary_op(self, operator: str, left_type: TypeBase, right_type: TypeBase) -> TypeBase | None:
@@ -512,18 +540,18 @@ class TypeEvaluator:
         # Handle complex numbers (highest precedence)
         if left_name == 'complex' or right_name == 'complex':
             assert self.prefetch.complex_class is not None
-            return self.prefetch.complex_class
+            return self._convert_to_instance(self.prefetch.complex_class)
         
         # Handle float (second precedence)
         if left_name == 'float' or right_name == 'float':
             assert self.prefetch.float_class is not None
-            return self.prefetch.float_class
+            return self._convert_to_instance(self.prefetch.float_class)
         
         # Handle division operations that always return float
         if operator in [TOKEN_MAP['DIV'], TOKEN_MAP['FLOOR_DIV']]:
             assert self.prefetch.float_class is not None
-            return self.prefetch.float_class
+            return self._convert_to_instance(self.prefetch.float_class)
         
         # Default to int for int/bool operations
         assert self.prefetch.int_class is not None
-        return self.prefetch.int_class
+        return self._convert_to_instance(self.prefetch.int_class)
