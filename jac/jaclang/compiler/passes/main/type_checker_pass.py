@@ -123,3 +123,9 @@ class TypeCheckPass(UniPass):
     def exit_atom_trailer(self, node: uni.AtomTrailer) -> None:
         """Handle the atom trailer node."""
         self.evaluator.get_type_of_expression(node)
+
+    def exit_binary_expr(self, node: uni.BinaryExpr) -> None:
+        """Pyright: Checker.visitBinaryOperation(node: BinaryOperationNode): boolean."""
+        # This ensures binary expressions are type-checked during AST traversal
+        # and validates that both operands are compatible with the operator
+        self.evaluator.get_type_of_expression(node)

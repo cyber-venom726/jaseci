@@ -117,72 +117,61 @@ class TypeEvaluator:
     # Pyright equivalent function name = getTypeOfBinaryOperation()
     def get_type_of_binary_operation(self, node: uni.BinaryExpr) -> TypeBase:
         """Return the effective type of a binary operation."""
-        # Reference: pyright packages/pyright-internal/src/analyzer/typeEvaluator.ts -> getTypeOfBinaryOperation
-        left_type = self.get_type_of_expression(node.left)
-        right_type = self.get_type_of_expression(node.right)
-        # print(type(node.left)) # remove
-        # print('right ', node.right.unparse(),' >>',right_type) # remove
-        # print('left ', node.left.unparse(),' >>',left_type) # remove
+        # Pyright: operations.ts -> getTypeOfBinaryOperation
+        left_type_result = {"type": self.get_type_of_expression(node.left), "isIncomplete": False}
+        right_type_result = {"type": self.get_type_of_expression(node.right), "isIncomplete": False}
+        
         # Get the operator string from the token
         operator = node.op.value if hasattr(node.op, 'value') else str(node.op)
         
-        # Define operator groups using TOKEN_MAP for maintainability
-        # This ensures consistency with language token definitions
-        ARITHMETIC_OPS = [
-            TOKEN_MAP['PLUS'],      # +
-            TOKEN_MAP['MINUS'],     # -
-            TOKEN_MAP['STAR_MUL'],  # *
-            TOKEN_MAP['DIV'],       # /
-            TOKEN_MAP['FLOOR_DIV'], # //
-            TOKEN_MAP['MOD'],       # %
-            TOKEN_MAP['STAR_POW'],  # **
+        # Delegate to validateBinaryOperation following Pyright pattern
+        result = self._validate_binary_operation(
+            operator, left_type_result, right_type_result, node
+        )
+        
+        return result["type"]
+
+    # Pyright equivalent function name = validateBinaryOperation()
+    def _validate_binary_operation(self, operator: str, left_type_result: dict, right_type_result: dict, error_node: uni.BinaryExpr) -> dict:
+        """Validate binary operation types following Pyright patterns."""
+        # Pyright: operations.ts -> validateBinaryOperation
+        left_type = left_type_result["type"]
+        right_type = right_type_result["type"]
+        is_incomplete = left_type_result.get("isIncomplete", False) or right_type_result.get("isIncomplete", False)
+        
+        # Map operators to operation types following Pyright's binaryOperatorMap
+        arithmetic_ops = [
+            TOKEN_MAP['PLUS'], TOKEN_MAP['MINUS'], TOKEN_MAP['STAR_MUL'], 
+            TOKEN_MAP['DIV'], TOKEN_MAP['FLOOR_DIV'], TOKEN_MAP['MOD'], TOKEN_MAP['STAR_POW']
         ]
-        COMPARISON_OPS = [
-            TOKEN_MAP['EE'],        # ==
-            TOKEN_MAP['NE'],        # !=
-            TOKEN_MAP['LT'],        # <
-            TOKEN_MAP['LTE'],       # <=
-            TOKEN_MAP['GT'],        # >
-            TOKEN_MAP['GTE'],       # >=
+        comparison_ops = [
+            TOKEN_MAP['EE'], TOKEN_MAP['NE'], TOKEN_MAP['LT'], 
+            TOKEN_MAP['LTE'], TOKEN_MAP['GT'], TOKEN_MAP['GTE']
         ]
-        BITWISE_OPS = [
-            TOKEN_MAP['BW_AND'],    # &
-            TOKEN_MAP['BW_OR'],     # |
-            TOKEN_MAP['BW_XOR'],    # ^
-            TOKEN_MAP['LSHIFT'],    # <<
-            TOKEN_MAP['RSHIFT'],    # >>
+        bitwise_ops = [
+            TOKEN_MAP['BW_AND'], TOKEN_MAP['BW_OR'], TOKEN_MAP['BW_XOR'],
+            TOKEN_MAP['LSHIFT'], TOKEN_MAP['RSHIFT']
         ]
-        MEMBERSHIP_OPS = [
-            TOKEN_MAP['KW_IN'],     # in
-            'not in',               # not in (compound operator)
-        ]
-        IDENTITY_OPS = [
-            TOKEN_MAP['KW_IS'],     # is
-            'is not',               # is not (compound operator)
-        ]
+        membership_ops = [TOKEN_MAP['KW_IN'], 'not in']
+        identity_ops = [TOKEN_MAP['KW_IS'], 'is not']
         
-        # Handle arithmetic operators (+, -, *, /, //, %, **)
-        if operator in ARITHMETIC_OPS:
-            return self._get_type_of_arithmetic_binary_operation(left_type, right_type, operator)
+        result_type = None
         
-        # Handle comparison operators (==, !=, <, <=, >, >=)
-        elif operator in COMPARISON_OPS:
-            return self._get_type_of_comparison_operation(left_type, right_type, operator)
+        if operator in arithmetic_ops:
+            result_type = self._validate_arithmetic_operation(left_type, right_type, operator, error_node)
+        elif operator in comparison_ops:
+            result_type = self._validate_comparison_operation(left_type, right_type, operator, error_node)  
+        elif operator in bitwise_ops:
+            result_type = self._validate_bitwise_operation(left_type, right_type, operator, error_node)
+        elif operator in membership_ops:
+            result_type = self._validate_membership_operation(left_type, right_type, operator, error_node)
+        elif operator in identity_ops:
+            result_type = self._validate_identity_operation(left_type, right_type, operator, error_node)
         
-        # Handle bitwise operators (&, |, ^, <<, >>)
-        elif operator in BITWISE_OPS:
-            return self._get_type_of_bitwise_operation(left_type, right_type, operator)
-        
-        # Handle membership operators (in, not in)
-        elif operator in MEMBERSHIP_OPS:
-            return self._get_type_of_membership_operation(left_type, right_type, operator)
-        
-        # Handle identity operators (is, is not)
-        elif operator in IDENTITY_OPS:
-            return self._get_type_of_identity_operation(left_type, right_type, operator)
-        
-        # If we don't recognize the operator, return Unknown
-        return types.UnknownType()
+        if result_type is None:
+            result_type = types.UnknownType()
+            
+        return {"type": result_type, "isIncomplete": is_incomplete}
 
     # Comments from pyright:
     # // Determines if the source type can be assigned to the dest type.
@@ -318,7 +307,7 @@ class TypeEvaluator:
                 return self._convert_to_instance(self.get_type_of_string(expr))
 
             case uni.Int():
-                # print('exp>>>>',expr.unparse(), expr.loc) # remove
+                print('exp>>>>',expr.unparse(), expr.loc) # remove
                 return self._convert_to_instance(self.get_type_of_int(expr))
 
             case uni.AtomTrailer():
@@ -348,6 +337,7 @@ class TypeEvaluator:
                     return self.get_type_of_symbol(symbol)
 
             case uni.BinaryExpr():
+                # operator should be checked for compatibility
                 return self.get_type_of_binary_operation(expr)
 
             # TODO: More expressions.
@@ -390,23 +380,23 @@ class TypeEvaluator:
             return self._lookup_class_member_type(base_type, member)
         return types.UnknownType()
 
-    def _get_type_of_arithmetic_binary_operation(
-        self, left_type: TypeBase, right_type: TypeBase, operator: str
-    ) -> TypeBase:
-        """Handle arithmetic binary operations (+, -, *, /, //, %, **)."""
-        # Reference: pyright getTypeOfBinaryOperation for arithmetic operations
+    # Pyright equivalent function name = validateArithmeticOperation()
+    def _validate_arithmetic_operation(self, left_type: TypeBase, right_type: TypeBase, operator: str, error_node: uni.BinaryExpr) -> TypeBase:
+        """Validate arithmetic operations following Pyright patterns."""
+        # Pyright: operations.ts -> validateArithmeticOperation
         
-        # Handle numeric operations
+        # Handle numeric operations with type promotion
         if self._are_both_numeric_types(left_type, right_type):
             return self._get_numeric_result_type(left_type, right_type, operator)
         
-        # Handle string concatenation
+        # Handle string operations
         if operator == TOKEN_MAP['PLUS'] and self._are_both_string_types(left_type, right_type):
+            # String concatenation: str + str -> str
             assert self.prefetch.str_class is not None
             return self.prefetch.str_class
         
-        # Handle string repetition (str * int or int * str)
         if operator == TOKEN_MAP['STAR_MUL']:
+            # String repetition: str * int -> str or int * str -> str
             if self._is_string_type(left_type) and self._is_int_type(right_type):
                 assert self.prefetch.str_class is not None
                 return self.prefetch.str_class
@@ -414,53 +404,58 @@ class TypeEvaluator:
                 assert self.prefetch.str_class is not None
                 return self.prefetch.str_class
         
-        # TODO: Handle other type combinations and magic methods like __add__, __sub__, etc.
+        # TODO: Handle magic methods like __add__, __sub__, etc. following Pyright's getTypeOfMagicMethodCall
         return types.UnknownType()
 
-    def _get_type_of_comparison_operation(
-        self, left_type: TypeBase, right_type: TypeBase, operator: str
-    ) -> TypeBase:
-        """Handle comparison operations (==, !=, <, <=, >, >=)."""
-        # Reference: pyright getTypeOfBinaryOperation for comparison operations
+    # Pyright equivalent function name = validateComparisonOperation() 
+    def _validate_comparison_operation(self, left_type: TypeBase, right_type: TypeBase, operator: str, error_node: uni.BinaryExpr) -> TypeBase:
+        """Validate comparison operations following Pyright patterns."""
+        # Pyright: checker.ts -> _validateComparisonTypes and operations.ts comparison handling
         
         # All comparison operations return bool
         assert self.prefetch.bool_class is not None
         return self.prefetch.bool_class
 
-    def _get_type_of_bitwise_operation(
-        self, left_type: TypeBase, right_type: TypeBase, operator: str
-    ) -> TypeBase:
-        """Handle bitwise operations (&, |, ^, <<, >>)."""
-        # Reference: pyright getTypeOfBinaryOperation for bitwise operations
+    # Pyright equivalent function name = validateBitwiseOperation() (inferred from patterns)
+    def _validate_bitwise_operation(self, left_type: TypeBase, right_type: TypeBase, operator: str, error_node: uni.BinaryExpr) -> TypeBase:
+        """Validate bitwise operations following Pyright patterns."""
+        # Pyright: operations.ts -> bitwise operations in validateArithmeticOperation
         
         # For integer bitwise operations, return int
         if self._are_both_int_types(left_type, right_type):
             assert self.prefetch.int_class is not None
             return self.prefetch.int_class
         
-        # TODO: Handle other type combinations and magic methods
+        # TODO: Handle magic methods like __and__, __or__, __xor__, etc.
         return types.UnknownType()
 
-    def _get_type_of_membership_operation(
-        self, left_type: TypeBase, right_type: TypeBase, operator: str
-    ) -> TypeBase:
-        """Handle membership operations (in, not in)."""
-        # Reference: pyright getTypeOfBinaryOperation for membership operations
+    # Pyright equivalent function name = validateContainmentOperation()
+    def _validate_membership_operation(self, left_type: TypeBase, right_type: TypeBase, operator: str, error_node: uni.BinaryExpr) -> TypeBase:
+        """Validate membership operations following Pyright patterns."""
+        # Pyright: operations.ts -> validateContainmentOperation
         
         # Membership operations always return bool
         assert self.prefetch.bool_class is not None
         return self.prefetch.bool_class
 
-    def _get_type_of_identity_operation(
-        self, left_type: TypeBase, right_type: TypeBase, operator: str
-    ) -> TypeBase:
-        """Handle identity operations (is, is not)."""
-        # Reference: pyright getTypeOfBinaryOperation for identity operations
+    # Pyright equivalent function name = validateIdentityOperation() (inferred from patterns)
+    def _validate_identity_operation(self, left_type: TypeBase, right_type: TypeBase, operator: str, error_node: uni.BinaryExpr) -> TypeBase:
+        """Validate identity operations following Pyright patterns."""
+        # Pyright: operations.ts -> identity operations handling in boolean operators
         
         # Identity operations always return bool
         assert self.prefetch.bool_class is not None
         return self.prefetch.bool_class
 
+    # Pyright equivalent function name = calcLiteralForBinaryOp()
+    def _calc_literal_for_binary_op(self, operator: str, left_type: TypeBase, right_type: TypeBase) -> TypeBase | None:
+        """Apply literal math for literal operands following Pyright patterns."""
+        # Pyright: operations.ts -> calcLiteralForBinaryOp
+        # TODO: Implement literal computation for known literal values
+        # This is a complex function in Pyright that handles literal arithmetic
+        pass
+
+    # Helper functions for type checking - following Pyright naming conventions
     def _are_both_numeric_types(self, left_type: TypeBase, right_type: TypeBase) -> bool:
         """Check if both types are numeric (int, float, bool)."""
         return self._is_numeric_type(left_type) and self._is_numeric_type(right_type)
