@@ -116,7 +116,7 @@ class TypeCheckPass(UniPass):
             left_type = self.evaluator.get_type_of_expression(node.target[0])
             right_type = self.evaluator.get_type_of_expression(node.value)
             if not self.evaluator.assign_type(right_type, left_type):
-                self.log_error(f"Cannot assign {right_type} to {left_type}")
+                self.log_error(f"Cannot assign {right_type.shared.class_name} to {left_type.shared.class_name}")
         else:
             pass  # TODO: handle
 

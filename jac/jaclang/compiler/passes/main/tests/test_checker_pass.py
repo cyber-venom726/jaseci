@@ -102,6 +102,78 @@ class TypeCheckerPassTests(TestCase):
           ^^^^^^^^^
         """, program.errors_had[0].pretty_print())
 
+    def test_binary_arithmetic_operations(self) -> None:
+        """Test binary arithmetic operations."""
+        src = """
+        with entry {
+          # Integer operations
+          a: int = 5 + 3;        # OK: int + int -> int
+          b: int = 10 - 2;       # OK: int - int -> int
+          c: int = 4 * 6;        # OK: int * int -> int
+          d: int = 8 // 2;       # OK: int // int -> int (should be float, but simplified for now)
+          
+          # String operations  
+          s1: str = "hello" + " world";  # OK: str + str -> str
+          s2: str = "abc" * 3;           # OK: str * int -> str
+          s3: str = 2 * "def";           # OK: int * str -> str
+          
+          # Type errors
+          bad1: str = 5 + 3;             # Error: int assigned to str
+          bad2: int = "hello" + "world"; # Error: str assigned to int
+        }
+        """
+        program = JacProgram()
+        mod = program.compile("main.jac", use_str=src)
+        TypeCheckPass(ir_in=mod, prog=program)
+        self.assertEqual(len(program.errors_had), 2)
+
+    def test_binary_comparison_operations(self) -> None:
+        """Test binary comparison operations."""
+        src = """
+        with entry {
+          x: int = 5;
+          y: int = 3;
+          
+          # Comparison operations return bool
+          eq: bool = x == y;     # OK: int == int -> bool
+          ne: bool = x != y;     # OK: int != int -> bool
+          lt: bool = x < y;      # OK: int < int -> bool
+          le: bool = x <= y;     # OK: int <= int -> bool
+          gt: bool = x > y;      # OK: int > int -> bool
+          ge: bool = x >= y;     # OK: int >= int -> bool
+          
+          # Type error
+          bad: int = x == y;     # Error: bool assigned to int
+        }
+        """
+        program = JacProgram()
+        mod = program.compile("main.jac", use_str=src)
+        TypeCheckPass(ir_in=mod, prog=program)
+        self.assertEqual(len(program.errors_had), 1)
+
+    def test_binary_bitwise_operations(self) -> None:
+        """Test binary bitwise operations."""
+        src = """
+        with entry {
+          x: int = 5;
+          y: int = 3;
+          
+          # Bitwise operations with integers
+          and_op: int = x & y;   # OK: int & int -> int
+          or_op: int = x | y;    # OK: int | int -> int
+          xor_op: int = x ^ y;   # OK: int ^ int -> int
+          lshift: int = x << 2;  # OK: int << int -> int
+          rshift: int = x >> 1;  # OK: int >> int -> int
+          
+          # Type error
+          bad: str = x & y;      # Error: int assigned to str
+        }
+        """
+        program = JacProgram()
+        mod = program.compile("main.jac", use_str=src)
+        TypeCheckPass(ir_in=mod, prog=program)
+        self.assertEqual(len(program.errors_had), 1)
+
     def _assert_error_pretty_found(self, needle: str, haystack: str) -> None:
         for line in [line.strip() for line in needle.splitlines() if line.strip()]:
             self.assertIn(line, haystack, f"Expected line '{line}' not found in:\n{haystack}")

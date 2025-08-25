@@ -9,6 +9,7 @@ PyrightReference:
 from dataclasses import dataclass
 
 import jaclang.compiler.unitree as uni
+from jaclang.compiler import TOKEN_MAP
 from jaclang.compiler.type_system import types
 
 from .types import TypeBase
@@ -28,6 +29,8 @@ class PrefetchedTypes:
     tuple_class: TypeBase | None = None
     bool_class: TypeBase | None = None
     int_class: TypeBase | None = None
+    float_class: TypeBase | None = None
+    complex_class: TypeBase | None = None
     str_class: TypeBase | None = None
     dict_class: TypeBase | None = None
     module_type_class: TypeBase | None = None
@@ -111,6 +114,76 @@ class TypeEvaluator:
         node.type = result  # Cache the result
         return result
 
+    # Pyright equivalent function name = getTypeOfBinaryOperation()
+    def get_type_of_binary_operation(self, node: uni.BinaryExpr) -> TypeBase:
+        """Return the effective type of a binary operation."""
+        # Reference: pyright packages/pyright-internal/src/analyzer/typeEvaluator.ts -> getTypeOfBinaryOperation
+        left_type = self.get_type_of_expression(node.left)
+        right_type = self.get_type_of_expression(node.right)
+        # print(type(node.left)) # remove
+        # print('right ', node.right.unparse(),' >>',right_type) # remove
+        # print('left ', node.left.unparse(),' >>',left_type) # remove
+        # Get the operator string from the token
+        operator = node.op.value if hasattr(node.op, 'value') else str(node.op)
+        
+        # Define operator groups using TOKEN_MAP for maintainability
+        # This ensures consistency with language token definitions
+        ARITHMETIC_OPS = [
+            TOKEN_MAP['PLUS'],      # +
+            TOKEN_MAP['MINUS'],     # -
+            TOKEN_MAP['STAR_MUL'],  # *
+            TOKEN_MAP['DIV'],       # /
+            TOKEN_MAP['FLOOR_DIV'], # //
+            TOKEN_MAP['MOD'],       # %
+            TOKEN_MAP['STAR_POW'],  # **
+        ]
+        COMPARISON_OPS = [
+            TOKEN_MAP['EE'],        # ==
+            TOKEN_MAP['NE'],        # !=
+            TOKEN_MAP['LT'],        # <
+            TOKEN_MAP['LTE'],       # <=
+            TOKEN_MAP['GT'],        # >
+            TOKEN_MAP['GTE'],       # >=
+        ]
+        BITWISE_OPS = [
+            TOKEN_MAP['BW_AND'],    # &
+            TOKEN_MAP['BW_OR'],     # |
+            TOKEN_MAP['BW_XOR'],    # ^
+            TOKEN_MAP['LSHIFT'],    # <<
+            TOKEN_MAP['RSHIFT'],    # >>
+        ]
+        MEMBERSHIP_OPS = [
+            TOKEN_MAP['KW_IN'],     # in
+            'not in',               # not in (compound operator)
+        ]
+        IDENTITY_OPS = [
+            TOKEN_MAP['KW_IS'],     # is
+            'is not',               # is not (compound operator)
+        ]
+        
+        # Handle arithmetic operators (+, -, *, /, //, %, **)
+        if operator in ARITHMETIC_OPS:
+            return self._get_type_of_arithmetic_binary_operation(left_type, right_type, operator)
+        
+        # Handle comparison operators (==, !=, <, <=, >, >=)
+        elif operator in COMPARISON_OPS:
+            return self._get_type_of_comparison_operation(left_type, right_type, operator)
+        
+        # Handle bitwise operators (&, |, ^, <<, >>)
+        elif operator in BITWISE_OPS:
+            return self._get_type_of_bitwise_operation(left_type, right_type, operator)
+        
+        # Handle membership operators (in, not in)
+        elif operator in MEMBERSHIP_OPS:
+            return self._get_type_of_membership_operation(left_type, right_type, operator)
+        
+        # Handle identity operators (is, is not)
+        elif operator in IDENTITY_OPS:
+            return self._get_type_of_identity_operation(left_type, right_type, operator)
+        
+        # If we don't recognize the operator, return Unknown
+        return types.UnknownType()
+
     # Comments from pyright:
     # // Determines if the source type can be assigned to the dest type.
     # // If constraint are provided, type variables within the destType are
@@ -123,20 +196,34 @@ class TypeEvaluator:
             # NOTE: For now if we don't have the type info, we assume it's compatible.
             # For strict mode we should disallow usage of unknown unless explicitly ignored.
             return True
-        # FIXME: This logic is not valid, just here as a stub.
-        if types.TypeCategory.Unknown in (src_type.category, dest_type.category):
-            return True
 
         if src_type == dest_type:
             return True
-
+        
         if dest_type.is_class_instance() and src_type.is_class_instance():
             assert isinstance(dest_type, types.ClassType)
             assert isinstance(src_type, types.ClassType)
             return self._assign_class(src_type, dest_type)
-
-        # FIXME: This is temporary.
-        return src_type == dest_type
+        
+        # Handle the case where both are instantiable classes (e.g., type annotations)
+        if dest_type.is_instantiable_class() and src_type.is_instantiable_class():
+            assert isinstance(dest_type, types.ClassType)
+            assert isinstance(src_type, types.ClassType)
+            return self._assign_class(src_type, dest_type)
+        # int and float
+        if (isinstance(src_type, types.ClassType) and src_type.shared.class_name == "int" and
+            isinstance(dest_type, types.ClassType) and dest_type.shared.class_name == "float"):
+            return True
+        if isinstance(src_type, types.ClassType) and src_type.shared.class_name == "float" and \
+           isinstance(dest_type, types.ClassType) and dest_type.shared.class_name == "int":
+            return True
+        
+        # Fallback: check if they have the same class name (temporary solution)
+        if (isinstance(src_type, types.ClassType) and 
+            isinstance(dest_type, types.ClassType)):
+            return src_type.shared.class_name == dest_type.shared.class_name
+        # If we can't determine compatibility, assume incompatible
+        return False
 
     def _assign_class(
         self, src_type: types.ClassType, dest_type: types.ClassType
@@ -163,6 +250,8 @@ class TypeEvaluator:
             tuple_class=self._get_builtin_type("tuple"),
             bool_class=self._get_builtin_type("bool"),
             int_class=self._get_builtin_type("int"),
+            float_class=self._get_builtin_type("float"),
+            complex_class=self._get_builtin_type("complex"),
             str_class=self._get_builtin_type("str"),
             dict_class=self._get_builtin_type("dict"),
             # module_type_class=
@@ -229,6 +318,7 @@ class TypeEvaluator:
                 return self._convert_to_instance(self.get_type_of_string(expr))
 
             case uni.Int():
+                # print('exp>>>>',expr.unparse(), expr.loc) # remove
                 return self._convert_to_instance(self.get_type_of_int(expr))
 
             case uni.AtomTrailer():
@@ -256,6 +346,9 @@ class TypeEvaluator:
             case uni.Name():
                 if symbol := expr.sym_tab.lookup(expr.value, deep=True):
                     return self.get_type_of_symbol(symbol)
+
+            case uni.BinaryExpr():
+                return self.get_type_of_binary_operation(expr)
 
             # TODO: More expressions.
         return types.UnknownType()
@@ -296,3 +389,146 @@ class TypeEvaluator:
             # TODO: We need to implement Member lookup flags and set SkipInstanceMember to 0.
             return self._lookup_class_member_type(base_type, member)
         return types.UnknownType()
+
+    def _get_type_of_arithmetic_binary_operation(
+        self, left_type: TypeBase, right_type: TypeBase, operator: str
+    ) -> TypeBase:
+        """Handle arithmetic binary operations (+, -, *, /, //, %, **)."""
+        # Reference: pyright getTypeOfBinaryOperation for arithmetic operations
+        
+        # Handle numeric operations
+        if self._are_both_numeric_types(left_type, right_type):
+            return self._get_numeric_result_type(left_type, right_type, operator)
+        
+        # Handle string concatenation
+        if operator == TOKEN_MAP['PLUS'] and self._are_both_string_types(left_type, right_type):
+            assert self.prefetch.str_class is not None
+            return self.prefetch.str_class
+        
+        # Handle string repetition (str * int or int * str)
+        if operator == TOKEN_MAP['STAR_MUL']:
+            if self._is_string_type(left_type) and self._is_int_type(right_type):
+                assert self.prefetch.str_class is not None
+                return self.prefetch.str_class
+            elif self._is_int_type(left_type) and self._is_string_type(right_type):
+                assert self.prefetch.str_class is not None
+                return self.prefetch.str_class
+        
+        # TODO: Handle other type combinations and magic methods like __add__, __sub__, etc.
+        return types.UnknownType()
+
+    def _get_type_of_comparison_operation(
+        self, left_type: TypeBase, right_type: TypeBase, operator: str
+    ) -> TypeBase:
+        """Handle comparison operations (==, !=, <, <=, >, >=)."""
+        # Reference: pyright getTypeOfBinaryOperation for comparison operations
+        
+        # All comparison operations return bool
+        assert self.prefetch.bool_class is not None
+        return self.prefetch.bool_class
+
+    def _get_type_of_bitwise_operation(
+        self, left_type: TypeBase, right_type: TypeBase, operator: str
+    ) -> TypeBase:
+        """Handle bitwise operations (&, |, ^, <<, >>)."""
+        # Reference: pyright getTypeOfBinaryOperation for bitwise operations
+        
+        # For integer bitwise operations, return int
+        if self._are_both_int_types(left_type, right_type):
+            assert self.prefetch.int_class is not None
+            return self.prefetch.int_class
+        
+        # TODO: Handle other type combinations and magic methods
+        return types.UnknownType()
+
+    def _get_type_of_membership_operation(
+        self, left_type: TypeBase, right_type: TypeBase, operator: str
+    ) -> TypeBase:
+        """Handle membership operations (in, not in)."""
+        # Reference: pyright getTypeOfBinaryOperation for membership operations
+        
+        # Membership operations always return bool
+        assert self.prefetch.bool_class is not None
+        return self.prefetch.bool_class
+
+    def _get_type_of_identity_operation(
+        self, left_type: TypeBase, right_type: TypeBase, operator: str
+    ) -> TypeBase:
+        """Handle identity operations (is, is not)."""
+        # Reference: pyright getTypeOfBinaryOperation for identity operations
+        
+        # Identity operations always return bool
+        assert self.prefetch.bool_class is not None
+        return self.prefetch.bool_class
+
+    def _are_both_numeric_types(self, left_type: TypeBase, right_type: TypeBase) -> bool:
+        """Check if both types are numeric (int, float, bool)."""
+        return self._is_numeric_type(left_type) and self._is_numeric_type(right_type)
+
+    def _is_numeric_type(self, type_obj: TypeBase) -> bool:
+        """Check if a type is numeric."""
+        if not isinstance(type_obj, types.ClassType) or not type_obj.is_class_instance():
+            return False
+        
+        numeric_types = ['int', 'float', 'bool', 'complex']
+        return type_obj.shared.class_name in numeric_types
+
+    def _are_both_string_types(self, left_type: TypeBase, right_type: TypeBase) -> bool:
+        """Check if both types are strings."""
+        return self._is_string_type(left_type) and self._is_string_type(right_type)
+
+    def _is_string_type(self, type_obj: TypeBase) -> bool:
+        """Check if a type is string."""
+        if not isinstance(type_obj, types.ClassType) or not type_obj.is_class_instance():
+            return False
+        return type_obj.shared.class_name == 'str'
+
+    def _are_both_int_types(self, left_type: TypeBase, right_type: TypeBase) -> bool:
+        """Check if both types are integers."""
+        return self._is_int_type(left_type) and self._is_int_type(right_type)
+
+    def _is_int_type(self, type_obj: TypeBase) -> bool:
+        """Check if a type is integer."""
+        if not isinstance(type_obj, types.ClassType) or not type_obj.is_class_instance():
+            return False
+        return type_obj.shared.class_name == 'int'
+
+    def _get_numeric_result_type(
+        self, left_type: TypeBase, right_type: TypeBase, operator: str
+    ) -> TypeBase:
+        """Get the result type for numeric operations."""
+        # Reference: pyright numeric type promotion rules
+        
+        # Simple type promotion rules:
+        # bool + bool -> int
+        # int + int -> int  
+        # float + anything -> float
+        # complex + anything -> complex
+        
+        # Get type names
+        left_name = ""
+        right_name = ""
+        
+        if isinstance(left_type, types.ClassType):
+            left_name = left_type.shared.class_name
+        if isinstance(right_type, types.ClassType):
+            right_name = right_type.shared.class_name
+        
+        # Handle complex numbers (highest precedence)
+        if left_name == 'complex' or right_name == 'complex':
+            assert self.prefetch.complex_class is not None
+            return self.prefetch.complex_class
+        
+        # Handle float (second precedence)
+        if left_name == 'float' or right_name == 'float':
+            assert self.prefetch.float_class is not None
+            return self.prefetch.float_class
+        
+        # Handle division operations that always return float
+        if operator in [TOKEN_MAP['DIV'], TOKEN_MAP['FLOOR_DIV']]:
+            assert self.prefetch.float_class is not None
+            return self.prefetch.float_class
+        
+        # Default to int for int/bool operations
+        assert self.prefetch.int_class is not None
+        return self.prefetch.int_class
