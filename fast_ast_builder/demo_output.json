@@ -1,0 +1,436 @@
+{
+  "node_type": "Module",
+  "value": null,
+  "line": 1,
+  "column": 0,
+  "children": [
+    {
+      "node_type": "NodeDefinition",
+      "value": "Person",
+      "line": 1,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "has name: str;",
+      "line": 2,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "has age: int;",
+      "line": 3,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "has friends: list[Person] = [];",
+      "line": 4,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "can introduce with Greeter entry {",
+      "line": 5,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "print(f\"Hi, I'm {self.name}, age {self.age}\");",
+      "line": 6,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "}",
+      "line": 7,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "}",
+      "line": 8,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "edge Friendship {",
+      "line": 9,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "has strength: float = 1.0;",
+      "line": 10,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "has since: str;",
+      "line": 11,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "}",
+      "line": 12,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "WalkerDefinition",
+      "value": "Greeter",
+      "line": 13,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "has greeting: str = \"Hello\";",
+      "line": 14,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "can greet with Person entry {",
+      "line": 15,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "print(f\"{self.greeting}, {here.name}!\");",
+      "line": 16,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "visit [-->];",
+      "line": 17,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "}",
+      "line": 18,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "can farewell with Person exit {",
+      "line": 19,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "print(f\"Goodbye, {here.name}!\");",
+      "line": 20,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "}",
+      "line": 21,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "}",
+      "line": 22,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "WalkerDefinition",
+      "value": "NetworkAnalyzer",
+      "line": 23,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "has total_people: int = 0;",
+      "line": 24,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "can count_people with Person entry {",
+      "line": 25,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Assignment",
+      "value": null,
+      "line": 26,
+      "column": 0,
+      "children": [
+        {
+          "node_type": "Variable",
+          "value": "self.total_people +",
+          "line": 26,
+          "column": 0,
+          "children": []
+        },
+        {
+          "node_type": "Value",
+          "value": "1",
+          "line": 26,
+          "column": 0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "node_type": "Expression",
+      "value": "for friend in [here -->:Friendship:--> Person] {",
+      "line": 27,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "print(f\"Friend: {friend.name}\");",
+      "line": 28,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "}",
+      "line": 29,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "}",
+      "line": 30,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "}",
+      "line": 31,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "EntryBlock",
+      "value": null,
+      "line": 32,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Assignment",
+      "value": null,
+      "line": 33,
+      "column": 0,
+      "children": [
+        {
+          "node_type": "Variable",
+          "value": "alice",
+          "line": 33,
+          "column": 0,
+          "children": []
+        },
+        {
+          "node_type": "Value",
+          "value": "Person(name=\"Alice\", age=25)",
+          "line": 33,
+          "column": 0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "node_type": "Assignment",
+      "value": null,
+      "line": 34,
+      "column": 0,
+      "children": [
+        {
+          "node_type": "Variable",
+          "value": "bob",
+          "line": 34,
+          "column": 0,
+          "children": []
+        },
+        {
+          "node_type": "Value",
+          "value": "Person(name=\"Bob\", age=30)",
+          "line": 34,
+          "column": 0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "node_type": "Assignment",
+      "value": null,
+      "line": 35,
+      "column": 0,
+      "children": [
+        {
+          "node_type": "Variable",
+          "value": "charlie",
+          "line": 35,
+          "column": 0,
+          "children": []
+        },
+        {
+          "node_type": "Value",
+          "value": "Person(name=\"Charlie\", age=28)",
+          "line": 35,
+          "column": 0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "node_type": "Expression",
+      "value": "root ++> alice;",
+      "line": 36,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Assignment",
+      "value": null,
+      "line": 37,
+      "column": 0,
+      "children": [
+        {
+          "node_type": "Variable",
+          "value": "alice ++>:Friendship(since",
+          "line": 37,
+          "column": 0,
+          "children": []
+        },
+        {
+          "node_type": "Value",
+          "value": "\"2020\"):++> bob",
+          "line": 37,
+          "column": 0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "node_type": "Assignment",
+      "value": null,
+      "line": 38,
+      "column": 0,
+      "children": [
+        {
+          "node_type": "Variable",
+          "value": "bob ++>:Friendship(since",
+          "line": 38,
+          "column": 0,
+          "children": []
+        },
+        {
+          "node_type": "Value",
+          "value": "\"2021\"):++> charlie",
+          "line": 38,
+          "column": 0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "node_type": "Assignment",
+      "value": null,
+      "line": 39,
+      "column": 0,
+      "children": [
+        {
+          "node_type": "Variable",
+          "value": "greeter",
+          "line": 39,
+          "column": 0,
+          "children": []
+        },
+        {
+          "node_type": "Value",
+          "value": "Greeter(greeting=\"Hey there\")",
+          "line": 39,
+          "column": 0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "node_type": "Assignment",
+      "value": null,
+      "line": 40,
+      "column": 0,
+      "children": [
+        {
+          "node_type": "Variable",
+          "value": "analyzer",
+          "line": 40,
+          "column": 0,
+          "children": []
+        },
+        {
+          "node_type": "Value",
+          "value": "NetworkAnalyzer()",
+          "line": 40,
+          "column": 0,
+          "children": []
+        }
+      ]
+    },
+    {
+      "node_type": "Expression",
+      "value": "greeter spawn alice;",
+      "line": 41,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "analyzer spawn alice;",
+      "line": 42,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "print(f\"Total people in network: {analyzer.total_people}\");",
+      "line": 43,
+      "column": 0,
+      "children": []
+    },
+    {
+      "node_type": "Expression",
+      "value": "}",
+      "line": 44,
+      "column": 0,
+      "children": []
+    }
+  ]
+}

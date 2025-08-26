@@ -1,0 +1,373 @@
+{
+  "node": "Module",
+  "value": null,
+  "line": 1,
+  "col": 0,
+  "kid": [
+    {
+      "node": "ArchSpec",
+      "value": null,
+      "line": 1,
+      "col": 0,
+      "kid": [
+        {
+          "node": "Token",
+          "value": "node",
+          "line": 1,
+          "col": 0,
+          "kid": []
+        },
+        {
+          "node": "Name",
+          "value": "Person",
+          "line": 1,
+          "col": 0,
+          "kid": [],
+          "sym_name": "Person"
+        },
+        {
+          "node": "ArchHas",
+          "value": null,
+          "line": 2,
+          "col": 0,
+          "kid": [
+            {
+              "node": "HasVar",
+              "value": null,
+              "line": 2,
+              "col": 0,
+              "kid": [
+                {
+                  "node": "Name",
+                  "value": "name",
+                  "line": 2,
+                  "col": 0,
+                  "kid": [],
+                  "sym_name": "name"
+                },
+                {
+                  "node": "SubTag",
+                  "value": null,
+                  "line": 2,
+                  "col": 0,
+                  "kid": [
+                    {
+                      "node": "Name",
+                      "value": "str",
+                      "line": 2,
+                      "col": 0,
+                      "kid": []
+                    }
+                  ]
+                }
+              ],
+              "sym_name": "name"
+            }
+          ]
+        },
+        {
+          "node": "ArchHas",
+          "value": null,
+          "line": 3,
+          "col": 0,
+          "kid": [
+            {
+              "node": "HasVar",
+              "value": null,
+              "line": 3,
+              "col": 0,
+              "kid": [
+                {
+                  "node": "Name",
+                  "value": "age",
+                  "line": 3,
+                  "col": 0,
+                  "kid": [],
+                  "sym_name": "age"
+                },
+                {
+                  "node": "SubTag",
+                  "value": null,
+                  "line": 3,
+                  "col": 0,
+                  "kid": [
+                    {
+                      "node": "Name",
+                      "value": "int",
+                      "line": 3,
+                      "col": 0,
+                      "kid": []
+                    }
+                  ]
+                }
+              ],
+              "sym_name": "age"
+            }
+          ]
+        },
+        {
+          "node": "ArchHas",
+          "value": null,
+          "line": 4,
+          "col": 0,
+          "kid": [
+            {
+              "node": "HasVar",
+              "value": null,
+              "line": 4,
+              "col": 0,
+              "kid": [
+                {
+                  "node": "Name",
+                  "value": "friends",
+                  "line": 4,
+                  "col": 0,
+                  "kid": [],
+                  "sym_name": "friends"
+                },
+                {
+                  "node": "SubTag",
+                  "value": null,
+                  "line": 4,
+                  "col": 0,
+                  "kid": [
+                    {
+                      "node": "Name",
+                      "value": "list[Person]",
+                      "line": 4,
+                      "col": 0,
+                      "kid": []
+                    }
+                  ]
+                },
+                {
+                  "node": "Literal",
+                  "value": "[]",
+                  "line": 4,
+                  "col": 0,
+                  "kid": []
+                }
+              ],
+              "sym_name": "friends"
+            }
+          ]
+        }
+      ],
+      "sym_name": "Person",
+      "sym_type": "NODE"
+    },
+    {
+      "node": "ArchSpec",
+      "value": null,
+      "line": 6,
+      "col": 0,
+      "kid": [
+        {
+          "node": "Token",
+          "value": "walker",
+          "line": 6,
+          "col": 0,
+          "kid": []
+        },
+        {
+          "node": "Name",
+          "value": "Greeter",
+          "line": 6,
+          "col": 0,
+          "kid": [],
+          "sym_name": "Greeter"
+        },
+        {
+          "node": "ArchHas",
+          "value": null,
+          "line": 7,
+          "col": 0,
+          "kid": [
+            {
+              "node": "HasVar",
+              "value": null,
+              "line": 7,
+              "col": 0,
+              "kid": [
+                {
+                  "node": "Name",
+                  "value": "greeting",
+                  "line": 7,
+                  "col": 0,
+                  "kid": [],
+                  "sym_name": "greeting"
+                },
+                {
+                  "node": "SubTag",
+                  "value": null,
+                  "line": 7,
+                  "col": 0,
+                  "kid": [
+                    {
+                      "node": "Name",
+                      "value": "str",
+                      "line": 7,
+                      "col": 0,
+                      "kid": []
+                    }
+                  ]
+                },
+                {
+                  "node": "Literal",
+                  "value": "\"Hello\"",
+                  "line": 7,
+                  "col": 0,
+                  "kid": []
+                }
+              ],
+              "sym_name": "greeting"
+            }
+          ]
+        },
+        {
+          "node": "Ability",
+          "value": null,
+          "line": 8,
+          "col": 0,
+          "kid": [
+            {
+              "node": "Name",
+              "value": "greet",
+              "line": 8,
+              "col": 0,
+              "kid": [],
+              "sym_name": "greet"
+            },
+            {
+              "node": "EventSignature",
+              "value": null,
+              "line": 8,
+              "col": 0,
+              "kid": [
+                {
+                  "node": "Token",
+                  "value": "entry",
+                  "line": 8,
+                  "col": 0,
+                  "kid": []
+                },
+                {
+                  "node": "Name",
+                  "value": "Person",
+                  "line": 8,
+                  "col": 0,
+                  "kid": []
+                }
+              ]
+            }
+          ]
+        }
+      ],
+      "sym_name": "Greeter",
+      "sym_type": "WALKER"
+    },
+    {
+      "node": "ExprStmt",
+      "value": "}",
+      "line": 10,
+      "col": 0,
+      "kid": []
+    },
+    {
+      "node": "ExprStmt",
+      "value": "}",
+      "line": 11,
+      "col": 0,
+      "kid": []
+    },
+    {
+      "node": "ModuleCode",
+      "value": null,
+      "line": 12,
+      "col": 0,
+      "kid": [
+        {
+          "node": "Assignment",
+          "value": null,
+          "line": 13,
+          "col": 0,
+          "kid": [
+            {
+              "node": "Name",
+              "value": "alice",
+              "line": 13,
+              "col": 0,
+              "kid": [],
+              "sym_name": "alice"
+            },
+            {
+              "node": "AtomExpr",
+              "value": "Person(name=\"Alice\", age=25)",
+              "line": 13,
+              "col": 0,
+              "kid": []
+            }
+          ]
+        },
+        {
+          "node": "BinaryExpr",
+          "value": "connect",
+          "line": 14,
+          "col": 0,
+          "kid": [
+            {
+              "node": "Name",
+              "value": "root",
+              "line": 14,
+              "col": 0,
+              "kid": []
+            },
+            {
+              "node": "Token",
+              "value": "++>",
+              "line": 14,
+              "col": 0,
+              "kid": []
+            },
+            {
+              "node": "Name",
+              "value": "alice",
+              "line": 14,
+              "col": 0,
+              "kid": []
+            }
+          ]
+        },
+        {
+          "node": "BinaryExpr",
+          "value": "spawn",
+          "line": 15,
+          "col": 0,
+          "kid": [
+            {
+              "node": "AtomExpr",
+              "value": "Greeter()",
+              "line": 15,
+              "col": 0,
+              "kid": []
+            },
+            {
+              "node": "Token",
+              "value": "spawn",
+              "line": 15,
+              "col": 0,
+              "kid": []
+            },
+            {
+              "node": "Name",
+              "value": "alice",
+              "line": 15,
+              "col": 0,
+              "kid": []
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

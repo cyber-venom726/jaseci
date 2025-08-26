@@ -1,0 +1,47 @@
+{
+  "timestamp": 1756225013.0621645,
+  "results": [
+    {
+      "name": "Simple Node",
+      "source_size": 36,
+      "avg_time": 1.216079981531948e-05,
+      "min_time": 5.48199750483036e-06,
+      "max_time": 2.5868997909128666e-05,
+      "avg_nodes": 1.0,
+      "chars_per_sec": 2960331.6020916044
+    },
+    {
+      "name": "Node with Walker",
+      "source_size": 107,
+      "avg_time": 1.7284194473177195e-05,
+      "min_time": 1.1665993952192366e-05,
+      "max_time": 2.8256996301934123e-05,
+      "avg_nodes": 2.0,
+      "chars_per_sec": 6190626.943364354
+    },
+    {
+      "name": "Complex Program",
+      "source_size": 967,
+      "avg_time": 0.00020229600195307285,
+      "min_time": 5.783500091638416e-05,
+      "max_time": 0.000610456001595594,
+      "avg_nodes": 11.0,
+      "chars_per_sec": 4780124.128327151
+    },
+    {
+      "name": "Large Program",
+      "source_size": 3223,
+      "avg_time": 0.00019321600266266614,
+      "min_time": 0.00014142699365038425,
+      "max_time": 0.0003302080003777519,
+      "avg_nodes": 21.0,
+      "chars_per_sec": 16680812.953298714
+    }
+  ],
+  "summary": {
+    "total_tests": 4,
+    "avg_speed": 7652973.906770456,
+    "fastest_test": "Large Program",
+    "slowest_test": "Simple Node"
+  }
+}
