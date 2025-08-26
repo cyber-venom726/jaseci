@@ -14,9 +14,11 @@ import from jaclang.compiler.unitree { UniScopeNode }
 import from sem_manager { SemTokManager }
 import from jaclang.vendor.pygls { uris }
 import from jaclang.vendor.pygls.server { LanguageServer }
+import from jaclang.settings { settings }
 
 import lsprotocol.types as lspt;
 import utils;
+import from utils { debounce }
 
 
 """Handles Jac module, semantic manager, and alert management."""
@@ -102,6 +104,7 @@ class JacLangServer(JacProgram , LanguageServer) {
         self.module_manager.update(file_path, build, update_annexed=need);
     }
 
+
     """Rebuild a file (syntax only)."""
     def quick_check(self: JacLangServer, file_path: str) -> bool {
         try {
@@ -122,6 +125,8 @@ class JacLangServer(JacProgram , LanguageServer) {
             return False;
         }
     }
+
+
 
     """Rebuild a file and its dependencies (typecheck)."""
     def deep_check(
@@ -166,6 +171,7 @@ class JacLangServer(JacProgram , LanguageServer) {
         }
     }
 
+
     """Analyze and publish diagnostics."""
     async def launch_quick_check(self: JacLangServer, uri: str) -> bool {
         return await asyncio.get_event_loop().run_in_executor(
@@ -194,6 +200,14 @@ class JacLangServer(JacProgram , LanguageServer) {
         task = asyncio.create_task(run_in_executor(self.deep_check, uri));
         self.tasks[uri] = task;
         await task;
+    }
+
+
+    """Debounced deep check to prevent excessive analysis during rapid typing."""
+    @debounce(settings.lsp_deep_check_debounce_ms / 1000.0)  # Convert ms to seconds
+    async def launch_deep_check_debounced(self: JacLangServer, uri: str) -> None {
+        self.log_py(f"'Debounced deep check triggered for '{uri}' (delay: {settings.lsp_deep_check_debounce_ms}ms)");
+        await self.launch_deep_check(uri);
     }
 
     """Return completion for a file."""

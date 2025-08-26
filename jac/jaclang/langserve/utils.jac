@@ -46,6 +46,7 @@ def gen_diagnostics(
 }
 
 
+
 """Debounce decorator for async functions."""
 def debounce(<>wait: float) -> Callable[[T], Callable[(..., Awaitable[None])]] {
     def decorator(fn: T) -> Callable[P, Awaitable[None]] {

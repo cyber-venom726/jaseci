@@ -26,6 +26,7 @@ class Settings:
 
     # LSP configuration
     lsp_debug: bool = False
+    lsp_deep_check_debounce_ms: int = 300
 
     def __post_init__(self) -> None:
         """Initialize settings."""

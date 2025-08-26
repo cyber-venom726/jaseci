@@ -26,6 +26,10 @@ async def did_open(ls: JacLangServer, params: lspt.DidOpenTextDocumentParams) ->
 }
 
 
+
+
+
+
 """Check syntax on change."""
 @server.feature(lspt.TEXT_DOCUMENT_DID_SAVE)
 async def did_save(ls: JacLangServer, params: lspt.DidOpenTextDocumentParams) -> None {
@@ -39,26 +43,30 @@ async def did_save(ls: JacLangServer, params: lspt.DidOpenTextDocumentParams) ->
 }
 
 
+
 """Check syntax on change."""
 @server.feature(lspt.TEXT_DOCUMENT_DID_CHANGE)
 async def did_change(
-    ls: JacLangServer,
+    ls: JacLangServer,         
     params: lspt.DidChangeTextDocumentParams
 ) -> None {
     file_path = params.text_document.uri;
     quick_check_passed = await ls.launch_quick_check(file_path);
 
-    if quick_check_passed {
-        document = ls.workspace.get_text_document(file_path);
-        lines = document.source.splitlines();
-        sem_manager = ls.sem_managers[file_path.removeprefix('file://')];
-        sem_manager.update_sem_tokens(
-            params,sem_manager.sem_tokens,lines
-        );
+    document = ls.workspace.get_text_document(file_path);
+    lines = document.source.splitlines();
+    sem_manager = ls.sem_managers[file_path.removeprefix('file://')];
+    sem_manager.update_sem_tokens(
+        params,sem_manager.sem_tokens,lines
+    );
+
+
         ls.lsp.send_request(lspt.WORKSPACE_SEMANTIC_TOKENS_REFRESH);
-        await ls.launch_deep_check(file_path);
-        ls.lsp.send_request(lspt.WORKSPACE_SEMANTIC_TOKENS_REFRESH);
-    }
+    # if quick_check_passed {
+    #     # Use debounced deep check for better performance during rapid typing
+    #     await ls.launch_deep_check_debounced(file_path);
+    #     ls.lsp.send_request(lspt.WORKSPACE_SEMANTIC_TOKENS_REFRESH);
+    # }
 }
 
 
