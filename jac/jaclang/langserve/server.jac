@@ -56,6 +56,12 @@ async def did_change(
     # logging.info(f"2 >> Quick check passed: {quick_check_passed} with duration: {one - zero}");
 
     if quick_check_passed {
+        # Check if deep analysis is already running for this file
+        if file_path in ls.tasks and not ls.tasks[file_path].done() {
+            # Skip deep analysis if already in progress to prevent overlap
+            return;
+        }
+        
         # Background deep analysis with debouncing
         # logging.info(f"3 >> Starting background deep analysis: {file_path}");
         await ls.debounced_deep_analysis(file_path);
