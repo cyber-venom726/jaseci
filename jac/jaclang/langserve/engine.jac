@@ -196,6 +196,24 @@ class JacLangServer(JacProgram , LanguageServer) {
         await task;
     }
 
+   """Semantic token refresh with 5ms debounce for responsiveness."""
+    @utils.debounce(0.005)
+    async def debounced_semantic_refresh(self: JacLangServer, uri: str) -> None {
+        self.lsp.send_request(lspt.WORKSPACE_SEMANTIC_TOKENS_REFRESH);
+    }
+
+    """Deep analysis with 50ms debounce for background processing."""
+    @utils.debounce(0.050)
+    async def debounced_deep_analysis(self: JacLangServer, uri: str) -> None {
+        # import logging;
+        # import from time { time }
+        # start = time();
+        await self.launch_deep_check(uri);
+        await self.debounced_semantic_refresh(uri);
+        # end = time();
+        # logging.info(f"DEEP >> Actual deep analysis for {uri} took {end - start} seconds");
+    }
+
     """Return completion for a file."""
     def get_completion(
         self: JacLangServer,

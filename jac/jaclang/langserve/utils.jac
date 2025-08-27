@@ -47,18 +47,22 @@ def gen_diagnostics(
 
 
 """Debounce decorator for async functions."""
-def debounce(<>wait: float) -> Callable[[T], Callable[(..., Awaitable[None])]] {
-    def decorator(fn: T) -> Callable[P, Awaitable[None]] {
+def debounce(<>wait: float) -> Callable[[T], Callable[P, Coroutine[Any, Any, Any]]] {
+    def decorator(fn: T) -> Callable[P, Coroutine[Any, Any, Any]] {
+        task: asyncio.Task | None = None;
+
         @wraps(fn)
         async def debounced(*args: P.args, **kwargs: P.kwargs) -> None {
+            nonlocal task;
+
             async def call_it() -> None {
-                await fn(*args, _=kwargs);
+                await fn(*args, **kwargs);
             }
-            if hasattr(debounced, '_task') {
-                debounced._task.cancel();
+            if task and not task.done(){
+                task.cancel();
             }
             async def debounced_coro() -> None {
-                try {
+                try{
                     await asyncio.sleep(<>wait);
                     await call_it();
                 } except asyncio.CancelledError {
@@ -66,7 +70,7 @@ def debounce(<>wait: float) -> Callable[[T], Callable[(..., Awaitable[None])]] {
                 }
 
             }
-            setattr(debounced, '_task', asyncio.create_task(debounced_coro()));
+            task = asyncio.create_task(debounced_coro());
         }
         return debounced;
     }

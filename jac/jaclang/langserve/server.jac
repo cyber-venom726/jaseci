@@ -22,7 +22,7 @@ with entry {
 @server.feature(lspt.TEXT_DOCUMENT_DID_OPEN)
 async def did_open(ls: JacLangServer, params: lspt.DidOpenTextDocumentParams) -> None {
     await ls.launch_deep_check(params.text_document.uri);
-    ls.lsp.send_request(lspt.WORKSPACE_SEMANTIC_TOKENS_REFRESH);
+    await ls.debounced_semantic_refresh(params.text_document.uri);
 }
 
 
@@ -34,8 +34,7 @@ async def did_save(ls: JacLangServer, params: lspt.DidOpenTextDocumentParams) ->
     if not quick_check_passed {
         return;
     }
-    await ls.launch_deep_check(file_path);
-    ls.lsp.send_request(lspt.WORKSPACE_SEMANTIC_TOKENS_REFRESH);
+    await ls.debounced_deep_analysis(file_path);
 }
 
 
@@ -45,19 +44,23 @@ async def did_change(
     ls: JacLangServer,
     params: lspt.DidChangeTextDocumentParams
 ) -> None {
+    # import logging;
+    # import from time { time }
+    # zero = time();
+    # logging.info(f"1 >> Document changed: {params.text_document.uri}");
     file_path = params.text_document.uri;
+
+    # Quick syntax check without blocking
     quick_check_passed = await ls.launch_quick_check(file_path);
+    # one = time();
+    # logging.info(f"2 >> Quick check passed: {quick_check_passed} with duration: {one - zero}");
 
     if quick_check_passed {
-        document = ls.workspace.get_text_document(file_path);
-        lines = document.source.splitlines();
-        sem_manager = ls.sem_managers[file_path.removeprefix('file://')];
-        sem_manager.update_sem_tokens(
-            params,sem_manager.sem_tokens,lines
-        );
-        ls.lsp.send_request(lspt.WORKSPACE_SEMANTIC_TOKENS_REFRESH);
-        await ls.launch_deep_check(file_path);
-        ls.lsp.send_request(lspt.WORKSPACE_SEMANTIC_TOKENS_REFRESH);
+        # Background deep analysis with debouncing
+        # logging.info(f"3 >> Starting background deep analysis: {file_path}");
+        await ls.debounced_deep_analysis(file_path);
+        # two = time();
+        # logging.info(f"4 >> Background deep analysis completed: {file_path} with duration: {two - one}");
     }
 }
 
