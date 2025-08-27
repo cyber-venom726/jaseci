@@ -78,6 +78,39 @@ def debounce(<>wait: float) -> Callable[[T], Callable[P, Coroutine[Any, Any, Any
 }
 
 
+"""Smart semantic recovery fallback mechanism."""
+async def smart_semantic_recovery(ls: Any, file_path: str) -> None {
+    try {
+        # First attempt after 300ms - just semantic refresh
+        await asyncio.sleep(0.3);
+        ls.lsp.send_request(lspt.WORKSPACE_SEMANTIC_TOKENS_REFRESH);
+        
+        # Only do deep check if colors are still missing after 1 second
+        # This prevents unnecessary deep checks for normal typing
+        await asyncio.sleep(0.7);  # Total 1 second wait
+        
+        # Only one deep check as final fallback if really needed
+        await ls.launch_deep_check(file_path);
+        ls.lsp.send_request(lspt.WORKSPACE_SEMANTIC_TOKENS_REFRESH);
+        
+    } except asyncio.CancelledError {
+        # If cancelled, user is still typing - no need for deep check
+        ;
+    }
+}
+
+
+
+"""Cancel and replace async task if running."""
+def cancel_and_replace_task(obj: Any, task_attr: str, new_task: Any) -> None {
+    current_task = getattr(obj, task_attr, None);
+    if current_task and not current_task.done() {
+        current_task.cancel();
+    }
+    setattr(obj, task_attr, new_task);
+}
+
+
 """Iterate through symbol table."""
 def sym_tab_list(sym_tab: UniScopeNode, file_path: str) -> <>list[UniScopeNode] {
     sym_tabs = [sym_tab]

@@ -1,5 +1,6 @@
 """Jaclang Language Server."""
 
+import asyncio;
 import from typing { Optional }
 
 import from jaclang.compiler.constant {
@@ -44,31 +45,32 @@ async def did_change(
     ls: JacLangServer,
     params: lspt.DidChangeTextDocumentParams
 ) -> None {
-    # import logging;
-    # import from time { time }
-    # zero = time();
-    # logging.info(f"1 >> Document changed: {params.text_document.uri}");
+    import asyncio;
+    import utils;
     file_path = params.text_document.uri;
 
-    # Quick syntax check without blocking
     quick_check_passed = await ls.launch_quick_check(file_path);
-    # one = time();
-    # logging.info(f"2 >> Quick check passed: {quick_check_passed} with duration: {one - zero}");
+
+    utils.cancel_and_replace_task(
+        ls, 
+        '_smart_recovery_task', 
+        asyncio.create_task(utils.smart_semantic_recovery(ls, file_path))
+    );
 
     if quick_check_passed {
-        # Check if deep analysis is already running for this file
         if file_path in ls.tasks and not ls.tasks[file_path].done() {
-            # Skip deep analysis if already in progress to prevent overlap
             return;
         }
-        
-        # Background deep analysis with debouncing
-        # logging.info(f"3 >> Starting background deep analysis: {file_path}");
         await ls.debounced_deep_analysis(file_path);
-        # two = time();
-        # logging.info(f"4 >> Background deep analysis completed: {file_path} with duration: {two - one}");
     }
 }
+
+
+
+
+
+
+
 
 
 """Format the given document."""
