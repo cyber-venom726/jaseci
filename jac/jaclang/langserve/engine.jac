@@ -8,7 +8,7 @@ import from typing { Callable, Optional }
 
 import jaclang.compiler.unitree as uni;
 import from jaclang { JacMachineInterface as Jac }
-import from jaclang.compiler.constant {SymbolType}
+import from jaclang.compiler.constant { SymbolType }
 import from jaclang.compiler.program { JacProgram }
 import from jaclang.compiler.unitree { UniScopeNode }
 import from sem_manager { SemTokManager }
@@ -56,9 +56,12 @@ class ModuleManager {
 }
 
 
+
+
+
 """Jac Language Server, manages JacProgram and LSP."""
 class JacLangServer(JacProgram , LanguageServer) {
-    """Initialize JacLangServer."""
+    """Initialize JacLangServer with optimized debounce timing."""
     def init(self: JacLangServer) -> None {
         LanguageServer.init(self, 'jac-lsp', 'v0.1');
         JacProgram.init(self);
@@ -66,63 +69,181 @@ class JacLangServer(JacProgram , LanguageServer) {
         self.tasks: <>dict[(str, asyncio.Task)] = {};
         self.sem_managers: <>dict[(str, SemTokManager)] = {};
         self.module_manager = ModuleManager(self, self.sem_managers);
-        # Debounce state (inspired by Pyright's recordUserInteractionTime/service.scheduleReanalysis in service.ts)
+        
+        # === PERFORMANCE OPTIMIZATION CONFIGURATION ===
+        # These timing parameters are carefully tuned for optimal responsiveness
+        # while preventing excessive CPU usage during rapid typing
+        
+        # Optimized debounce timing for better responsiveness
         self._last_user_interaction_time: float = 0.0;
-        self._debounce_delay_sec: float = 0.30;  # Similar to _userActivityBackoffTimeInMs (=250ms) in Pyright/service.ts
+        self._debounce_delay_sec: float = 0.15;  # Reduced from 0.30 for faster response
         self._pending_deep_checks: <>dict[(str, asyncio.Task)] = {};
-    # Deep check timing control
-    self._last_deep_check_time: <>dict[(str, float)] = {};
-    self._min_interval_for_trivial_sec: float = 1.2;  # Skip repeated deep checks for trivial edits within this window
+        
+        # Performance tracking
+        self._last_deep_check_time: <>dict[(str, float)] = {};
+        
+        # Version tracking for invalidating stale analysis (prevents resource waste)
+        self._analysis_version: <>dict[(str, int)] = {};
+        self._active_version: <>dict[(str, int)] = {};
     }
 
-    """Record time of last user interaction (Pyright: AnalyzerService.recordUserInteractionTime in service.ts)."""
+    """Record timestamp of user interaction for debounce scheduling."""
     def record_user_interaction_time(self: JacLangServer) -> None {
-        self._last_user_interaction_time = time.time();
+        current_time = time.time();
+        self._last_user_interaction_time = current_time;
+        # Log interaction timing for performance analysis
+        self.log_py(f"'[PERF] User interaction recorded at '{current_time}");
     }
 
-    """Schedule a debounced deep check (Pyright analogue: scheduleReanalysis in service.ts)."""
+    """
+    Optimized debounced deep check scheduler with improved cancellation logic.
+    
+    Key improvements:
+    - Faster initial debounce (150ms vs 300ms) for better responsiveness
+    - Single-shot scheduling (no recursive rescheduling loops)
+    - Better stale task detection to prevent resource waste
+    - Guarantees final typecheck after user stops typing
+    
+    This addresses the newline performance issue where users experienced
+    2+ second delays for syntax highlighting after pressing Enter.
+    """
     def schedule_deep_check(self: JacLangServer, file_path: str) -> None {
-        # Cancel existing scheduled deep check for this file
-        if file_path in self._pending_deep_checks
-        and not self._pending_deep_checks[file_path].done() {
-            self._pending_deep_checks[file_path].cancel();
-        }
-
-        async def _debounced_run() -> None {
-                try {
-                    # Sleep for the debounce window
-                    await asyncio.sleep(self._debounce_delay_sec);
-                    # If user typed again recently, reschedule (mirrors Pyright's dynamic delay recomputation)
-                    if (time.time() - self._last_user_interaction_time) < self._debounce_delay_sec {
-                        # Reschedule with fresh timer
-                        self.schedule_deep_check(file_path);
-                        return;
-                    }
-                    # Perform deep check (similar to BackgroundAnalysisProgram.startAnalysis path in Pyright)
-                    await self.launch_deep_check(file_path);
-                    self._last_deep_check_time[file_path] = time.time();
-                    self.lsp.send_request(lspt.WORKSPACE_SEMANTIC_TOKENS_REFRESH);
-                } except asyncio.CancelledError {
-                    ;  # Silently swallow cancellation
+        schedule_start_time = time.time();
+        self.log_py(f"'[PERF] Starting schedule_deep_check for '{file_path}' at '{schedule_start_time}");
+        
+        # Cancel any existing deep check task for this file
+        if file_path in self._pending_deep_checks {
+            self.log_py(f"'[PERF] Cancelling existing deep check task for '{file_path}");
+            try {
+                if not self._pending_deep_checks[file_path].done() {
+                    self._pending_deep_checks[file_path].cancel();
+                    self.log_py(f"'[PERF] Successfully cancelled pending task for '{file_path}");
+                } else {
+                    self.log_py(f"'[PERF] Task for '{file_path}' was already done");
                 }
+            } except Exception as e {
+                self.log_warning(f"'Error cancelling pending deep check: '{e}");
+            }
+            del (self._pending_deep_checks[file_path], ) ;
+        } else {
+            self.log_py(f"'[PERF] No existing task to cancel for '{file_path}");
         }
-
-        task = asyncio.create_task(_debounced_run());
-        self._pending_deep_checks[file_path] = task;
-    }
-
-    """Conditionally schedule deep check; skip trivial rapid edits (newline/whitespace) (Pyright analogy: early return in onDidChangeTextDocument when only whitespace)."""
-    def conditional_schedule_deep_check(
-        self: JacLangServer,
-        file_path: str,
-        is_trivial: bool
-    ) -> None {
-        if is_trivial {
-            last = self._last_deep_check_time.get(file_path, 0.0);
-            if (time.time() - last) < self._min_interval_for_trivial_sec {
-                return;  # Defer heavy work; quick check already updated diagnostics
+        
+        
+        fs_path = file_path.removeprefix('file://');
+        
+        async def _guaranteed_final_analysis() -> None {
+            task_start_time = time.time();
+            self.log_py(f"'[PERF] Deep check task started for '{file_path}' at '{task_start_time}");
+            
+            try {
+                # Initial debounce period
+                debounce_start = time.time();
+                self.log_py(f"'[PERF] Starting debounce sleep ({self._debounce_delay_sec}s) for '{file_path}");
+                await asyncio.sleep(self._debounce_delay_sec);
+                debounce_end = time.time();
+                self.log_py(f"'[PERF] Debounce sleep completed for '{file_path}' after '{debounce_end - debounce_start}' seconds");
+                
+                # Check if user is still actively typing
+                time_since_interaction = time.time() - self._last_user_interaction_time;
+                self.log_py(f"'[PERF] Time since last interaction: '{time_since_interaction}' seconds for '{file_path}");
+                
+                # Only skip if a newer task for this specific file was created
+                current_task = self._pending_deep_checks.get(file_path);
+                if current_task != asyncio.current_task() {
+                    self.log_py(f"'[PERF] Skipping analysis - newer task exists for '{file_path}");
+                    return;  # A newer task was scheduled, let it handle the analysis
+                }
+                
+                # Execute the deep check - this is the final analysis
+                deep_check_start = time.time();
+                self.log_py(f"'[PERF] Starting launch_deep_check for '{file_path}' at '{deep_check_start}");
+                await self.launch_deep_check(file_path);
+                deep_check_end = time.time();
+                self.log_py(f"'[PERF] launch_deep_check completed for '{file_path}' in '{deep_check_end - deep_check_start}' seconds");
+                
+                # Update timing tracking
+                self._last_deep_check_time[file_path] = time.time();
+                
+                # Refresh semantic tokens
+                token_refresh_start = time.time();
+                self.log_py(f"'[PERF] Starting semantic token refresh for '{file_path}");
+                self.lsp.send_request(lspt.WORKSPACE_SEMANTIC_TOKENS_REFRESH);
+                token_refresh_end = time.time();
+                self.log_py(f"'[PERF] Semantic token refresh sent for '{file_path}' in '{token_refresh_end - token_refresh_start}' seconds");
+                
+                total_time = time.time() - task_start_time;
+                self.log_py(f"'[PERF] TOTAL deep check task completed for '{file_path}' in '{total_time}' seconds");
+                
+            } except asyncio.CancelledError {
+                cancel_time = time.time();
+                self.log_py(f"'[PERF] Deep check task CANCELLED for '{file_path}' at '{cancel_time}' (ran for '{cancel_time - task_start_time}' seconds)");
+                # If cancelled, it means a newer analysis was scheduled
+                # This is expected behavior during rapid typing
+                ;
+            } except Exception as e {
+                error_time = time.time();
+                self.log_warning(f"'[PERF] ERROR in debounced deep check for '{file_path}' at '{error_time}': '{e}");
             }
         }
+        
+        # Create and track the task
+        task = asyncio.create_task(_guaranteed_final_analysis());
+        self._pending_deep_checks[file_path] = task;
+        
+        schedule_end_time = time.time();
+        self.log_py(f"'[PERF] schedule_deep_check completed for '{file_path}' in '{schedule_end_time - schedule_start_time}' seconds");
+    }
+    
+
+    """
+    Cancel any active or pending deep analysis for a file.
+    
+    This method cancels pending debounced analysis and in-progress deep checks
+    to make way for newer analysis. The new scheduling system ensures that
+    the final analysis will still run when the user stops typing.
+    """
+    def cancel_analysis_for(self: JacLangServer, file_path: str) -> None {
+        # Cancel scheduled debounced deep check
+        if file_path in self._pending_deep_checks {
+            try {
+                if not self._pending_deep_checks[file_path].done() {
+                    self._pending_deep_checks[file_path].cancel();
+                }
+            } except Exception as e {
+                self.log_warning(f"'Error cancelling scheduled analysis: '{e}");
+            }
+            del (self._pending_deep_checks[file_path], ) ;
+        }
+        
+        # Cancel in-progress deep check asyncio wrapper
+        if file_path in self.tasks {
+            try {
+                if not self.tasks[file_path].done() {
+                    self.tasks[file_path].cancel();
+                }
+            } except Exception as e {
+                self.log_warning(f"'Error cancelling active deep check: '{e}");
+            }
+            del (self.tasks[file_path], ) ;
+        }
+        
+        # Note: We don't increment analysis version here anymore
+        # The new task comparison system handles stale task detection
+    }
+
+
+    """
+    Schedule deep check for any file change.
+    
+    Simplified approach: Cancel running analysis and re-analyze for all changes.
+    This ensures consistent behavior without ad-hoc trivial edit handling.
+    """
+    def conditional_schedule_deep_check(
+        self: JacLangServer,
+        file_path: str
+    ) -> None {
+        # Always schedule deep check - no special trivial edit handling
         self.schedule_deep_check(file_path);
     }
 
@@ -160,46 +281,128 @@ class JacLangServer(JacProgram , LanguageServer) {
         self.module_manager.update(file_path, build, update_annexed=need);
     }
 
-    """Rebuild a file (syntax only)."""
+    """Rebuild a file (syntax only) with detailed performance logging."""
     def quick_check(self: JacLangServer, file_path: str) -> bool {
+        import time;
+        method_start_time = time.time();
+        file_path_fs = None;
+        
+        self.log_py(f"'[PERF] quick_check STARTED for '{file_path}' at '{method_start_time}");
+        
         try {
+            # File path processing
+            path_start = time.time();
             file_path_fs = file_path.removeprefix('file://');
+            path_end = time.time();
+            self.log_py(f"'[PERF] File path processing took '{path_end - path_start}' seconds");
+            
+            # Document retrieval
+            doc_start = time.time();
             document = self.workspace.get_text_document(file_path);
+            doc_end = time.time();
+            self.log_py(f"'[PERF] Document retrieval took '{doc_end - doc_start}' seconds (source length: '{len(document.source)}')");
+            
+            # Clear alerts
+            clear_start = time.time();
             self._clear_alerts_for_file(file_path_fs);
+            clear_end = time.time();
+            self.log_py(f"'[PERF] Alert clearing took '{clear_end - clear_start}' seconds");
+            
+            # Compilation (likely bottleneck)
+            compile_start = time.time();
+            self.log_py(f"'[PERF] Starting compilation for quick_check");
             build = self.compile(use_str=document.source, file_path=document.path);
+            compile_end = time.time();
+            compile_time = compile_end - compile_start;
+            self.log_py(f"'[PERF] Compilation took '{compile_time}' seconds - [POTENTIAL BOTTLENECK]");
+            
+            # Module updates
+            update_start = time.time();
             self.update_modules(file_path_fs, build, need=False);
+            update_end = time.time();
+            self.log_py(f"'[PERF] Module updates took '{update_end - update_start}' seconds");
+            
+            # Diagnostics publishing
+            diag_start = time.time();
             self.publish_diagnostics(
                 file_path,
                 utils.gen_diagnostics(file_path, self.errors_had, self.warnings_had)
             );
+            diag_end = time.time();
+            self.log_py(f"'[PERF] Diagnostics publishing took '{diag_end - diag_start}' seconds");
+            
+            # Build error analysis
+            error_start = time.time();
             build_errors =
                 [ e for e in self.errors_had if e.loc.mod_path == file_path_fs ];
-            return len(build_errors) == 0;
+            error_end = time.time();
+            self.log_py(f"'[PERF] Error analysis took '{error_end - error_start}' seconds (found '{len(build_errors)}' errors)");
+            
+            total_time = time.time() - method_start_time;
+            result = len(build_errors) == 0;
+            self.log_py(f"'[PERF] quick_check TOTAL TIME for '{file_path}': '{total_time}' seconds (success: '{result}')");
+            
+            return result;
         } except Exception as e {
+            error_time = time.time() - method_start_time;
             self.log_error(f"'Error during syntax check: '{e}");
+            self.log_py(f"'[PERF] quick_check FAILED for '{file_path}' after '{error_time}' seconds");
             return False;
         }
     }
 
-    """Rebuild a file and its dependencies (typecheck)."""
+    """Rebuild a file and its dependencies (typecheck) with detailed performance logging."""
     def deep_check(
         self: JacLangServer,
         file_path: str,
         annex_view: Optional[str] = None
     ) -> bool {
+        overall_start_time = time.time();
+        self.log_py(f"'[PERF] deep_check STARTED for '{file_path}' at '{overall_start_time}");
+        
         try {
-            start_time = time.time();
+            # Step 1: Preparation
+            prep_start = time.time();
             file_path_fs = file_path.removeprefix('file://');
             document = self.workspace.get_text_document(file_path);
+            prep_end = time.time();
+            self.log_py(f"'[PERF] Preparation completed for '{file_path}' in '{prep_end - prep_start}' seconds");
+            
+            # Step 2: Clear alerts
+            clear_start = time.time();
             self._clear_alerts_for_file(file_path_fs);
+            clear_end = time.time();
+            self.log_py(f"'[PERF] Alert clearing completed for '{file_path}' in '{clear_end - clear_start}' seconds");
+            
+            # Step 3: Build/compilation (this is likely the bottleneck)
+            build_start = time.time();
+            self.log_py(f"'[PERF] Starting BUILD for '{file_path}' - THIS IS LIKELY THE BOTTLENECK");
             build = self.build(use_str=document.source, file_path=document.path);
+            build_end = time.time();
+            build_time = build_end - build_start;
+            self.log_py(f"'[PERF] BUILD COMPLETED for '{file_path}' in '{build_time}' seconds *** CRITICAL TIMING ***");
+            
+            # Step 4: Update modules
+            update_start = time.time();
             self.update_modules(file_path_fs, build);
+            update_end = time.time();
+            self.log_py(f"'[PERF] Module update completed for '{file_path}' in '{update_end - update_start}' seconds");
+            
+            # Step 5: Handle annexation
             if build.annexable_by {
-                return self.deep_check(
+                annex_start = time.time();
+                self.log_py(f"'[PERF] Starting annexation check for '{file_path}' (annexable_by: '{build.annexable_by}')");
+                result = self.deep_check(
                     uris.from_fs_path(build.annexable_by),
                     annex_view=file_path
                 );
+                annex_end = time.time();
+                self.log_py(f"'[PERF] Annexation completed for '{file_path}' in '{annex_end - annex_start}' seconds");
+                return result;
             }
+            
+            # Step 6: Publish diagnostics
+            diag_start = time.time();
             self.publish_diagnostics(
                 annex_view if annex_view else file_path,
                 utils.gen_diagnostics(
@@ -214,12 +417,22 @@ class JacLangServer(JacProgram , LanguageServer) {
                     utils.gen_diagnostics(file_path, self.errors_had, self.warnings_had)
                 );
             }
-            self.log_py(
-                f"'PROFILE: Deep check took '{(time.time() - start_time)}' seconds.'"
-            );
-            return len(self.errors_had) == 0;
+            diag_end = time.time();
+            self.log_py(f"'[PERF] Diagnostics publishing completed for '{file_path}' in '{diag_end - diag_start}' seconds");
+            
+            # Final timing
+            total_time = time.time() - overall_start_time;
+            error_count = len(self.errors_had);
+            self.log_py(f"'[PERF] *** DEEP CHECK SUMMARY for '{file_path}' ***");
+            self.log_py(f"'[PERF] - Build time: '{build_time}' seconds (likely bottleneck)");
+            self.log_py(f"'[PERF] - Total time: '{total_time}' seconds");
+            self.log_py(f"'[PERF] - Error count: '{error_count}");
+            self.log_py(f"'[PERF] *** END SUMMARY ***");
+            
+            return error_count == 0;
         } except Exception as e {
-            self.log_py(f"'Error during deep check: '{e}");
+            error_time = time.time() - overall_start_time;
+            self.log_py(f"'[PERF] ERROR in deep_check for '{file_path}' after '{error_time}' seconds: '{e}");
             return False;
         }
     }
@@ -233,25 +446,47 @@ class JacLangServer(JacProgram , LanguageServer) {
         );
     }
 
-    """Analyze and publish diagnostics."""
+    """Analyze and publish diagnostics with detailed performance logging."""
     async def launch_deep_check(self: JacLangServer, uri: str) -> None {
+        launch_start_time = time.time();
+        self.log_py(f"'[PERF] launch_deep_check STARTED for '{uri}' at '{launch_start_time}");
+        
         async def run_in_executor(
             func: Callable[([str, Optional[str]], bool)],
             file_path: str,
             annex_view: Optional[str] = None
         ) -> None {
+            executor_start = time.time();
+            self.log_py(f"'[PERF] run_in_executor STARTED for '{file_path}' at '{executor_start}");
             loop = asyncio.get_event_loop();
             await loop.run_in_executor(self.executor, func, file_path, annex_view);
+            executor_end = time.time();
+            self.log_py(f"'[PERF] run_in_executor COMPLETED for '{file_path}' in '{executor_end - executor_start}' seconds");
         }
+        
         if uri in self.tasks and not self.tasks[uri].done()  {
-            self.log_py(f"'Canceling '{uri}' deep check...'");
+            self.log_py(f"'[PERF] Canceling existing deep check task for '{uri}'");
             self.tasks[uri].cancel();
             del (self.tasks[uri], ) ;
+        } else {
+            self.log_py(f"'[PERF] No existing task to cancel for '{uri}'");
         }
-        self.log_py(f"'Analyzing '{uri}'...'");
+        
+        self.log_py(f"'[PERF] Creating new analysis task for '{uri}'");
+        task_create_start = time.time();
         task = asyncio.create_task(run_in_executor(self.deep_check, uri));
         self.tasks[uri] = task;
+        task_create_end = time.time();
+        self.log_py(f"'[PERF] Task created for '{uri}' in '{task_create_end - task_create_start}' seconds");
+        
+        await_start = time.time();
+        self.log_py(f"'[PERF] Starting await for task '{uri}'");
         await task;
+        await_end = time.time();
+        self.log_py(f"'[PERF] Task await completed for '{uri}' in '{await_end - await_start}' seconds");
+        
+        total_launch_time = time.time() - launch_start_time;
+        self.log_py(f"'[PERF] launch_deep_check TOTAL TIME for '{uri}': '{total_launch_time}' seconds");
     }
 
     """Return completion for a file."""
@@ -522,8 +757,7 @@ class JacLangServer(JacProgram , LanguageServer) {
             }
             if isinstance(node_selected.sym, uni.NameAtom) {
                 node_selected = node_selected.name_of;
-            }
-            elif isinstance(node_selected, uni.Name)
+            } elif isinstance(node_selected, uni.Name)
             and node_selected.parent
             and isinstance(node_selected.parent, uni.ModulePath)
              {

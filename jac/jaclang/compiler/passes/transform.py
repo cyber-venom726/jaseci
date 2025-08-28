@@ -88,9 +88,10 @@ class Transform(ABC, Generic[T, R]):
         ir_out = self.transform(ir_in=ir_in)
         self.time_taken = time.time() - start_time
         if settings.pass_timer:
-            self.log_info(
-                f"Time taken in {self.__class__.__name__}: {self.time_taken:.4f} seconds"
-            )
+            pass
+            # self.log_info(
+            #     f"Time taken in {self.__class__.__name__}: {self.time_taken:.4f} seconds"
+            # )
         return ir_out
 
     def pre_transform(self) -> None:

@@ -38,54 +38,61 @@ async def did_save(ls: JacLangServer, params: lspt.DidOpenTextDocumentParams) ->
     ls.lsp.send_request(lspt.WORKSPACE_SEMANTIC_TOKENS_REFRESH);
 }
 
+"""
+Enhanced document change handler with detailed performance logging.
 
-"""Check syntax on change."""
+This handler implements a simplified approach:
+1. Fast quick checks for immediate syntax error feedback
+2. Cancel any running analysis and re-analyze for all changes
+3. Consistent behavior without ad-hoc trivial edit handling
+"""
 @server.feature(lspt.TEXT_DOCUMENT_DID_CHANGE)
 async def did_change(
     ls: JacLangServer,
     params: lspt.DidChangeTextDocumentParams
 ) -> None {
-    # Inspired by Pyright's onDidChangeTextDocument (languageServerBase.ts) and scheduleReanalysis (service.ts)
+    import time;
+    handler_start_time = time.time();
     file_path = params.text_document.uri;
-    # Record interaction for debouncing (Pyright: recordUserInteractionTime)
+    
+    ls.log_py(f"'[PERF] did_change STARTED for '{file_path}' at '{handler_start_time}");
+    
+    # Record interaction for optimized debouncing
+    interaction_start = time.time();
     ls.record_user_interaction_time();
+    interaction_end = time.time();
+    ls.log_py(f"'[PERF] User interaction recording took '{interaction_end - interaction_start}' seconds");
+    
+    # Cancel any previous analysis work for this file (superseded by this change)
+    cancel_start = time.time();
+    ls.cancel_analysis_for(file_path);
+    cancel_end = time.time();
+    ls.log_py(f"'[PERF] Analysis cancellation took '{cancel_end - cancel_start}' seconds");
 
-    # Fast syntax check (quick) to surface parse errors rapidly
+    # Fast syntax check to surface parse errors immediately
+    quick_check_start = time.time();
+    ls.log_py(f"'[PERF] Starting quick check for '{file_path}'");
     quick_check_passed = await ls.launch_quick_check(file_path);
+    quick_check_end = time.time();
+    quick_check_time = quick_check_end - quick_check_start;
+    ls.log_py(f"'[PERF] Quick check for '{file_path}' took '{quick_check_time}' seconds (passed: '{quick_check_passed}')");
 
-    # # Lightweight semantic token refresh using existing IR (avoid heavy typecheck churn)
-    # try {
-    #     document = ls.workspace.get_text_document(file_path);
-    #     lines = document.source.splitlines();
-    #     file_key = file_path.removeprefix('file://');
-    #     if file_key in ls.sem_managers  {
-    #         sem_manager = ls.sem_managers[file_key];
-    #         sem_manager.update_sem_tokens(params, sem_manager.sem_tokens, lines);
-    #         ls.lsp.send_request(lspt.WORKSPACE_SEMANTIC_TOKENS_REFRESH);
-    #     }
-    # } except Exception as e {
-    #     ls.log_warning(f"'Semantic token quick update failed: '{e}");
-    # }
-
-    # Schedule (debounced) deep check & final semantic token refresh only if quick check passed
+    # Schedule debounced deep check for all changes if quick check passed
     if quick_check_passed {
-        # Heuristic trivial edit detection (Pyright style: skip expensive work on purely whitespace changes)
-        is_trivial = False;
-        try {
-            if params.content_changes and len(params.content_changes) == 1 {
-                change = params.content_changes[0];
-                text = change.text;
-                # Treat as trivial if only newline(s) or whitespace
-                if text.strip() == '' and ('\n' in text or '\r' in text or text.isspace()) {
-                    is_trivial = True;
-                }
-            }
-        } except Exception as e {
-            ls.log_warning(f"'Trivial edit detection failed: '{e}");
-        }
-        ls.conditional_schedule_deep_check(file_path, is_trivial);
+        schedule_start = time.time();
+        ls.log_py(f"'[PERF] Starting conditional_schedule_deep_check for '{file_path}'");
+        ls.conditional_schedule_deep_check(file_path);
+        schedule_end = time.time();
+        ls.log_py(f"'[PERF] conditional_schedule_deep_check took '{schedule_end - schedule_start}' seconds");
+    } else {
+        ls.log_py(f"'[PERF] Skipping deep check for '{file_path}' - quick check failed");
     }
+    
+    total_handler_time = time.time() - handler_start_time;
+    ls.log_py(f"'[PERF] did_change TOTAL TIME for '{file_path}': '{total_handler_time}' seconds");
 }
+
+
 
 
 """Format the given document."""
