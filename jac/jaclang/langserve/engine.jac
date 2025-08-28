@@ -66,6 +66,64 @@ class JacLangServer(JacProgram , LanguageServer) {
         self.tasks: <>dict[(str, asyncio.Task)] = {};
         self.sem_managers: <>dict[(str, SemTokManager)] = {};
         self.module_manager = ModuleManager(self, self.sem_managers);
+        # Debounce state (inspired by Pyright's recordUserInteractionTime/service.scheduleReanalysis in service.ts)
+        self._last_user_interaction_time: float = 0.0;
+        self._debounce_delay_sec: float = 0.30;  # Similar to _userActivityBackoffTimeInMs (=250ms) in Pyright/service.ts
+        self._pending_deep_checks: <>dict[(str, asyncio.Task)] = {};
+    # Deep check timing control
+    self._last_deep_check_time: <>dict[(str, float)] = {};
+    self._min_interval_for_trivial_sec: float = 1.2;  # Skip repeated deep checks for trivial edits within this window
+    }
+
+    """Record time of last user interaction (Pyright: AnalyzerService.recordUserInteractionTime in service.ts)."""
+    def record_user_interaction_time(self: JacLangServer) -> None {
+        self._last_user_interaction_time = time.time();
+    }
+
+    """Schedule a debounced deep check (Pyright analogue: scheduleReanalysis in service.ts)."""
+    def schedule_deep_check(self: JacLangServer, file_path: str) -> None {
+        # Cancel existing scheduled deep check for this file
+        if file_path in self._pending_deep_checks
+        and not self._pending_deep_checks[file_path].done() {
+            self._pending_deep_checks[file_path].cancel();
+        }
+
+        async def _debounced_run() -> None {
+                try {
+                    # Sleep for the debounce window
+                    await asyncio.sleep(self._debounce_delay_sec);
+                    # If user typed again recently, reschedule (mirrors Pyright's dynamic delay recomputation)
+                    if (time.time() - self._last_user_interaction_time) < self._debounce_delay_sec {
+                        # Reschedule with fresh timer
+                        self.schedule_deep_check(file_path);
+                        return;
+                    }
+                    # Perform deep check (similar to BackgroundAnalysisProgram.startAnalysis path in Pyright)
+                    await self.launch_deep_check(file_path);
+                    self._last_deep_check_time[file_path] = time.time();
+                    self.lsp.send_request(lspt.WORKSPACE_SEMANTIC_TOKENS_REFRESH);
+                } except asyncio.CancelledError {
+                    ;  # Silently swallow cancellation
+                }
+        }
+
+        task = asyncio.create_task(_debounced_run());
+        self._pending_deep_checks[file_path] = task;
+    }
+
+    """Conditionally schedule deep check; skip trivial rapid edits (newline/whitespace) (Pyright analogy: early return in onDidChangeTextDocument when only whitespace)."""
+    def conditional_schedule_deep_check(
+        self: JacLangServer,
+        file_path: str,
+        is_trivial: bool
+    ) -> None {
+        if is_trivial {
+            last = self._last_deep_check_time.get(file_path, 0.0);
+            if (time.time() - last) < self._min_interval_for_trivial_sec {
+                return;  # Defer heavy work; quick check already updated diagnostics
+            }
+        }
+        self.schedule_deep_check(file_path);
     }
 
     """Return diagnostics for all files as a dict {uri: diagnostics}."""

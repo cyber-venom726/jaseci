@@ -45,19 +45,45 @@ async def did_change(
     ls: JacLangServer,
     params: lspt.DidChangeTextDocumentParams
 ) -> None {
+    # Inspired by Pyright's onDidChangeTextDocument (languageServerBase.ts) and scheduleReanalysis (service.ts)
     file_path = params.text_document.uri;
+    # Record interaction for debouncing (Pyright: recordUserInteractionTime)
+    ls.record_user_interaction_time();
+
+    # Fast syntax check (quick) to surface parse errors rapidly
     quick_check_passed = await ls.launch_quick_check(file_path);
 
+    # # Lightweight semantic token refresh using existing IR (avoid heavy typecheck churn)
+    # try {
+    #     document = ls.workspace.get_text_document(file_path);
+    #     lines = document.source.splitlines();
+    #     file_key = file_path.removeprefix('file://');
+    #     if file_key in ls.sem_managers  {
+    #         sem_manager = ls.sem_managers[file_key];
+    #         sem_manager.update_sem_tokens(params, sem_manager.sem_tokens, lines);
+    #         ls.lsp.send_request(lspt.WORKSPACE_SEMANTIC_TOKENS_REFRESH);
+    #     }
+    # } except Exception as e {
+    #     ls.log_warning(f"'Semantic token quick update failed: '{e}");
+    # }
+
+    # Schedule (debounced) deep check & final semantic token refresh only if quick check passed
     if quick_check_passed {
-        document = ls.workspace.get_text_document(file_path);
-        lines = document.source.splitlines();
-        sem_manager = ls.sem_managers[file_path.removeprefix('file://')];
-        sem_manager.update_sem_tokens(
-            params,sem_manager.sem_tokens,lines
-        );
-        ls.lsp.send_request(lspt.WORKSPACE_SEMANTIC_TOKENS_REFRESH);
-        await ls.launch_deep_check(file_path);
-        ls.lsp.send_request(lspt.WORKSPACE_SEMANTIC_TOKENS_REFRESH);
+        # Heuristic trivial edit detection (Pyright style: skip expensive work on purely whitespace changes)
+        is_trivial = False;
+        try {
+            if params.content_changes and len(params.content_changes) == 1 {
+                change = params.content_changes[0];
+                text = change.text;
+                # Treat as trivial if only newline(s) or whitespace
+                if text.strip() == '' and ('\n' in text or '\r' in text or text.isspace()) {
+                    is_trivial = True;
+                }
+            }
+        } except Exception as e {
+            ls.log_warning(f"'Trivial edit detection failed: '{e}");
+        }
+        ls.conditional_schedule_deep_check(file_path, is_trivial);
     }
 }
 
