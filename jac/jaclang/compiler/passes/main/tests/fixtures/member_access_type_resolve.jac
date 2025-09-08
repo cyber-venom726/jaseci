@@ -1,8 +1,8 @@
-node Bar {
+node Barrr {
   has baz: int;
 }
 node Foo {
-  has bar: Bar;
+  has bar: Barrr;
 }
 with entry {
   f: Foo = Foo();
