@@ -856,13 +856,35 @@ class JacParser(Transform[uni.Source, uni.Module]):
             # Otherwise, parse the traditional parameter list form
             else:
                 self.consume_token(Tok.LPAREN)
-                params = self.match(list)
+                all_params = self.match(list)
+                posonly_params =[]
+                params = []
+                varargs = []
+                kwonlyargs =[]
+                kw_defaults = []
+                kwargs = []
                 self.consume_token(Tok.RPAREN)
                 if self.match_token(Tok.RETURN_HINT):
                     return_spec = self.consume(uni.Expr)
+                print(len(all_params))
+                for p in all_params:
+                    if isinstance(p, uni.ParamVar):
+                        # print("param", p.name.value, p.unpack)
+                        if p.unpack and p.unpack.name == Tok.STAR_POW.name:
+                            kwargs.append(p)
+                            print("kwargs", p)
+                        elif p.unpack and p.unpack.name == Tok.STAR_MUL.name:
+                            # varargs.append(p)
+                            print("varargs", p)
+                        elif varargs or kwargs:
+                            # kwonlyargs.append(p)
+                            print("kwonlyargs", p)
+                    
+                    # print(p)
+                exit()
                 return uni.FuncSignature(
                     params=(
-                        self.extract_from_list(params, uni.ParamVar) if params else []
+                        self.extract_from_list(all_params, uni.ParamVar) if params else []
                     ),
                     return_type=return_spec,
                     posonly_params=[],
