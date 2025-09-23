@@ -56,8 +56,13 @@ class TypeCheckPass(UniPass):
             TypeCheckPass._EVALUATOR = TypeEvaluator(
                 builtins_module=TypeCheckPass._BUILTINS_MODULE,
                 program=self.prog,
+                callback=self._add_diagnostic,
             )
         return TypeCheckPass._EVALUATOR
+
+    def _add_diagnostic(self, node: uni.UniNode, message: str) -> None:
+        """Add a diagnostic message to the pass."""
+        self.log_error(message, node)
 
     # --------------------------------------------------------------------------
     # Internal helper functions
