@@ -39,15 +39,30 @@ export function clearEnvironmentCache(): void {
 
 /**
  * Checks for a 'jac' executable in a given virtual environment directory.
+ * Supports Windows (.exe, .bat, .cmd) and Unix-like systems.
  * @param venvPath The root path of the virtual environment.
  * @returns The full path to the 'jac' executable or null if not found.
  */
 async function getJacInVenv(venvPath: string): Promise<string | null> {
+    // Unix-like systems (Linux, macOS, WSL)
     const jacPathNix = path.join(venvPath, 'bin', JAC_EXECUTABLE_NIX);
-    if (await fileExists(jacPathNix)) return jacPathNix;
+    if (await fileExists(jacPathNix) && await isExecutable(jacPathNix)) {
+        return jacPathNix;
+    }
 
-    const jacPathWin = path.join(venvPath, 'Scripts', JAC_EXECUTABLE_WIN);
-    if (await fileExists(jacPathWin)) return jacPathWin;
+    // Windows systems - check multiple possible extensions
+    const windowsPaths = [
+        path.join(venvPath, 'Scripts', 'jac.exe'),
+        path.join(venvPath, 'Scripts', 'jac.bat'),
+        path.join(venvPath, 'Scripts', 'jac.cmd'),
+        path.join(venvPath, 'Scripts', 'jac'), // Sometimes no extension
+    ];
+
+    for (const winPath of windowsPaths) {
+        if (await fileExists(winPath)) {
+            return winPath;
+        }
+    }
 
     return null;
 }
@@ -90,13 +105,31 @@ async function walkForVenvs(baseDir: string, depth: number): Promise<string[]> {
 // --- Discovery Strategies ---
 
 async function findInPath(): Promise<string[]> {
-    const jacExe = process.platform === 'win32' ? JAC_EXECUTABLE_WIN : JAC_EXECUTABLE_NIX;
     const pathDirs = process.env.PATH?.split(path.delimiter) || [];
     const found = [];
+    
     for (const dir of pathDirs) {
-        const jacPath = path.join(dir, jacExe);
-        if (await fileExists(jacPath)) {
-            found.push(jacPath);
+        if (process.platform === 'win32') {
+            // Windows: check multiple extensions
+            const windowsExes = [
+                path.join(dir, 'jac.exe'),
+                path.join(dir, 'jac.bat'),
+                path.join(dir, 'jac.cmd'),
+                path.join(dir, 'jac') // Sometimes no extension
+            ];
+            
+            for (const exe of windowsExes) {
+                if (await fileExists(exe)) {
+                    found.push(exe);
+                    break; // Only add one per directory
+                }
+            }
+        } else {
+            // Unix-like systems
+            const jacPath = path.join(dir, JAC_EXECUTABLE_NIX);
+            if (await fileExists(jacPath) && await isExecutable(jacPath)) {
+                found.push(jacPath);
+            }
         }
     }
     return found;
@@ -205,10 +238,26 @@ export async function findPythonEnvsWithJac(workspaceRoot: string = process.cwd(
 
 // --- Utility Helpers ---
 
+/**
+ * Check if a file has execute permissions (Unix-like systems only)
+ */
+async function isExecutable(filePath: string): Promise<boolean> {
+    if (process.platform === 'win32') {
+        return true; // Windows doesn't have execute permissions in the same way
+    }
+    
+    try {
+        await fs.access(filePath, fs.constants.X_OK);
+        return true;
+    } catch {
+        return false;
+    }
+}
+
 async function fileExists(filePath: string): Promise<boolean> {
     try {
-        await fs.access(filePath, fs.constants.F_OK);
-        return true;
+        const stat = await fs.stat(filePath);
+        return stat.isFile();
     } catch {
         return false;
     }

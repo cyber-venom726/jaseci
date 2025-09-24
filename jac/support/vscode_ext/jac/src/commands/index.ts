@@ -51,4 +51,9 @@ export function registerAllCommands(context: vscode.ExtensionContext, envManager
             await config.update('developerMode', !currentMode, vscode.ConfigurationTarget.Global);
         })
     );
+    context.subscriptions.push(
+        vscode.commands.registerCommand(COMMANDS.ENTER_INTERPRETER_PATH, () => {
+            envManager.promptInterpreterPath();
+        })
+    );
 }
