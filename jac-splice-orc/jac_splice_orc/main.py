@@ -9,7 +9,8 @@ from fastapi.responses import ORJSONResponse
 
 from orjson import dumps, loads
 
-from .routers.deployment import Deployment, deployment, router
+from .routers import routers
+from .routers.deployment import Deployment, deployment
 from .utils import logger
 
 MODULES = getenv("MODULES", "{}")
@@ -56,4 +57,6 @@ async def lifespan(app: FastAPI) -> AsyncGenerator[None, FastAPI]:
 
 
 app = FastAPI(default_response_class=ORJSONResponse, lifespan=lifespan)
-app.include_router(router)
+
+for router in routers:
+    app.include_router(router)
