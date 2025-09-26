@@ -37,16 +37,34 @@ jobs:
           kubectl wait --for=condition=Available deployment/jac-reloader --timeout=60s
           kubectl wait --for=condition=Available deployment/jac-orc --timeout=60s
           kubectl port-forward service/jac-orc 8081:80 & sleep 5
-          curl --connect-timeout 1 http://127.0.0.1:8081/healthz
+          curl --fail http://127.0.0.1:8081/healthz
           lsof -t -i tcp:8081 | xargs -r kill
       - name: Deploy JacCloud
         run: |
           kubectl port-forward service/jac-orc 8081:80 & sleep 5
-          curl -X 'POST' 'http://127.0.0.1:8081/deployment' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"module":"jac-cloud","version":"latest","config":{}}'
+          curl --fail -X 'POST' 'http://127.0.0.1:8081/deployment' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"module":"jac-cloud","version":"latest","config":{}}'
           lsof -t -i tcp:8081 | xargs -r kill
       - name: Verify JacCloud
         run: |
           kubectl wait --for=condition=Available deployment/jac-cloud --timeout=120s
           kubectl port-forward service/jac-cloud 8082:80 & sleep 5
-          curl --connect-timeout 1 http://127.0.0.1:8082/healthz
+          curl --fail http://127.0.0.1:8082/healthz
+          curl --fail -X 'POST' 'http://127.0.0.1:8082/user/register' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"email":"user@email.com","password":"12345678"}'
+          curl --fail -X 'POST' 'http://127.0.0.1:8082/user/login' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"email":"user@email.com","password":"12345678"}'
+          lsof -t -i tcp:8082 | xargs -r kill
+      - name: Deploy MongoDB
+        run: |
+          kubectl port-forward service/jac-orc 8081:80 & sleep 5
+          curl --fail -X 'POST' 'http://127.0.0.1:8081/deployment' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"module":"mongodb","version":"latest","config":{}}'
+          curl --fail -X 'POST' 'http://127.0.0.1:8081/deployment' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"module":"jac-cloud","version":"latest","config":{"env-vars":{"DATABASE_HOST":"mongodb+srv://my-user:12345678@jac-mongodb-svc.default.svc.cluster.local/admin?replicaSet=jac-mongodb&ssl=false"}}}'
+          lsof -t -i tcp:8081 | xargs -r kill
+      - name: Verify JacCloud Connected to MongoDB
+        run: |
+          kubectl wait --for=condition=Available deployment/jac-cloud --timeout=120s
+          kubectl port-forward service/jac-cloud 8082:80 & sleep 5
+          curl --fail http://127.0.0.1:8082/healthz
+          curl --fail -X 'POST' 'http://127.0.0.1:8082/user/register' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"email":"user@email.com","password":"12345678"}'
+          curl --fail -X 'POST' 'http://127.0.0.1:8082/user/login' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"email":"user@email.com","password":"12345678"}'
+          # register again and should fail
+          curl --fail -s -o /dev/null -X 'POST' 'http://127.0.0.1:8082/user/register' -H 'accept: application/json' -H 'Content-Type: application/json' -d '{"email":"user@email.com","password":"12345678"}' && exit 1 || exit 0
           lsof -t -i tcp:8082 | xargs -r kill

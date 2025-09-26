@@ -170,7 +170,7 @@ class KubernetesService:
                     current = ""
                     _current = config.get(prefix, default)
                     for key, value in _current.items():
-                        current += f"{spaces}{key}: {value}\n"
+                        current += f"{spaces}{key}: {dumps(value).decode()}\n"
 
                     raw = raw.replace(placeholder[0], current)
                     parsed_config[prefix] = _current
@@ -231,7 +231,7 @@ class KubernetesService:
                     current = ""
                     _current = config.get(prefix, default)
                     for key, value in _current.items():
-                        current += f"{spaces}{key}: {value}\n"
+                        current += f"{spaces}{key}: {dumps(value).decode()}\n"
 
                     raw = raw.replace(placeholder[0], current)
                     placeholders[prefix] = {"current": _current, "default": default}
